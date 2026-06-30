@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ar-Rahmani — Luxury Extrait de Parfum. Handcrafted niche fragrances inspired by timeless elegance, exceptional ingredients, and unforgettable memories. Discover the art of perfumery.">
+  <meta name="keywords" content="luxury perfume, extrait de parfum, niche fragrance, oud, Arabian perfume, premium fragrance, handcrafted perfume">
+  <meta name="author" content="Ar-Rahmani Perfumes">
+  <meta name="theme-color" content="#050505">
+  <meta property="og:title" content="Ar-Rahmani — Luxury Extrait de Parfum">
+  <meta property="og:description" content="Handcrafted niche fragrances inspired by timeless elegance, exceptional ingredients, and unforgettable memories.">
+  <meta property="og:type" content="website">
+  <title>Ar-Rahmani — Luxury Extrait de Parfum | Crafted Beyond Fragrance</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/design-system.css?v=1.2">
+  <link rel="stylesheet" href="css/animations.css?v=1.2">
+  <link rel="stylesheet" href="css/components.css?v=1.2">
+  <link rel="stylesheet" href="css/sections.css?v=1.2">
+
+  <!-- Preconnect to Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+
+  <!-- Preload critical frames -->
+  <link rel="preload" as="image" href="assets/frames/frame_0001.webp">
+  <link rel="preload" as="image" href="assets/frames/frame_0002.webp">
+  <link rel="preload" as="image" href="assets/frames/frame_0003.webp">
+</head>
+<body>
+
+  <!-- ============================================================
+       CUSTOM CURSOR
+       ============================================================ -->
+  <div class="cursor-dot" id="cursor-dot"></div>
+  <div class="cursor-ring" id="cursor-ring"></div>
+
+  <!-- ============================================================
+       LOADING SCREEN
+       ============================================================ -->
+  <div class="loader" id="loader">
+    <div class="loader-logo">
+      <img src="assets/images/fulllogo.png" alt="Ar-Rahmani Perfumes" class="loader-logo-img">
+    </div>
+    <div class="loader-progress">
+      <div class="loader-progress-bar" id="loader-progress-bar"></div>
+    </div>
+    <div class="loader-tagline">Luxury Extrait de Parfum</div>
+  </div>
+
+  <!-- ============================================================
+       NAVIGATION
+       ============================================================ -->
+  <nav class="navbar" id="navbar">
+    <div class="navbar-inner">
+      <div class="navbar-links">
+        <a href="#about">About</a>
+        <a href="#craftsmanship">Craftsmanship</a>
+      </div>
+      <a href="#home" class="navbar-logo">
+        <img src="assets/images/logo.png" alt="Ar-Rahmani" class="navbar-logo-img">
+      </a>
+      <div class="navbar-links-right">
+        <a href="#journal">Journal</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Navigation -->
+  <div class="mobile-nav" id="mobile-nav">
+    <img src="assets/images/fulllogo.png" alt="Ar-Rahmani Perfumes" class="mobile-nav-logo">
+    <a href="#about">About</a>
+    <a href="#craftsmanship">Craftsmanship</a>
+    <a href="#journal">Journal</a>
+    <a href="#contact">Contact</a>
+  </div>
+
+  <!-- ============================================================
+       HERO SECTION (Scroll-Driven Image Sequence)
+       ============================================================ -->
+  <section class="hero" id="home">
+    <div class="hero-sticky">
+      <!-- Main canvas for frame sequence -->
+      <canvas class="hero-canvas" id="sequence-canvas"></canvas>
+
+      <!-- Atmospheric layers -->
+      <div class="hero-glow" id="hero-glow"></div>
+      <div class="hero-smoke-overlay"></div>
+      <canvas class="hero-particles-canvas" id="particles-canvas"></canvas>
+      <div class="hero-vignette"></div>
+
+      <!-- Story Overlay: INTRO (0%–10%) -->
+      <div class="hm-story hm-story--intro" id="story-intro">
+        <span class="hm-story__label">Extrait de Parfum</span>
+        <h1 class="hm-story__title">HAMOOD</h1>
+        <p class="hm-story__subtitle">Crafted Beyond Fragrance.</p>
+      </div>
+
+      <!-- Story Overlay: 01 (10%–25%) -->
+      <div class="hm-story hm-story--01" id="story-01">
+        <div class="hm-story__divider"></div>
+        <h2 class="hm-story__heading">Every Legend Begins<br>in Silence.</h2>
+        <p class="hm-story__body">Forged through light, shadow, and craftsmanship, HAMOOD is more than a fragrance — it is an expression of timeless luxury.</p>
+      </div>
+
+      <!-- Story Overlay: 02 (30%–50%) -->
+      <div class="hm-story hm-story--02" id="story-02">
+        <div class="hm-story__divider"></div>
+        <h2 class="hm-story__heading">Every Detail<br>Matters.</h2>
+        <p class="hm-story__body">From crystal-clear glass to the richness of its amber essence, every element is crafted with precision, elegance, and uncompromising quality.</p>
+      </div>
+
+      <!-- Story Overlay: 03 (55%–75%) -->
+      <div class="hm-story hm-story--03" id="story-03">
+        <div class="hm-story__divider"></div>
+        <h2 class="hm-story__heading">Luxury,<br>Perfected.</h2>
+        <p class="hm-story__body">A harmonious composition where citrus, oud, leather, amber, and musk unite to create an unforgettable signature.</p>
+      </div>
+
+      <!-- Story Overlay: 04 — FINAL (85%–100%) -->
+      <div class="hm-story hm-story--04" id="story-04">
+        <h2 class="hm-story__heading" style="color: #FFFFFF; font-weight: 300; margin-bottom: 0.5rem; letter-spacing: 0.3em; text-transform: uppercase;">AR-RAHMANI</h2>
+        <p class="hm-story__byline" style="color: #D4AF37; letter-spacing: 0.4em; font-size: var(--text-xs); text-transform: uppercase; margin-bottom: 0;">HAMOOD — EXTRAIT DE PARFUM</p>
+      </div>
+
+      <!-- Scroll Indicator -->
+      <div class="hm-scroll-indicator" id="scroll-indicator">
+        <span class="hm-scroll-indicator__text">Scroll</span>
+        <div class="hm-scroll-indicator__line"></div>
+      </div>
+
+      <!-- Bottom fade -->
+      <div class="hero-fade-bottom"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       BRAND STORY
+       ============================================================ -->
+  <section class="section story" id="about">
+    <div class="container">
+      <div class="story-grid">
+        <div class="story-image reveal-left">
+          <img src="assets/images/brand-story.png" alt="Ar-Rahmani perfume atelier">
+        </div>
+        <div class="story-text">
+          <span class="label reveal-up">Our Heritage</span>
+          <h2 class="heading-2 reveal-up">The Art of<br><span class="text-gold-gradient">Perfumery</span></h2>
+          <div class="divider reveal-up" style="margin-left:0;"></div>
+          <p class="reveal-up">
+            Born from a deep reverence for Middle Eastern fragrance traditions and refined through modern luxury craftsmanship, Ar-Rahmani represents the pinnacle of niche perfumery.
+          </p>
+          <p class="reveal-up">
+            Every creation is an ode to timeless elegance — meticulously composed with the world's rarest ingredients, from aged Indian oud to Bulgarian rose absolute, blended by master perfumers who understand that true luxury lies in the invisible.
+          </p>
+          <blockquote class="story-quote reveal-up">
+            "Every drop tells a story — of heritage, of craftsmanship, of moments that become eternal."
+          </blockquote>
+          <a href="#craftsmanship" class="btn reveal-up">
+            <span>Our Craftsmanship</span>
+            <span class="btn-arrow">→</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Second story block (reversed) -->
+      <div class="story-grid reverse" style="margin-top: var(--space-section);">
+        <div class="story-image reveal-right">
+          <img src="assets/images/lifestyle.png" alt="Luxury lifestyle">
+        </div>
+        <div class="story-text">
+          <span class="label reveal-up">Philosophy</span>
+          <h2 class="heading-2 reveal-up">Where Elegance<br><span class="text-gold-gradient">Meets Oud</span></h2>
+          <div class="divider reveal-up" style="margin-left:0;"></div>
+          <p class="reveal-up">
+            We believe fragrance is the most intimate form of luxury. It precedes you, accompanies you, and lingers after you leave — becoming part of your identity, your signature, your legacy.
+          </p>
+          <p class="reveal-up">
+            Each Ar-Rahmani creation is an Extrait de Parfum — the most concentrated and luxurious form of fragrance — ensuring unparalleled longevity and depth that unfolds like a story throughout the day.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       PREMIUM FEATURED PRODUCT SHOWCASE
+       ============================================================ -->
+  <section class="section showcase-section" id="showcase">
+    <div class="showcase-container">
+      <!-- Background glow & smoke -->
+      <div class="showcase-glow" id="showcase-glow"></div>
+      <div class="showcase-smoke"></div>
+      <div class="showcase-particles" id="showcase-particles"></div>
+
+      <!-- Left Column: Product Info -->
+      <div class="showcase-col-left">
+        <span class="showcase-label" id="showcase-label">EXTRAIT DE PARFUM</span>
+        <h2 class="showcase-title" id="showcase-title">HAMOOD</h2>
+        <h3 class="showcase-subtitle" id="showcase-subtitle">PARFUM</h3>
+        
+        <div class="showcase-divider"></div>
+        
+        <p class="showcase-desc" id="showcase-desc">
+          A rich and opulent fragrance that embodies strength, elegance and timeless Arabic heritage.
+        </p>
+
+        <div class="showcase-notes-section">
+          <h4 class="showcase-notes-title">NOTES</h4>
+          <div class="showcase-notes-grid">
+            <p><strong>Top:</strong> <span id="notes-top">Bergamot, Saffron, Cinnamon</span></p>
+            <p><strong>Heart:</strong> <span id="notes-heart">Oud, Rose, Patchouli</span></p>
+            <p><strong>Base:</strong> <span id="notes-base">Amber, Musk, Vanilla</span></p>
+          </div>
+        </div>
+
+        <div class="showcase-purchase">
+          <div class="showcase-price-container">
+            <span class="showcase-price" id="showcase-price">$180.00</span>
+            <span class="showcase-currency">USD</span>
+          </div>
+          <div class="showcase-actions">
+            <button class="btn btn-primary btn-add-bag">
+              <span>ADD TO BAG</span>
+            </button>
+            <button class="btn-wishlist" aria-label="Add to wishlist">
+              <svg viewBox="0 0 24 24" class="wishlist-icon">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center Column: Hero Bottle -->
+      <div class="showcase-col-center" id="showcase-col-center">
+        <div class="pedestal-container">
+          <div class="marble-pedestal"></div>
+        </div>
+        <div class="showcase-shadow" id="showcase-shadow"></div>
+        <div class="hero-bottle-wrapper" id="hero-bottle-wrapper">
+          <img src="assets/images/hamood.png" alt="HAMOOD" class="showcase-hero-bottle" id="showcase-hero-image" style="--hero-size: 85vh; transform: scale(2.2);">
+        </div>
+        <div class="showcase-reflection" id="showcase-reflection">
+          <img src="assets/images/hamood.png" alt="" id="showcase-reflection-image" style="--hero-size: 85vh; transform: scale(2.2);">
+        </div>
+      </div>
+
+      <!-- Left Preview Card -->
+      <div class="preview-card-trigger preview-card-left" id="preview-left" data-target="1">
+        <div class="preview-card-inner">
+          <div class="preview-card-image">
+            <img src="assets/images/paradise.png" alt="PARADISE" id="preview-left-image" style="--preview-size: 240px;">
+          </div>
+          <h4 class="preview-card-name" id="preview-left-name">PARADISE</h4>
+          <span class="preview-card-price" id="preview-left-price">$130.00</span>
+        </div>
+        <button class="arrow-trigger arrow-left" aria-label="Previous product">
+          <span>‹</span>
+        </button>
+      </div>
+
+      <!-- Right Preview Card -->
+      <div class="preview-card-trigger preview-card-right" id="preview-right" data-target="2">
+        <div class="preview-card-inner">
+          <div class="preview-card-image">
+            <img src="assets/images/sabr.png" alt="SABR" id="preview-right-image">
+          </div>
+          <h4 class="preview-card-name" id="preview-right-name">SABR</h4>
+          <span class="preview-card-price" id="preview-right-price">$150.00</span>
+        </div>
+        <button class="arrow-trigger arrow-right" aria-label="Next product">
+          <span>›</span>
+        </button>
+      </div>
+
+      <!-- Bottom Feature Bar -->
+      <div class="showcase-feature-bar">
+        <div class="showcase-feature-item">
+          <span class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"></path></svg>
+          </span>
+          <div class="feature-text">
+            <h5>EXTRAIT DE PARFUM</h5>
+            <p>35% Concentration</p>
+          </div>
+        </div>
+        <div class="showcase-feature-item">
+          <span class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
+          </span>
+          <div class="feature-text">
+            <h5>PREMIUM INGREDIENTS</h5>
+            <p>Sourced Globally</p>
+          </div>
+        </div>
+        <div class="showcase-feature-item">
+          <span class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </span>
+          <div class="feature-text">
+            <h5>LONG LASTING</h5>
+            <p>8+ Hours</p>
+          </div>
+        </div>
+        <div class="showcase-feature-item">
+          <span class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"></rect><path d="M12 8v13"></path><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"></path></svg>
+          </span>
+          <div class="feature-text">
+            <h5>LUXURY PACKAGING</h5>
+            <p>Perfect for Gifting</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CRAFTSMANSHIP
+       ============================================================ -->
+  <section class="section craftsmanship" id="craftsmanship">
+    <div class="container">
+      <div class="section-header">
+        <span class="label reveal-up">The Process</span>
+        <h2 class="heading-2 reveal-up">Crafted Beyond<br><span class="text-gold-gradient">Time</span></h2>
+        <div class="divider divider-wide reveal-up"></div>
+        <p class="subheading reveal-up">Every masterpiece follows a sacred journey from vision to vessel.</p>
+      </div>
+
+      <div class="craft-timeline">
+        <!-- Step 1 -->
+        <div class="craft-step">
+          <div class="craft-step-content reveal-right">
+            <div class="craft-step-number text-gold-gradient">01</div>
+            <h3 class="craft-step-title">The Vision</h3>
+            <p class="craft-step-text">Every fragrance begins as an emotion — a memory, a place, a feeling. Our master perfumers translate the invisible into olfactory poetry.</p>
+          </div>
+          <div class="craft-step-image reveal-left">
+            <img data-src="assets/images/brand-story.png" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="The Vision" loading="lazy">
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="craft-step">
+          <div class="craft-step-content reveal-left">
+            <div class="craft-step-number text-gold-gradient">02</div>
+            <h3 class="craft-step-title">The Ingredients</h3>
+            <p class="craft-step-text">We source only the world's rarest and finest materials — aged oud from Assam, Bulgarian rose, Yemeni frankincense, and Persian saffron.</p>
+          </div>
+          <div class="craft-step-image reveal-right">
+            <img data-src="assets/images/ingredients-showcase.png" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="The Ingredients" loading="lazy">
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="craft-step">
+          <div class="craft-step-content reveal-right">
+            <div class="craft-step-number text-gold-gradient">03</div>
+            <h3 class="craft-step-title">The Composition</h3>
+            <p class="craft-step-text">Hundreds of trials, endless patience. Each note is balanced to perfection — a symphony of top, heart, and base that evolves throughout the day.</p>
+          </div>
+          <div class="craft-step-image reveal-left">
+            <img data-src="assets/images/lifestyle.png" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="The Composition" loading="lazy">
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="craft-step">
+          <div class="craft-step-content reveal-left">
+            <div class="craft-step-number text-gold-gradient">04</div>
+            <h3 class="craft-step-title">The Vessel</h3>
+            <p class="craft-step-text">Housed in handcrafted crystal flacons with gold-plated accents, each bottle is a work of art — worthy of the liquid treasure within.</p>
+          </div>
+          <div class="craft-step-image reveal-right">
+            <img data-src="assets/images/luxury-packaging.png" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="The Vessel" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       INGREDIENT SHOWCASE
+       ============================================================ -->
+  <section class="section ingredients" id="journal">
+    <div class="container">
+      <div class="section-header">
+        <span class="label reveal-up">Precious Materials</span>
+        <h2 class="heading-2 reveal-up">Every Drop Tells<br><span class="text-gold-gradient">A Story</span></h2>
+        <div class="divider divider-wide reveal-up"></div>
+        <p class="subheading reveal-up">The world's rarest ingredients, handpicked for excellence.</p>
+      </div>
+
+      <div class="ingredients-grid" data-stagger>
+        <div class="ingredient-card reveal-scale">
+          <img data-src="assets/images/oud.png" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Oud" loading="lazy">
+          <div class="ingredient-card-overlay">
+            <h3 class="ingredient-card-name text-gold-gradient">Oud</h3>
+            <p class="ingredient-card-desc">The liquid gold of perfumery — aged agarwood from ancient forests, more precious than gold itself.</p>
+          </div>
+        </div>
+
+        <div class="ingredient-card reveal-scale">
+          <img data-src="assets/images/rose.png" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Rose" loading="lazy">
+          <div class="ingredient-card-overlay">
+            <h3 class="ingredient-card-name text-gold-gradient">Rose</h3>
+            <p class="ingredient-card-desc">Hand-picked Damascus rose petals, harvested at dawn for the purest essence of romance.</p>
+          </div>
+        </div>
+
+        <div class="ingredient-card reveal-scale">
+          <img data-src="assets/images/amber.png" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Amber" loading="lazy">
+          <div class="ingredient-card-overlay">
+            <h3 class="ingredient-card-name text-gold-gradient">Amber</h3>
+            <p class="ingredient-card-desc">Warm, sensual amber resin — liquid sunlight trapped in stone over millennia.</p>
+          </div>
+        </div>
+
+        <div class="ingredient-card reveal-scale">
+          <img data-src="assets/images/saffron.png" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Saffron" loading="lazy">
+          <div class="ingredient-card-overlay">
+            <h3 class="ingredient-card-name text-gold-gradient">Saffron</h3>
+            <p class="ingredient-card-desc">Crimson threads of Persian saffron — each strand a testament to patience and rarity.</p>
+          </div>
+        </div>
+
+        <div class="ingredient-card reveal-scale">
+          <img data-src="assets/images/ingredients-showcase.png" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Leather" loading="lazy">
+          <div class="ingredient-card-overlay">
+            <h3 class="ingredient-card-name text-gold-gradient">Leather</h3>
+            <p class="ingredient-card-desc">Supple, smoky leather accord — evoking ancient libraries and aristocratic refinement.</p>
+          </div>
+        </div>
+
+        <div class="ingredient-card reveal-scale">
+          <img data-src="assets/images/hero-bottle.png" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Vanilla" loading="lazy">
+          <div class="ingredient-card-overlay">
+            <h3 class="ingredient-card-name text-gold-gradient">Vanilla</h3>
+            <p class="ingredient-card-desc">Madagascar vanilla absolute — rich, creamy, and intoxicatingly warm.</p>
+          </div>
+        </div>
+
+        <div class="ingredient-card reveal-scale">
+          <img data-src="assets/images/collection-3.png" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Vetiver" loading="lazy">
+          <div class="ingredient-card-overlay">
+            <h3 class="ingredient-card-name text-gold-gradient">Vetiver</h3>
+            <p class="ingredient-card-desc">Earthy, grounding vetiver roots from Haiti — the foundation of timeless compositions.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       WHY CHOOSE US
+       ============================================================ -->
+  <section class="section why-us">
+    <div class="container">
+      <div class="section-header">
+        <span class="label reveal-up">Why Ar-Rahmani</span>
+        <h2 class="heading-2 reveal-up">The <span class="text-gold-gradient">Promise</span></h2>
+        <div class="divider divider-wide reveal-up"></div>
+      </div>
+
+      <div class="why-us-grid" data-stagger>
+        <div class="feature-card reveal-up">
+          <span class="feature-card-icon">✦</span>
+          <h3 class="feature-card-title">Extrait de Parfum</h3>
+          <p class="feature-card-text">The highest concentration of fragrance oils for unmatched depth, complexity, and character.</p>
+        </div>
+        <div class="feature-card reveal-up">
+          <span class="feature-card-icon">◈</span>
+          <h3 class="feature-card-title">Long Lasting</h3>
+          <p class="feature-card-text">Engineered to last 12+ hours, our compositions unfold beautifully from morning to midnight.</p>
+        </div>
+        <div class="feature-card reveal-up">
+          <span class="feature-card-icon">❖</span>
+          <h3 class="feature-card-title">Luxury Ingredients</h3>
+          <p class="feature-card-text">Sourced from the world's most prestigious ingredient houses — no compromises, no shortcuts.</p>
+        </div>
+        <div class="feature-card reveal-up">
+          <span class="feature-card-icon">⬡</span>
+          <h3 class="feature-card-title">Premium Packaging</h3>
+          <p class="feature-card-text">Handcrafted crystal flacons, velvet-lined boxes, and gold-foil details worthy of royalty.</p>
+        </div>
+        <div class="feature-card reveal-up">
+          <span class="feature-card-icon">◇</span>
+          <h3 class="feature-card-title">Handcrafted</h3>
+          <p class="feature-card-text">Each batch is personally overseen by our master perfumer — artisanal quality at every step.</p>
+        </div>
+        <div class="feature-card reveal-up">
+          <span class="feature-card-icon">⊹</span>
+          <h3 class="feature-card-title">Unisex Collection</h3>
+          <p class="feature-card-text">Luxury knows no boundaries — our fragrances transcend gender for universal elegance.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="footer" id="contact">
+    <div class="container">
+      <!-- Newsletter -->
+      <div class="footer-newsletter reveal-up">
+        <h3 class="heading-4">Enter the World of <span class="text-gold-gradient">Ar-Rahmani</span></h3>
+        <p class="subheading">Subscribe for exclusive previews, limited editions, and the art of luxury fragrance.</p>
+        <form class="newsletter-form" id="newsletter-form">
+          <input type="email" class="newsletter-input" placeholder="Your email address" required aria-label="Email address">
+          <button type="submit" class="btn btn-primary">
+            <span>Subscribe</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Footer Grid -->
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="#home" class="footer-logo">
+            <img src="assets/images/fulllogo.png" alt="Ar-Rahmani Perfumes" class="footer-logo-img">
+          </a>
+          <p>Luxury Extrait de Parfum. Handcrafted niche fragrances inspired by timeless elegance, exceptional ingredients, and unforgettable memories.</p>
+          <div class="footer-social">
+            <a href="#" aria-label="Instagram">✦</a>
+            <a href="#" aria-label="Facebook">◈</a>
+            <a href="#" aria-label="Twitter">❖</a>
+            <a href="#" aria-label="TikTok">⊹</a>
+          </div>
+        </div>
+
+        <div>
+          <h5 class="footer-heading">Maison</h5>
+          <div class="footer-links">
+            <a href="#about">Our Story</a>
+            <a href="#craftsmanship">Craftsmanship</a>
+            <a href="#journal">Ingredients</a>
+          </div>
+        </div>
+
+        <div>
+          <h5 class="footer-heading">Connect</h5>
+          <div class="footer-links">
+            <a href="#">Customer Care</a>
+            <a href="#">Store Locator</a>
+            <a href="#">Wholesale</a>
+            <a href="#">Press & Media</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Bar -->
+      <div class="footer-bottom">
+        <p>© 2026 Ar-Rahmani Perfumes. All rights reserved.</p>
+        <p>Crafted with ♦ for the connoisseur.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       SCRIPTS
+       ============================================================ -->
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <!-- Lenis Smooth Scroll -->
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+
+  <script src="js/loader.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/cursor.js"></script>
+
+  <!-- HAMOOD Scroll & Atmosphere Modules -->
+  <script src="js/hamood-atmosphere.js"></script>
+  <script src="js/hamood-scroll.js"></script>
+
+  <!-- Premium Featured Product Showcase -->
+  <script src="js/featured-showcase.js"></script>
+
+  <script src="js/animations.js"></script>
+  <script src="js/fragrance-finder.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
