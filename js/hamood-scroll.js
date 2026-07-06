@@ -75,67 +75,65 @@ const HamoodScroll = {
      FRAME PRELOADING
      ---------------------------------------------------------- */
   preloadFrames() {
-    // Preload in priority batches
-    const batchSizes = [10, 50, 126];
     let loaded = 0;
     const self = this;
-
+    
+    // Initialize frames array
     for (let i = 0; i < this.totalFrames; i++) {
+      this.frames[i] = null;
+    }
+
+    const loadFrame = (i, callback) => {
+      if (i >= this.totalFrames) return;
       const img = new Image();
       const frameNum = String(i + 1).padStart(4, '0');
-      img.src = `assets/frames/frame_${frameNum}.webp`;
-
-      img.onload = function () {
-        // Asynchronously decode the image to prevent main thread blocking on render
-        if (typeof img.decode === 'function') {
-          img.decode().then(() => {
-            loaded++;
-            self.imagesLoaded = loaded;
-
-            if (i === 0 && self.currentFrame < 0) {
-              self.currentFrame = 0;
-              self.renderFrame(0);
-            }
-
-            if (loaded >= batchSizes[0] && !self.isReady) {
-              self.onReady();
-            }
-          }).catch(() => {
-            // Fallback if decoding is aborted or fails
-            loaded++;
-            self.imagesLoaded = loaded;
-
-            if (i === 0 && self.currentFrame < 0) {
-              self.currentFrame = 0;
-              self.renderFrame(0);
-            }
-
-            if (loaded >= batchSizes[0] && !self.isReady) {
-              self.onReady();
-            }
-          });
-        } else {
-          // Fallback for browsers without img.decode support
-          loaded++;
-          self.imagesLoaded = loaded;
-
-          if (i === 0 && self.currentFrame < 0) {
-            self.currentFrame = 0;
-            self.renderFrame(0);
-          }
-
-          if (loaded >= batchSizes[0] && !self.isReady) {
-            self.onReady();
-          }
-        }
-      };
-
-      img.onerror = function () {
+      
+      const onloadOrError = () => {
         loaded++;
         self.imagesLoaded = loaded;
+        
+        if (i === 0 && self.currentFrame < 0) {
+          self.currentFrame = 0;
+          self.renderFrame(0);
+        }
+        
+        if (loaded >= 10 && !self.isReady) {
+          self.onReady();
+        }
+        
+        if (callback) callback();
       };
-
+      
+      img.onload = () => {
+        if (typeof img.decode === 'function') {
+          img.decode().then(onloadOrError).catch(onloadOrError);
+        } else {
+          onloadOrError();
+        }
+      };
+      
+      img.onerror = onloadOrError;
+      
       this.frames[i] = img;
+      img.src = `assets/frames/frame_${frameNum}.webp`;
+    };
+    
+    // Queue configuration for optimal performance
+    // Concurrency of 5 prevents network starvation for other lazy-loaded images
+    const concurrency = 5;
+    let nextToLoad = 0;
+    
+    const loadNext = () => {
+      if (nextToLoad < this.totalFrames) {
+        const idx = nextToLoad++;
+        loadFrame(idx, loadNext);
+      }
+    };
+
+    // Start concurrent workers
+    for (let i = 0; i < Math.min(concurrency, this.totalFrames); i++) {
+      const idx = nextToLoad++;
+      loadFrame(idx, loadNext);
     }
   },
 
@@ -214,12 +212,12 @@ const HamoodScroll = {
      RENDER FRAME TO CANVAS
      ---------------------------------------------------------- */
   renderFrame(index) {
-    if (!this.ctx || !this.frames[index]) return;
-
+    if (!this.ctx) return;
     const img = this.frames[index];
-    if (!img.complete || img.naturalWidth === 0) {
+
+    if (!img || !img.complete || img.naturalWidth === 0) {
       // Frame not loaded yet — find nearest loaded frame
-      for (let offset = 1; offset < 10; offset++) {
+      for (let offset = 1; offset < 30; offset++) {
         const prev = this.frames[index - offset];
         if (prev && prev.complete && prev.naturalWidth > 0) {
           this.drawCover(prev);

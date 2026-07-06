@@ -33,8 +33,11 @@ const Loader = {
       }, delay);
     });
 
-    // Final step once window is loaded
-    window.addEventListener('load', () => {
+    // Final step once window is loaded or timeout
+    let loaded = false;
+    const finishLoader = () => {
+      if (loaded) return;
+      loaded = true;
       const elapsed = Date.now() - this.startTime;
       const remaining = Math.max(0, this.minDisplayTime - elapsed);
 
@@ -42,7 +45,11 @@ const Loader = {
         this.setProgress(100);
         setTimeout(() => this.hide(), 300);
       }, remaining);
-    });
+    };
+
+    window.addEventListener('load', finishLoader);
+    // Fallback: if load takes more than 2.5 seconds, dismiss the loader
+    setTimeout(finishLoader, 2500);
   },
 
   setProgress(value) {
