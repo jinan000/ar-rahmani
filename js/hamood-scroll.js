@@ -7,7 +7,7 @@
 const HamoodScroll = {
   // Image sequence state
   frames: [],
-  totalFrames: 256,
+  totalFrames: 240,
   currentFrame: -1,
   canvas: null,
   ctx: null,
