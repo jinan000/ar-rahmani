@@ -176,10 +176,10 @@ const FeaturedShowcase = {
         const parallaxRotX = -this.mouseY * 4;
         
         // 3. Apply Transforms to Hero Bottle and Reflection
-        const baseScale = FeaturedShowcase.activeId === 2 ? 1 : 2.2; // Sabr is 1x, Hamood/Paradise are 2.2x to compensate for padding
+        const baseScale = FeaturedShowcase.activeId === 2 ? 1 : 2.2;
         const finalScale = baseScale * breatheScale;
         
-        const offsetX = FeaturedShowcase.activeId === 2 ? 35 : 0; // Sabr image padding offset
+        const offsetX = 0;
         const transformString = `translate3d(${offsetX}px, ${breatheY}px, 0) rotateX(${parallaxRotX}deg) rotateY(${parallaxRotY}deg) rotateZ(${breatheRot}deg) scale3d(${finalScale}, ${finalScale}, 1)`;
         
         if (heroImage) heroImage.style.transform = transformString;
@@ -267,7 +267,7 @@ const FeaturedShowcase = {
     // Scale factors and Offsets
     const currentScale = this.activeId === 2 ? 1 : 2.2;
     const targetScale = targetId === 2 ? 1 : 2.2;
-    const targetOffsetX = targetId === 2 ? 35 : 0;
+    const targetOffsetX = 0;
 
     // ==========================================
     // PHASE 1: EXIT CURRENT PRODUCT
@@ -325,7 +325,6 @@ const FeaturedShowcase = {
       
       price.textContent = nextProduct.price;
 
-      // Update images
       if (heroImage) {
         heroImage.src = nextProduct.image;
         heroImage.alt = nextProduct.name;
@@ -390,17 +389,8 @@ const FeaturedShowcase = {
     if (!leftCard || !rightCard) return;
 
     let leftIndex, rightIndex;
-
-    if (this.activeId === 0) {
-      leftIndex = 1; // Paradise
-      rightIndex = 2; // Sabr
-    } else if (this.activeId === 1) {
-      leftIndex = 2; // Sabr
-      rightIndex = 0; // Hamood
-    } else {
-      leftIndex = 0; // Hamood
-      rightIndex = 1; // Paradise
-    }
+    leftIndex = this.activeId === 0 ? this.products.length - 1 : this.activeId - 1;
+    rightIndex = this.activeId === this.products.length - 1 ? 0 : this.activeId + 1;
 
     const leftProduct = this.products[leftIndex];
     const rightProduct = this.products[rightIndex];

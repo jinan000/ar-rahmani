@@ -7,7 +7,7 @@ const Loader = {
   el: null,
   progressBar: null,
   progress: 0,
-  minDisplayTime: 2200,
+  minDisplayTime: 500,
   startTime: 0,
 
   init() {
@@ -22,11 +22,9 @@ const Loader = {
 
   simulateProgress() {
     const steps = [
-      { target: 25, delay: 200 },
-      { target: 50, delay: 500 },
-      { target: 70, delay: 800 },
-      { target: 85, delay: 1200 },
-      { target: 95, delay: 1600 },
+      { target: 40, delay: 100 },
+      { target: 80, delay: 250 },
+      { target: 95, delay: 400 },
     ];
 
     steps.forEach(({ target, delay }) => {

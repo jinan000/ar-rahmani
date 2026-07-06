@@ -429,17 +429,11 @@
 .story-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
 }
 
-.story-image::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border: var(--border-gold);
-  border-radius: var(--radius-lg);
-  pointer-events: none;
-}
+
 
 .story-text {
   padding: var(--space-6) 0;
@@ -576,108 +570,298 @@
 /* ============================================================
    CRAFTSMANSHIP SECTION
    ============================================================ */
+/* ============================================================
+   CRAFTSMANSHIP SECTION (Horizontal Scroll Story)
+   ============================================================ */
 .craftsmanship {
   background: var(--color-bg-secondary);
-  overflow: hidden;
   position: relative;
+  /* GSAP ScrollTrigger will pin the wrapper and add the required padding/height */
 }
 
-.craftsmanship::before {
-  content: '';
+.craft-pin-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--color-bg-secondary);
+  display: flex;
+  align-items: center;
+}
+
+/* Cinematic Background Layers */
+.craft-bg-layer {
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 140%;
+  height: 140%;
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform;
+}
+
+.craft-bg-layer.smoke {
+  background: radial-gradient(circle at center, rgba(30, 25, 15, 0.2) 0%, transparent 70%);
+  filter: blur(40px);
+}
+
+.craft-bg-layer.light {
+  background: radial-gradient(ellipse at 30% 50%, rgba(212, 175, 55, 0.08) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 50%, rgba(212, 175, 55, 0.05) 0%, transparent 50%);
+  filter: blur(60px);
+}
+
+.craft-bg-layer.dust {
+  background-image: radial-gradient(rgba(212, 175, 55, 0.4) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.15;
+}
+
+/* Header */
+.craft-header-container {
+  width: 100vw;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  z-index: 10;
+}
+
+/* Scroll Container */
+.craft-scroll-container {
+  display: flex;
+  align-items: center;
+  height: 100vh;
+  width: max-content;
+  /* Adjust padding so scroll ends when the last step (which has 32vw width) is centered */
+  padding-right: calc(50vw - 16vw);
+  position: relative;
+  z-index: 5;
+  will-change: transform;
+}
+
+/* Horizontal Timeline */
+.craft-timeline-horizontal {
+  position: absolute;
+  top: 55%; /* Moved down slightly to perfectly balance visual mass */
+  left: 100vw; 
+  width: calc(100% - 100vw);
+  height: 2px;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.craft-timeline-line {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--color-gold-border), transparent);
+  width: calc(100% - 50vw);
+  height: 100%;
+  background: rgba(212, 175, 55, 0.15);
 }
 
-.craft-timeline {
-  position: relative;
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.craft-timeline::before {
-  content: '';
+.craft-timeline-progress {
   position: absolute;
-  left: 50%;
   top: 0;
-  bottom: 0;
-  width: 1px;
-  background: var(--color-gold-border);
-  transform: translateX(-50%);
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: var(--color-gold);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+  will-change: width;
 }
 
-.craft-step {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-12);
-  align-items: center;
-  margin-bottom: var(--space-13);
-  position: relative;
-}
-
-.craft-step::before {
-  content: '';
+/* Markers (Now positioned inside each step) */
+.craft-step > .craft-marker {
   position: absolute;
+  top: 55%;
   left: 50%;
-  top: 50%;
-  width: 12px;
-  height: 12px;
-  background: var(--color-bg-primary);
-  border: 2px solid var(--color-gold);
-  border-radius: 50%;
   transform: translate(-50%, -50%);
-  z-index: 2;
-  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
 }
 
+.craft-marker-inner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--color-gold);
+  background: transparent;
+  transition: all 0.5s var(--ease-luxury);
+  box-shadow: 0 0 0 rgba(212, 175, 55, 0);
+}
+
+.craft-marker.active .craft-marker-inner {
+  background: var(--color-gold);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.8);
+  animation: markerPulse 1s var(--ease-luxury) forwards;
+}
+
+@keyframes markerPulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
+  50% { transform: scale(1.3); box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 15px rgba(212, 175, 55, 0.6); }
+}
+
+/* Steps Row */
+.craft-steps-row {
+  display: flex;
+  padding-left: 10vw; 
+  gap: 10vw; 
+  align-items: center;
+  height: 100vh;
+  position: relative;
+  z-index: 10;
+}
+
+/* Base Step (Perfectly Centered Container) */
+.craft-step {
+  position: relative;
+  width: 32vw;
+  min-width: 380px;
+  max-width: 480px;
+  height: 100vh;
+  text-align: center;
+}
+
+/* Top Anchored (Image) */
+.craft-step-top {
+  position: absolute;
+  bottom: calc(45% + 60px); /* 45% from bottom = 55% from top. Plus 60px connector gap. */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* Bottom Anchored (Text) */
+.craft-step-bottom {
+  position: absolute;
+  top: calc(55% + 40px); /* Just below the 55% timeline */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Vertical Gold Connector */
+.craft-connector {
+  position: absolute;
+  bottom: 45%; /* Starts exactly at the 55% timeline */
+  left: 50%;
+  width: 1px;
+  height: 60px; /* Shorter connector keeps visual mass compact */
+  background: var(--color-gold);
+  transform: translateX(-50%) scaleY(0);
+  transform-origin: bottom; 
+  z-index: 1;
+}
+
+/* Content Typography & Alignment */
 .craft-step-number {
   font-family: var(--font-heading);
-  font-size: var(--text-5xl);
-  font-weight: var(--weight-light);
-  color: var(--color-gold-border);
-  margin-bottom: var(--space-4);
+  font-size: clamp(4rem, 8vw, 6rem); /* Reduced size per request */
+  font-weight: 300;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(212, 175, 55, 0.15);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* Removed transform here, letting GSAP fully control it to prevent misalignment */
+  z-index: -1;
+  opacity: 0;
 }
 
 .craft-step-title {
   font-family: var(--font-heading);
-  font-size: var(--text-2xl);
+  font-size: clamp(2rem, 3vw, 2.5rem);
   font-weight: var(--weight-regular);
   color: var(--color-text-primary);
-  margin-bottom: var(--space-4);
+  margin: 0;
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+.craft-divider {
+  width: 0%;
+  height: 1px;
+  background: var(--gradient-gold);
+  margin: var(--space-4) 0;
+  opacity: 0.5;
 }
 
 .craft-step-text {
-  font-size: var(--text-base);
+  font-size: var(--text-md);
   color: var(--color-text-muted);
   line-height: var(--leading-relaxed);
+  margin: 0;
+  opacity: 0;
+  transform: translateY(40px);
 }
 
-.craft-step-image {
+.craft-step-image-container {
+  position: relative;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  aspect-ratio: 4 / 3;
-}
-
-.craft-step-image img {
   width: 100%;
-  height: 100%;
+  height: 40vh;
+  max-height: 360px;
   object-fit: cover;
 }
 
-.craft-step:nth-child(even) .craft-step-content {
-  order: 2;
-  text-align: left;
+.craft-image-wrapper {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(0 0, 0 0, -25% 100%, -25% 100%);
+  -webkit-clip-path: polygon(0 0, 0 0, -25% 100%, -25% 100%);
 }
 
-.craft-step:nth-child(even) .craft-step-image {
-  order: 1;
+.craft-bottle-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
+  opacity: 0;
+  transform: scale(0.9) translateY(40px); /* Reduced float distance */
+  filter: blur(14px);
+  will-change: transform, filter, opacity;
 }
 
-.craft-step:nth-child(odd) .craft-step-content {
-  text-align: right;
+/* Legacy media query fixes */
+@media (max-width: 1024px) {
+  .craft-step {
+    width: 75vw;
+  }
+}
+@media (max-width: 768px) {
+  .craft-step {
+    width: 85vw;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+  .craft-step:nth-child(even) .craft-step-content,
+  .craft-step:nth-child(even) .craft-step-image-container {
+    order: initial;
+    text-align: left;
+  }
+  .craft-step:nth-child(even) .craft-divider {
+    margin-left: 0;
+    margin-right: auto;
+  }
+  .craft-header-container {
+    top: 10vh;
+  }
 }
 
 /* ============================================================
@@ -728,13 +912,13 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   aspect-ratio: 16 / 10;
-  border: var(--border-gold);
 }
 
 .signature-card img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: var(--radius-lg);
   transition: transform var(--duration-slowest) var(--ease-luxury);
 }
 
@@ -922,7 +1106,7 @@
 }
 
 .footer-logo-img {
-  height: 45px;
+  height: 85px;
   width: auto;
   filter: invert(1) sepia(1) saturate(3) hue-rotate(10deg) brightness(0.85);
   transition: filter var(--duration-normal) var(--ease-luxury);
@@ -984,6 +1168,13 @@
   border-color: var(--color-gold-border-hover);
   color: var(--color-gold);
   box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
+}
+
+.footer-social a svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  transition: all var(--duration-normal) var(--ease-luxury);
 }
 
 .footer-bottom {
@@ -1772,3 +1963,111 @@
     justify-content: center;
   }
 }
+
+
+/* ==========================================================================
+   GALLERY FLASHLIGHT
+   ========================================================================== */
+.gallery-flashlight {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%); /* Full width bleed out of container */
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000000;
+  cursor: none;
+  margin-top: var(--space-section);
+}
+
+.gf-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  width: 100%;
+  max-width: 72rem; /* max-w-6xl */
+  padding: 0 1rem;
+}
+
+.gf-bg-grid {
+  position: absolute;
+  opacity: 0.1;
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.gf-fg-grid {
+  position: relative;
+  z-index: 10;
+  -webkit-mask-image: radial-gradient(300px circle at 0px 0px, black 100%, transparent 100%);
+  mask-image: radial-gradient(300px circle at 0px 0px, black 100%, transparent 100%);
+}
+
+.gf-item {
+  aspect-ratio: 1 / 1;
+  background-color: #262626;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.gf-bg-grid .gf-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(100%);
+}
+
+.gf-fg-grid .gf-item {
+  background-color: #171717;
+}
+
+.gf-fg-grid .gf-item:hover {
+  transform: scale(0.95);
+}
+
+.gf-fg-grid .gf-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gf-item-border {
+  position: absolute;
+  inset: 0;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+}
+
+.gf-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 2px solid white;
+  mix-blend-mode: difference;
+  pointer-events: none;
+  z-index: 50;
+  transform: translate(-50%, -50%);
+  display: none;
+}
+
+.gallery-flashlight:hover .gf-cursor {
+  display: block;
+}
+
+.gf-hint {
+  position: absolute;
+  bottom: 2rem;
+  color: #737373;
+  font-family: monospace;
+  font-size: 0.875rem;
+  letter-spacing: 0.1em;
+  pointer-events: none;
+}
+

@@ -5,13 +5,10 @@
 
 const Cursor = {
   dot: null,
-  ring: null,
   mouseX: 0,
   mouseY: 0,
   dotX: 0,
   dotY: 0,
-  ringX: 0,
-  ringY: 0,
   isHovering: false,
   isTouch: false,
   magneticElements: [],
@@ -24,10 +21,16 @@ const Cursor = {
     }
 
     this.dot = document.getElementById('cursor-dot');
-    this.ring = document.getElementById('cursor-ring');
-    if (!this.dot || !this.ring) return;
+    if (!this.dot) return;
 
     document.addEventListener('mousemove', (e) => this.onMouseMove(e));
+    document.addEventListener('mousedown', () => {
+      if (this.dot) this.dot.classList.add('clicking');
+    });
+    document.addEventListener('mouseup', () => {
+      if (this.dot) this.dot.classList.remove('clicking');
+    });
+    
     this.setupHoverTargets();
     this.setupMagneticButtons();
     this.animate();
@@ -47,12 +50,10 @@ const Cursor = {
       el.addEventListener('mouseenter', () => {
         this.isHovering = true;
         if (this.dot) this.dot.classList.add('hovering');
-        if (this.ring) this.ring.classList.add('hovering');
       });
       el.addEventListener('mouseleave', () => {
         this.isHovering = false;
         if (this.dot) this.dot.classList.remove('hovering');
-        if (this.ring) this.ring.classList.remove('hovering');
       });
     });
   },
@@ -77,23 +78,15 @@ const Cursor = {
   animate() {
     if (this.isTouch) return;
 
-    // Smooth follow — dot is faster, ring is slower
+    // Smooth follow
     const dotSpeed = 0.15;
-    const ringSpeed = 0.08;
 
     this.dotX += (this.mouseX - this.dotX) * dotSpeed;
     this.dotY += (this.mouseY - this.dotY) * dotSpeed;
-    this.ringX += (this.mouseX - this.ringX) * ringSpeed;
-    this.ringY += (this.mouseY - this.ringY) * ringSpeed;
 
     if (this.dot) {
-      this.dot.style.left = `${this.dotX - 3}px`;
-      this.dot.style.top = `${this.dotY - 3}px`;
-    }
-
-    if (this.ring) {
-      this.ring.style.left = `${this.ringX - 18}px`;
-      this.ring.style.top = `${this.ringY - 18}px`;
+      this.dot.style.left = `${this.dotX}px`;
+      this.dot.style.top = `${this.dotY}px`;
     }
 
     requestAnimationFrame(() => this.animate());

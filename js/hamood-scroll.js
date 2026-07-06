@@ -76,7 +76,7 @@ const HamoodScroll = {
      ---------------------------------------------------------- */
   preloadFrames() {
     // Preload in priority batches
-    const batchSizes = [40, 90, 126];
+    const batchSizes = [10, 50, 126];
     let loaded = 0;
     const self = this;
 
@@ -148,9 +148,6 @@ const HamoodScroll = {
 
     // Small delay for premium feel
     setTimeout(() => {
-      // Initialize Lenis smooth scroll
-      this.initLenis();
-
       // Initialize GSAP ScrollTrigger
       this.initScrollTrigger();
 
@@ -172,31 +169,6 @@ const HamoodScroll = {
         if (glow) glow.classList.add('active');
       }, 800);
     }, 600);
-  },
-
-  /* ----------------------------------------------------------
-     LENIS SMOOTH SCROLL
-     ---------------------------------------------------------- */
-  initLenis() {
-    try {
-      this.lenis = new Lenis({
-        duration: 1.4,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        orientation: 'vertical',
-        smoothWheel: true,
-      });
-
-      // Connect Lenis to GSAP ScrollTrigger
-      this.lenis.on('scroll', ScrollTrigger.update);
-
-      gsap.ticker.add((time) => {
-        this.lenis.raf(time * 1000);
-      });
-
-      gsap.ticker.lagSmoothing(0);
-    } catch (e) {
-      console.warn('Lenis not loaded, using native scroll.');
-    }
   },
 
   /* ----------------------------------------------------------

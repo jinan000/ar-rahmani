@@ -20,6 +20,8 @@ const App = {
     Cursor.init();
     FragranceFinder.init();
 
+    this.initLenis();
+
     this.setupLazyLoading();
     this.setupMobileMenu();
     this.setupNewsletterForm();
@@ -27,6 +29,33 @@ const App = {
     // Prefers reduced motion
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       Particles.destroy();
+      if (this.lenis) this.lenis.destroy();
+    }
+  },
+
+  /* ----------------------------------------------------------
+     LENIS SMOOTH SCROLL
+     ---------------------------------------------------------- */
+  initLenis() {
+    try {
+      this.lenis = new Lenis({
+        duration: 1.8, // Increased duration for super smooth premium feel
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        orientation: 'vertical',
+        smoothWheel: true,
+        wheelMultiplier: 1.2,
+      });
+
+      // Connect Lenis to GSAP ScrollTrigger
+      this.lenis.on('scroll', ScrollTrigger.update);
+
+      gsap.ticker.add((time) => {
+        this.lenis.raf(time * 1000);
+      });
+
+      gsap.ticker.lagSmoothing(0);
+    } catch (e) {
+      console.warn('Lenis not loaded, using native scroll.');
     }
   },
 
