@@ -14,6 +14,9 @@ const FeaturedShowcase = {
       desc: "A rich and opulent fragrance that embodies strength, elegance and timeless Arabic heritage.",
       price: "$180.00",
       image: "assets/images/hamood.png",
+      scale: 2.2,
+      heroSize: "85vh",
+      previewSize: "240px",
       glowColor: "rgba(212, 175, 55, 0.08)",
       notes: {
         top: "Bergamot, Saffron, Cinnamon",
@@ -28,7 +31,10 @@ const FeaturedShowcase = {
       label: "EXTRAIT DE PARFUM",
       desc: "A paradise of tropical fruits, white flowers, and silky musk.",
       price: "$130.00",
-      image: "assets/images/paradise.png",
+      image: "assets/images/paradisee.png",
+      scale: 1.4,
+      heroSize: "60vh",
+      previewSize: "180px",
       glowColor: "rgba(100, 200, 180, 0.06)",
       notes: {
         top: "Tropical Fruits, Bergamot, Coconut",
@@ -44,6 +50,9 @@ const FeaturedShowcase = {
       desc: "Patience distilled — deep amber, sacred incense, and aged sandalwood.",
       price: "$150.00",
       image: "assets/images/sabr.png",
+      scale: 1,
+      heroSize: "52vh",
+      previewSize: "160px",
       glowColor: "rgba(180, 150, 100, 0.06)",
       notes: {
         top: "Incense, Bergamot, Pink Pepper",
@@ -176,7 +185,8 @@ const FeaturedShowcase = {
         const parallaxRotX = -this.mouseY * 4;
         
         // 3. Apply Transforms to Hero Bottle and Reflection
-        const baseScale = FeaturedShowcase.activeId === 2 ? 1 : 2.2;
+        const activeProduct = FeaturedShowcase.products.find(p => p.id === FeaturedShowcase.activeId);
+        const baseScale = activeProduct ? activeProduct.scale : 2.2;
         const finalScale = baseScale * breatheScale;
         
         const offsetX = 0;
@@ -265,8 +275,9 @@ const FeaturedShowcase = {
     const cineEase = "cubic-bezier(.22,.61,.36,1)";
     
     // Scale factors and Offsets
-    const currentScale = this.activeId === 2 ? 1 : 2.2;
-    const targetScale = targetId === 2 ? 1 : 2.2;
+    const currentProduct = this.products.find(p => p.id === this.activeId);
+    const currentScale = currentProduct ? currentProduct.scale : 2.2;
+    const targetScale = nextProduct.scale;
     const targetOffsetX = 0;
 
     // ==========================================
@@ -329,12 +340,12 @@ const FeaturedShowcase = {
         heroImage.src = nextProduct.image;
         heroImage.alt = nextProduct.name;
         // Dynamic hero sizing
-        heroImage.style.setProperty('--hero-size', nextProduct.id === 2 ? '52vh' : '85vh');
+        heroImage.style.setProperty('--hero-size', nextProduct.heroSize);
       }
       
       if (reflection) {
         reflection.src = nextProduct.image;
-        reflection.style.setProperty('--hero-size', nextProduct.id === 2 ? '52vh' : '85vh');
+        reflection.style.setProperty('--hero-size', nextProduct.heroSize);
       }
 
       if (glow) {
@@ -399,7 +410,7 @@ const FeaturedShowcase = {
     if(leftImg) {
       leftImg.src = leftProduct.image;
       leftImg.alt = leftProduct.name;
-      leftImg.style.setProperty('--preview-size', leftProduct.id === 2 ? '160px' : '240px');
+      leftImg.style.setProperty('--preview-size', leftProduct.previewSize);
     }
     if(leftName) leftName.textContent = leftProduct.name;
     if(leftPrice) leftPrice.textContent = leftProduct.price;
@@ -408,7 +419,7 @@ const FeaturedShowcase = {
     if(rightImg) {
       rightImg.src = rightProduct.image;
       rightImg.alt = rightProduct.name;
-      rightImg.style.setProperty('--preview-size', rightProduct.id === 2 ? '160px' : '240px');
+      rightImg.style.setProperty('--preview-size', rightProduct.previewSize);
     }
     if(rightName) rightName.textContent = rightProduct.name;
     if(rightPrice) rightPrice.textContent = rightProduct.price;
