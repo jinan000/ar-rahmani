@@ -50,9 +50,9 @@ const FeaturedShowcase = {
       desc: "Patience distilled — deep amber, sacred incense, and aged sandalwood.",
       price: "$150.00",
       image: "assets/images/sabr.png",
-      scale: 1,
-      heroSize: "52vh",
-      previewSize: "160px",
+      scale: 1.8,
+      heroSize: "75vh",
+      previewSize: "200px",
       glowColor: "rgba(180, 150, 100, 0.06)",
       notes: {
         top: "Incense, Bergamot, Pink Pepper",
