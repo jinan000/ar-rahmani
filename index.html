@@ -21,11 +21,13 @@
   <link rel="stylesheet" href="css/animations.css?v=1.2">
   <link rel="stylesheet" href="css/components.css?v=1.2">
   <link rel="stylesheet" href="css/sections.css?v=1.2">
+  <link rel="stylesheet" href="css/perfume-carousel.css?v=1.0">
 
   <!-- Preconnect to Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght@8..144,25..151,100..1000&display=swap"
+  <link
+    href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Roboto+Flex:opsz,wdth,wght@8..144,25..151,100..1000&display=swap"
     rel="stylesheet">
 
   <!-- Favicon -->
@@ -84,7 +86,8 @@
 
   <!-- Mobile Navigation -->
   <div class="mobile-nav" id="mobile-nav">
-    <img src="assets/images/fulllogo.png" alt="Ar-Rahmani Perfumes" class="mobile-nav-logo" loading="lazy" decoding="async">
+    <img src="assets/images/fulllogo.png" alt="Ar-Rahmani Perfumes" class="mobile-nav-logo" loading="lazy"
+      decoding="async">
     <a href="#about">About</a>
     <a href="#craftsmanship">Craftsmanship</a>
     <a href="#journal">Journal</a>
@@ -279,7 +282,8 @@
       <div class="preview-card-trigger preview-card-left" id="preview-left" data-target="1">
         <div class="preview-card-inner">
           <div class="preview-card-image">
-            <img src="assets/images/paradisee.png" alt="PARADISE" id="preview-left-image" style="--preview-size: 180px;" loading="lazy" decoding="async">
+            <img src="assets/images/paradisee.png" alt="PARADISE" id="preview-left-image" style="--preview-size: 180px;"
+              loading="lazy" decoding="async">
           </div>
           <h4 class="preview-card-name" id="preview-left-name">PARADISE</h4>
           <span class="preview-card-price" id="preview-left-price">$130.00</span>
@@ -293,7 +297,8 @@
       <div class="preview-card-trigger preview-card-right" id="preview-right" data-target="2">
         <div class="preview-card-inner">
           <div class="preview-card-image">
-            <img src="assets/images/sabr.png" alt="SABR" id="preview-right-image" style="--preview-size: 130px;" loading="lazy" decoding="async">
+            <img src="assets/images/sabr.png" alt="SABR" id="preview-right-image" style="--preview-size: 130px;"
+              loading="lazy" decoding="async">
           </div>
           <h4 class="preview-card-name" id="preview-right-name">SABR</h4>
           <span class="preview-card-price" id="preview-right-price">$150.00</span>
@@ -365,6 +370,81 @@
   </section>
 
   <!-- ============================================================
+       PERFUME CAROUSEL — Full-Viewport Showcase
+       ============================================================ -->
+  <section class="pc-hero" id="pc-hero">
+    <div class="pc-hero__viewport">
+
+      <!-- Grain overlay -->
+      <div class="pc-grain"></div>
+
+      <!-- Ambient glow behind center bottle -->
+      <div class="pc-glow"></div>
+
+      <!-- Bottom vignette fade -->
+      <div class="pc-vignette"></div>
+
+      <!-- Giant ghost text -->
+      <div class="pc-ghost-text">
+        <span>HAMOOD</span>
+      </div>
+
+      <!-- Top-left brand label -->
+      <div class="pc-brand">AR-RAHMANI</div>
+
+      <!-- Carousel -->
+      <div class="pc-carousel">
+        <!-- Item 0: HAMOOD -->
+        <div class="pc-carousel__item" data-index="0" data-role="center">
+          <img src="assets/images/hamood.png" alt="HAMOOD Extrait de Parfum" draggable="false">
+        </div>
+        <!-- Item 1: SABR -->
+        <div class="pc-carousel__item" data-index="1" data-role="right">
+          <img src="assets/images/sabr.png" alt="SABR Extrait de Parfum" draggable="false">
+        </div>
+        <!-- Item 2: PARADISE -->
+        <div class="pc-carousel__item" data-index="2" data-role="left">
+          <img src="assets/images/paradisee.png" alt="PARADISE Extrait de Parfum" draggable="false">
+        </div>
+      </div>
+
+      <!-- Bottom-left info & nav -->
+      <div class="pc-info">
+        <p class="pc-info__label">AR-RAHMANI COLLECTION</p>
+        <p class="pc-info__desc">
+          Handcrafted with the world's rarest ingredients.
+          The finish is a vision, the craft is flawless.
+          Extrait de Parfum — unmatched depth and longevity. Discover now.
+        </p>
+        <div class="pc-info__nav">
+          <button class="pc-info__btn" id="pc-btn-prev" aria-label="Previous perfume">
+            <svg viewBox="0 0 24 24">
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+          </button>
+          <button class="pc-info__btn" id="pc-btn-next" aria-label="Next perfume">
+            <svg viewBox="0 0 24 24">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Bottom-right discover link -->
+      <a href="#showcase" class="pc-discover">
+        DISCOVER IT
+        <svg viewBox="0 0 24 24">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ============================================================
        CRAFTSMANSHIP
        ============================================================ -->
   <section class="section craftsmanship" id="craftsmanship">
@@ -402,7 +482,8 @@
             <div class="craft-step-top">
               <div class="craft-step-image-container">
                 <div class="craft-image-wrapper">
-                  <img src="assets/images/thevision.png" alt="The Vision" class="craft-bottle-img" loading="lazy" decoding="async">
+                  <img src="assets/images/thevision.png" alt="The Vision" class="craft-bottle-img" loading="lazy"
+                    decoding="async">
                 </div>
               </div>
             </div>
@@ -424,7 +505,8 @@
             <div class="craft-step-top">
               <div class="craft-step-image-container">
                 <div class="craft-image-wrapper">
-                  <img src="assets/images/ingredients.png" alt="The Ingredients" class="craft-bottle-img" loading="lazy" decoding="async">
+                  <img src="assets/images/ingredients.png" alt="The Ingredients" class="craft-bottle-img" loading="lazy"
+                    decoding="async">
                 </div>
               </div>
             </div>
@@ -446,7 +528,8 @@
             <div class="craft-step-top">
               <div class="craft-step-image-container">
                 <div class="craft-image-wrapper">
-                  <img src="assets/images/thecomposition.png" alt="The Composition" class="craft-bottle-img" loading="lazy" decoding="async">
+                  <img src="assets/images/thecomposition.png" alt="The Composition" class="craft-bottle-img"
+                    loading="lazy" decoding="async">
                 </div>
               </div>
             </div>
@@ -468,7 +551,8 @@
             <div class="craft-step-top">
               <div class="craft-step-image-container">
                 <div class="craft-image-wrapper">
-                  <img src="assets/images/thevessel.png" alt="The Vessel" class="craft-bottle-img" loading="lazy" decoding="async">
+                  <img src="assets/images/thevessel.png" alt="The Vessel" class="craft-bottle-img" loading="lazy"
+                    decoding="async">
                 </div>
               </div>
             </div>
@@ -501,7 +585,8 @@
       <div class="ingredients-grid" data-stagger>
         <div class="ingredient-card reveal-scale">
           <img data-src="assets/images/oud.png"
-            src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Oud" loading="lazy" decoding="async">
+            src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Oud" loading="lazy"
+            decoding="async">
           <div class="ingredient-card-overlay">
             <h3 class="ingredient-card-name text-gold-gradient">Oud</h3>
             <p class="ingredient-card-desc">The liquid gold of perfumery — aged agarwood from ancient forests, more
@@ -511,7 +596,8 @@
 
         <div class="ingredient-card reveal-scale">
           <img data-src="assets/images/rose.png"
-            src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Rose" loading="lazy" decoding="async">
+            src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Rose" loading="lazy"
+            decoding="async">
           <div class="ingredient-card-overlay">
             <h3 class="ingredient-card-name text-gold-gradient">Rose</h3>
             <p class="ingredient-card-desc">Hand-picked Damascus rose petals, harvested at dawn for the purest essence
@@ -521,7 +607,8 @@
 
         <div class="ingredient-card reveal-scale">
           <img data-src="assets/images/amber.png"
-            src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Amber" loading="lazy" decoding="async">
+            src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Amber" loading="lazy"
+            decoding="async">
           <div class="ingredient-card-overlay">
             <h3 class="ingredient-card-name text-gold-gradient">Amber</h3>
             <p class="ingredient-card-desc">Warm, sensual amber resin — liquid sunlight trapped in stone over millennia.
@@ -716,22 +803,35 @@
       <div class="footer-top">
         <div class="footer-brand">
           <a href="#home" class="footer-logo">
-            <img src="assets/images/fulllogo.png" alt="Ar-Rahmani Perfumes" class="footer-logo-img" loading="lazy" decoding="async">
+            <img src="assets/images/fulllogo.png" alt="Ar-Rahmani Perfumes" class="footer-logo-img" loading="lazy"
+              decoding="async">
           </a>
           <p>Luxury Extrait de Parfum. Handcrafted niche fragrances inspired by timeless elegance, exceptional
             ingredients, and unforgettable memories.</p>
           <div class="footer-social">
             <a href="#" aria-label="Instagram">
-              <svg viewBox="0 0 24 24"><path d="M7.75 2h8.5C19.423 2 22 4.577 22 7.75v8.5C22 19.423 19.423 22 16.25 22h-8.5C4.577 22 2 19.423 2 16.25v-8.5C2 4.577 4.577 2 7.75 2Zm8.5 1.5h-8.5c-2.343 0-4.25 1.907-4.25 4.25v8.5c0 2.343 1.907 4.25 4.25 4.25h8.5c2.343 0 4.25-1.907 4.25-4.25v-8.5c0-2.343-1.907-4.25-4.25-4.25ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm5.25-.5a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Z"/></svg>
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M7.75 2h8.5C19.423 2 22 4.577 22 7.75v8.5C22 19.423 19.423 22 16.25 22h-8.5C4.577 22 2 19.423 2 16.25v-8.5C2 4.577 4.577 2 7.75 2Zm8.5 1.5h-8.5c-2.343 0-4.25 1.907-4.25 4.25v8.5c0 2.343 1.907 4.25 4.25 4.25h8.5c2.343 0 4.25-1.907 4.25-4.25v-8.5c0-2.343-1.907-4.25-4.25-4.25ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm5.25-.5a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Z" />
+              </svg>
             </a>
             <a href="#" aria-label="Facebook">
-              <svg viewBox="0 0 24 24"><path d="M14.53 10.66h3.4l-.54 3.38h-2.86V22h-4.05v-7.96h-2.7v-3.38h2.7V8.42c0-2.67 1.63-4.13 4.02-4.13 1.14 0 2.12.08 2.4.12v2.78l-1.65.01c-1.29 0-1.54.61-1.54 1.51v1.95Z"/></svg>
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M14.53 10.66h3.4l-.54 3.38h-2.86V22h-4.05v-7.96h-2.7v-3.38h2.7V8.42c0-2.67 1.63-4.13 4.02-4.13 1.14 0 2.12.08 2.4.12v2.78l-1.65.01c-1.29 0-1.54.61-1.54 1.51v1.95Z" />
+              </svg>
             </a>
             <a href="#" aria-label="X (Twitter)">
-              <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
             </a>
             <a href="#" aria-label="TikTok">
-              <svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.95v7.4c-.01 1.94-.69 3.84-1.95 5.3-1.26 1.47-3.08 2.42-5.03 2.62-1.95.21-3.95-.14-5.63-1.07-1.68-.94-3.01-2.42-3.78-4.2-.76-1.78-.92-3.79-.45-5.67.46-1.87 1.5-3.53 2.94-4.68 1.45-1.16 3.23-1.77 5.11-1.75.14 0 .28.01.42.02v4.06c-.84-.13-1.71-.05-2.48.24-.76.29-1.42.82-1.88 1.5-.47.67-.71 1.49-.68 2.31.02.82.32 1.61.85 2.22.52.61 1.25 1.01 2.05 1.12.8.11 1.62-.02 2.32-.38.71-.35 1.29-.91 1.64-1.61.35-.7.54-1.48.54-2.28V.02h4.08z"/></svg>
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.95v7.4c-.01 1.94-.69 3.84-1.95 5.3-1.26 1.47-3.08 2.42-5.03 2.62-1.95.21-3.95-.14-5.63-1.07-1.68-.94-3.01-2.42-3.78-4.2-.76-1.78-.92-3.79-.45-5.67.46-1.87 1.5-3.53 2.94-4.68 1.45-1.16 3.23-1.77 5.11-1.75.14 0 .28.01.42.02v4.06c-.84-.13-1.71-.05-2.48.24-.76.29-1.42.82-1.88 1.5-.47.67-.71 1.49-.68 2.31.02.82.32 1.61.85 2.22.52.61 1.25 1.01 2.05 1.12.8.11 1.62-.02 2.32-.38.71-.35 1.29-.91 1.64-1.61.35-.7.54-1.48.54-2.28V.02h4.08z" />
+              </svg>
             </a>
           </div>
         </div>
@@ -790,6 +890,7 @@
   <script src="js/fragrance-finder.js"></script>
   <script src="js/text-pressure.js"></script>
   <script src="js/decay-card.js"></script>
+  <script src="js/perfume-carousel.js"></script>
   <script src="js/craftsmanship.js"></script>
   <script src="js/main.js"></script>
 </body>
