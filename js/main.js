@@ -39,11 +39,11 @@ const App = {
   initLenis() {
     try {
       this.lenis = new Lenis({
-        duration: 1.8, // Increased duration for super smooth premium feel
+        duration: 0.8, // Responsive, crisp, fast scroll without inertia lag
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         orientation: 'vertical',
         smoothWheel: true,
-        wheelMultiplier: 1.2,
+        wheelMultiplier: 1.0,
       });
 
       // Connect Lenis to GSAP ScrollTrigger

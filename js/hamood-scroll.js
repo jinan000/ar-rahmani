@@ -72,7 +72,7 @@ const HamoodScroll = {
   },
 
   /* ----------------------------------------------------------
-     FRAME PRELOADING
+     FRAME PRELOADING (Fast Progressive Loading)
      ---------------------------------------------------------- */
   preloadFrames() {
     let loaded = 0;
@@ -83,57 +83,48 @@ const HamoodScroll = {
       this.frames[i] = null;
     }
 
-    const loadFrame = (i, callback) => {
-      if (i >= this.totalFrames) return;
-      const img = new Image();
-      const frameNum = String(i + 1).padStart(4, '0');
-      
-      const onloadOrError = () => {
-        loaded++;
-        self.imagesLoaded = loaded;
-        
-        if (i === 0 && self.currentFrame < 0) {
-          self.currentFrame = 0;
-          self.renderFrame(0);
-        }
-        
-        if (loaded >= 10 && !self.isReady) {
-          self.onReady();
-        }
-        
-        if (callback) callback();
-      };
-      
-      img.onload = () => {
-        if (typeof img.decode === 'function') {
-          img.decode().then(onloadOrError).catch(onloadOrError);
-        } else {
-          onloadOrError();
-        }
-      };
-      
-      img.onerror = onloadOrError;
-      
-      this.frames[i] = img;
-      img.src = `assets/frames/frame_${frameNum}.webp`;
+    // High priority: load frame 0 immediately for instant display
+    const firstImg = new Image();
+    firstImg.onload = () => {
+      self.frames[0] = firstImg;
+      self.currentFrame = 0;
+      self.renderFrame(0);
+      self.onReady(); // Instant ready!
     };
-    
-    // Queue configuration for optimal performance
-    // Concurrency of 5 prevents network starvation for other lazy-loaded images
-    const concurrency = 5;
-    let nextToLoad = 0;
-    
-    const loadNext = () => {
-      if (nextToLoad < this.totalFrames) {
-        const idx = nextToLoad++;
-        loadFrame(idx, loadNext);
+    firstImg.src = `assets/frames/frame_0001.webp`;
+
+    // Background loader for remaining frames
+    const loadRemainingFrames = () => {
+      let nextToLoad = 1;
+      const concurrency = 3;
+
+      const loadNext = () => {
+        if (nextToLoad >= this.totalFrames) return;
+        const i = nextToLoad++;
+        const img = new Image();
+        const frameNum = String(i + 1).padStart(4, '0');
+        img.onload = () => {
+          self.frames[i] = img;
+          loaded++;
+          loadNext();
+        };
+        img.onerror = () => {
+          loaded++;
+          loadNext();
+        };
+        img.src = `assets/frames/frame_${frameNum}.webp`;
+      };
+
+      for (let c = 0; c < concurrency; c++) {
+        loadNext();
       }
     };
 
-    // Start concurrent workers
-    for (let i = 0; i < Math.min(concurrency, this.totalFrames); i++) {
-      const idx = nextToLoad++;
-      loadFrame(idx, loadNext);
+    // Defer remaining frames until main thread settles
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => loadRemainingFrames(), { timeout: 1000 });
+    } else {
+      setTimeout(loadRemainingFrames, 300);
     }
   },
 
@@ -144,29 +135,18 @@ const HamoodScroll = {
     if (this.isReady) return;
     this.isReady = true;
 
-    // Small delay for premium feel
-    setTimeout(() => {
-      // Initialize GSAP ScrollTrigger
-      this.initScrollTrigger();
+    this.initScrollTrigger();
 
-      // Show scroll indicator
-      setTimeout(() => {
-        if (this.scrollIndicator) {
-          this.scrollIndicator.classList.add('visible');
-        }
-      }, 1500);
+    if (this.scrollIndicator) {
+      this.scrollIndicator.classList.add('visible');
+    }
 
-      // Show intro text
-      setTimeout(() => {
-        if (this.storyOverlays.intro) {
-          this.storyOverlays.intro.style.opacity = '1';
-          this.storyOverlays.intro.classList.add('active');
-        }
-        // Activate hero glow
-        const glow = document.getElementById('hero-glow');
-        if (glow) glow.classList.add('active');
-      }, 800);
-    }, 600);
+    if (this.storyOverlays.intro) {
+      this.storyOverlays.intro.style.opacity = '1';
+      this.storyOverlays.intro.classList.add('active');
+    }
+    const glow = document.getElementById('hero-glow');
+    if (glow) glow.classList.add('active');
   },
 
   /* ----------------------------------------------------------
@@ -177,12 +157,12 @@ const HamoodScroll = {
 
     const self = this;
 
-    // Main scroll trigger for the hero image sequence
+    // Main scroll trigger for the hero image sequence with smooth scrub
     ScrollTrigger.create({
       trigger: '.hero',
       start: 'top top',
       end: 'bottom bottom',
-      scrub: 0,
+      scrub: 0.1, // Smooth interpolation syncing with scroll
       onUpdate(trigger) {
         const progress = trigger.progress;
         const frameIndex = Math.min(
@@ -192,7 +172,7 @@ const HamoodScroll = {
 
         if (frameIndex !== self.currentFrame) {
           self.currentFrame = frameIndex;
-          self.renderFrame(frameIndex);
+          self.requestRenderFrame(frameIndex);
         }
 
         // Update story overlays based on progress
@@ -205,6 +185,14 @@ const HamoodScroll = {
           self.scrollIndicator.classList.add('visible');
         }
       }
+    });
+  },
+
+  requestRenderFrame(index) {
+    if (this.rafRenderId) return;
+    this.rafRenderId = requestAnimationFrame(() => {
+      this.renderFrame(index);
+      this.rafRenderId = null;
     });
   },
 

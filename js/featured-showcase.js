@@ -163,52 +163,53 @@ const FeaturedShowcase = {
     const reflection = document.getElementById("showcase-reflection-image");
     const shadow = document.getElementById("showcase-shadow");
     const glow = document.getElementById("showcase-glow");
+    const showcaseSection = document.getElementById("showcase");
     
-    // Continuous hardware-accelerated 60FPS loop
+    // Viewport-aware hardware-accelerated loop
     const render = () => {
-      if (!this.isAnimating) {
-        this.time += 0.015; // Drives the 7-9s subtle breathing
+      if (!this.isAnimating && showcaseSection) {
+        const rect = showcaseSection.getBoundingClientRect();
+        // Only compute and mutate DOM when section is visible
+        if (rect.bottom > -200 && rect.top < window.innerHeight + 200) {
+          this.time += 0.015; // Drives the 7-9s subtle breathing
 
-        // Smoothly interpolate mouse targets (lerp)
-        this.mouseX += (this.targetX - this.mouseX) * 0.08;
-        this.mouseY += (this.targetY - this.mouseY) * 0.08;
+          // Smoothly interpolate mouse targets (lerp)
+          this.mouseX += (this.targetX - this.mouseX) * 0.08;
+          this.mouseY += (this.targetY - this.mouseY) * 0.08;
 
-        // 1. Calculate Breathing Motion
-        // 8px vertical float, 0.5deg rotation, very subtle scale pulse (0.995 to 1.005)
-        const breatheY = Math.sin(this.time) * 8; 
-        const breatheRot = Math.cos(this.time * 0.8) * 0.5; 
-        const breatheScale = 1 + Math.sin(this.time * 1.2) * 0.005; 
+          // 1. Calculate Breathing Motion
+          const breatheY = Math.sin(this.time) * 8; 
+          const breatheRot = Math.cos(this.time * 0.8) * 0.5; 
+          const breatheScale = 1 + Math.sin(this.time * 1.2) * 0.005; 
 
-        // 2. Calculate Parallax Motion
-        // Max 6deg rotation based on mouse
-        const parallaxRotY = this.mouseX * 6; 
-        const parallaxRotX = -this.mouseY * 4;
-        
-        // 3. Apply Transforms to Hero Bottle and Reflection
-        const activeProduct = FeaturedShowcase.products.find(p => p.id === FeaturedShowcase.activeId);
-        const baseScale = activeProduct ? activeProduct.scale : 2.2;
-        const finalScale = baseScale * breatheScale;
-        
-        const offsetX = 0;
-        const transformString = `translate3d(${offsetX}px, ${breatheY}px, 0) rotateX(${parallaxRotX}deg) rotateY(${parallaxRotY}deg) rotateZ(${breatheRot}deg) scale3d(${finalScale}, ${finalScale}, 1)`;
-        
-        if (heroImage) heroImage.style.transform = transformString;
-        if (reflection) reflection.style.transform = transformString;
+          // 2. Calculate Parallax Motion
+          const parallaxRotY = this.mouseX * 6; 
+          const parallaxRotX = -this.mouseY * 4;
+          
+          // 3. Apply Transforms to Hero Bottle and Reflection
+          const activeProduct = FeaturedShowcase.products.find(p => p.id === FeaturedShowcase.activeId);
+          const baseScale = activeProduct ? activeProduct.scale : 2.2;
+          const finalScale = baseScale * breatheScale;
+          
+          const offsetX = 0;
+          const transformString = `translate3d(${offsetX}px, ${breatheY}px, 0) rotateX(${parallaxRotX}deg) rotateY(${parallaxRotY}deg) rotateZ(${breatheRot}deg) scale3d(${finalScale}, ${finalScale}, 1)`;
+          
+          if (heroImage) heroImage.style.transform = transformString;
+          if (reflection) reflection.style.transform = transformString;
 
-        // 4. Dynamic Shadow
-        // Shadow compresses when bottle is high, expands when low
-        const shadowScale = 1 - (breatheY / 40);
-        // Shadow shifts slightly opposite to mouse (light source assumption)
-        const shadowX = -50 + this.mouseX * -10; 
-        
-        if (shadow) {
-          shadow.style.transform = `translateX(${shadowX}%) scale(${shadowScale})`;
-          shadow.style.opacity = 0.8 * shadowScale;
-        }
+          // 4. Dynamic Shadow
+          const shadowScale = 1 - (breatheY / 40);
+          const shadowX = -50 + this.mouseX * -10; 
+          
+          if (shadow) {
+            shadow.style.transform = `translateX(${shadowX}%) scale(${shadowScale})`;
+            shadow.style.opacity = 0.8 * shadowScale;
+          }
 
-        // 5. Dynamic Glow Shift
-        if (glow) {
-          glow.style.transform = `translate3d(${this.mouseX * -20}px, ${this.mouseY * -20}px, 0)`;
+          // 5. Dynamic Glow Shift
+          if (glow) {
+            glow.style.transform = `translate3d(${this.mouseX * -20}px, ${this.mouseY * -20}px, 0)`;
+          }
         }
       }
       this.rafId = requestAnimationFrame(render);

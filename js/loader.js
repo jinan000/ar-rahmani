@@ -33,23 +33,23 @@ const Loader = {
       }, delay);
     });
 
-    // Final step once window is loaded or timeout
+    // Final step once DOM is ready or fast timeout
     let loaded = false;
     const finishLoader = () => {
       if (loaded) return;
       loaded = true;
-      const elapsed = Date.now() - this.startTime;
-      const remaining = Math.max(0, this.minDisplayTime - elapsed);
-
-      setTimeout(() => {
-        this.setProgress(100);
-        setTimeout(() => this.hide(), 300);
-      }, remaining);
+      this.setProgress(100);
+      setTimeout(() => this.hide(), 200);
     };
 
-    window.addEventListener('load', finishLoader);
-    // Fallback: if load takes more than 2.5 seconds, dismiss the loader
-    setTimeout(finishLoader, 2500);
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      setTimeout(finishLoader, 150);
+    } else {
+      document.addEventListener('DOMContentLoaded', finishLoader);
+      window.addEventListener('load', finishLoader);
+    }
+    // Fallback: dismiss after 450ms maximum
+    setTimeout(finishLoader, 450);
   },
 
   setProgress(value) {
