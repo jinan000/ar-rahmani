@@ -25,19 +25,43 @@ const HamoodAtmosphere = {
     this.resize();
     this.createParticles();
     this.isRunning = true;
+    this.isVisible = true;
     this.animate();
 
-    window.addEventListener('resize', () => this.resize());
+    // Debounced resize
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => this.resize(), 150);
+    });
 
-    // Track scroll progress for particle density
+    // Viewport visibility observer — pause when offscreen
+    const hero = document.querySelector('.hero');
+    if (hero) {
+      const observer = new IntersectionObserver((entries) => {
+        this.isVisible = entries[0].isIntersecting;
+        if (this.isVisible && this.isRunning && !this.animationFrame) {
+          this.animate();
+        }
+      }, { rootMargin: '200px' });
+      observer.observe(hero);
+    }
+
+    // Track scroll progress for particle density (throttled to rAF)
+    let scrollTicking = false;
     window.addEventListener('scroll', () => {
-      const hero = document.querySelector('.hero');
-      if (!hero) return;
-      const rect = hero.getBoundingClientRect();
-      const total = hero.offsetHeight - window.innerHeight;
-      if (total > 0) {
-        this.scrollProgress = Math.max(0, Math.min(1, -rect.top / total));
-      }
+      if (scrollTicking) return;
+      scrollTicking = true;
+      requestAnimationFrame(() => {
+        const heroEl = document.querySelector('.hero');
+        if (!heroEl) { scrollTicking = false; return; }
+        const rect = heroEl.getBoundingClientRect();
+        const total = heroEl.offsetHeight - window.innerHeight;
+        if (total > 0) {
+          this.scrollProgress = Math.max(0, Math.min(1, -rect.top / total));
+        }
+        scrollTicking = false;
+      });
     }, { passive: true });
   },
 
@@ -96,6 +120,12 @@ const HamoodAtmosphere = {
      ---------------------------------------------------------- */
   animate() {
     if (!this.isRunning || !this.ctx) return;
+
+    // Skip rendering when offscreen — save GPU/CPU
+    if (!this.isVisible) {
+      this.animationFrame = null;
+      return;
+    }
 
     this.ctx.clearRect(0, 0, this.width, this.height);
 

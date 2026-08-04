@@ -60,7 +60,7 @@ const App = {
   },
 
   /* ----------------------------------------------------------
-     LAZY LOADING
+     LAZY LOADING (Enhanced: larger prefetch margin, decode async)
      ---------------------------------------------------------- */
   setupLazyLoading() {
     const images = document.querySelectorAll('img[data-src]');
@@ -69,15 +69,29 @@ const App = {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
             const img = entry.target;
-            img.src = img.dataset.src;
+            const src = img.dataset.src;
             img.removeAttribute('data-src');
-            img.addEventListener('load', () => {
-              img.classList.add('loaded');
-            });
+
+            // Use decode() for non-blocking image decode
+            if ('decode' in img) {
+              img.src = src;
+              img.decoding = 'async';
+              img.decode().then(() => {
+                img.classList.add('loaded');
+              }).catch(() => {
+                img.classList.add('loaded');
+              });
+            } else {
+              img.src = src;
+              img.addEventListener('load', () => {
+                img.classList.add('loaded');
+              }, { once: true });
+            }
+
             imgObserver.unobserve(img);
           }
         });
-      }, { rootMargin: '200px' });
+      }, { rootMargin: '600px' }); // Start loading 600px before viewport
 
       images.forEach(img => imgObserver.observe(img));
     } else {
@@ -87,6 +101,16 @@ const App = {
         img.removeAttribute('data-src');
       });
     }
+
+    // Also set decoding=async on all non-critical images
+    document.querySelectorAll('img:not([fetchpriority="high"])').forEach(img => {
+      if (!img.hasAttribute('decoding')) {
+        img.decoding = 'async';
+      }
+      if (!img.hasAttribute('loading') && !img.dataset.src) {
+        img.loading = 'lazy';
+      }
+    });
   },
 
   /* ----------------------------------------------------------

@@ -165,51 +165,66 @@ const FeaturedShowcase = {
     const glow = document.getElementById("showcase-glow");
     const showcaseSection = document.getElementById("showcase");
     
+    let isVisible = true;
+
+    // Use IntersectionObserver for efficient visibility detection
+    if (showcaseSection) {
+      const observer = new IntersectionObserver((entries) => {
+        isVisible = entries[0].isIntersecting;
+        if (isVisible && !this.rafId) {
+          this.rafId = requestAnimationFrame(render);
+        }
+      }, { rootMargin: '200px' });
+      observer.observe(showcaseSection);
+    }
+
     // Viewport-aware hardware-accelerated loop
     const render = () => {
+      // Pause completely when offscreen
+      if (!isVisible) {
+        this.rafId = null;
+        return;
+      }
+
       if (!this.isAnimating && showcaseSection) {
-        const rect = showcaseSection.getBoundingClientRect();
-        // Only compute and mutate DOM when section is visible
-        if (rect.bottom > -200 && rect.top < window.innerHeight + 200) {
-          this.time += 0.015; // Drives the 7-9s subtle breathing
+        this.time += 0.015; // Drives the 7-9s subtle breathing
 
-          // Smoothly interpolate mouse targets (lerp)
-          this.mouseX += (this.targetX - this.mouseX) * 0.08;
-          this.mouseY += (this.targetY - this.mouseY) * 0.08;
+        // Smoothly interpolate mouse targets (lerp)
+        this.mouseX += (this.targetX - this.mouseX) * 0.08;
+        this.mouseY += (this.targetY - this.mouseY) * 0.08;
 
-          // 1. Calculate Breathing Motion
-          const breatheY = Math.sin(this.time) * 8; 
-          const breatheRot = Math.cos(this.time * 0.8) * 0.5; 
-          const breatheScale = 1 + Math.sin(this.time * 1.2) * 0.005; 
+        // 1. Calculate Breathing Motion
+        const breatheY = Math.sin(this.time) * 8; 
+        const breatheRot = Math.cos(this.time * 0.8) * 0.5; 
+        const breatheScale = 1 + Math.sin(this.time * 1.2) * 0.005; 
 
-          // 2. Calculate Parallax Motion
-          const parallaxRotY = this.mouseX * 6; 
-          const parallaxRotX = -this.mouseY * 4;
-          
-          // 3. Apply Transforms to Hero Bottle and Reflection
-          const activeProduct = FeaturedShowcase.products.find(p => p.id === FeaturedShowcase.activeId);
-          const baseScale = activeProduct ? activeProduct.scale : 2.2;
-          const finalScale = baseScale * breatheScale;
-          
-          const offsetX = 0;
-          const transformString = `translate3d(${offsetX}px, ${breatheY}px, 0) rotateX(${parallaxRotX}deg) rotateY(${parallaxRotY}deg) rotateZ(${breatheRot}deg) scale3d(${finalScale}, ${finalScale}, 1)`;
-          
-          if (heroImage) heroImage.style.transform = transformString;
-          if (reflection) reflection.style.transform = transformString;
+        // 2. Calculate Parallax Motion
+        const parallaxRotY = this.mouseX * 6; 
+        const parallaxRotX = -this.mouseY * 4;
+        
+        // 3. Apply Transforms to Hero Bottle and Reflection
+        const activeProduct = FeaturedShowcase.products.find(p => p.id === FeaturedShowcase.activeId);
+        const baseScale = activeProduct ? activeProduct.scale : 2.2;
+        const finalScale = baseScale * breatheScale;
+        
+        const offsetX = 0;
+        const transformString = `translate3d(${offsetX}px, ${breatheY}px, 0) rotateX(${parallaxRotX}deg) rotateY(${parallaxRotY}deg) rotateZ(${breatheRot}deg) scale3d(${finalScale}, ${finalScale}, 1)`;
+        
+        if (heroImage) heroImage.style.transform = transformString;
+        if (reflection) reflection.style.transform = transformString;
 
-          // 4. Dynamic Shadow
-          const shadowScale = 1 - (breatheY / 40);
-          const shadowX = -50 + this.mouseX * -10; 
-          
-          if (shadow) {
-            shadow.style.transform = `translateX(${shadowX}%) scale(${shadowScale})`;
-            shadow.style.opacity = 0.8 * shadowScale;
-          }
+        // 4. Dynamic Shadow
+        const shadowScale = 1 - (breatheY / 40);
+        const shadowX = -50 + this.mouseX * -10; 
+        
+        if (shadow) {
+          shadow.style.transform = `translateX(${shadowX}%) scale(${shadowScale})`;
+          shadow.style.opacity = 0.8 * shadowScale;
+        }
 
-          // 5. Dynamic Glow Shift
-          if (glow) {
-            glow.style.transform = `translate3d(${this.mouseX * -20}px, ${this.mouseY * -20}px, 0)`;
-          }
+        // 5. Dynamic Glow Shift
+        if (glow) {
+          glow.style.transform = `translate3d(${this.mouseX * -20}px, ${this.mouseY * -20}px, 0)`;
         }
       }
       this.rafId = requestAnimationFrame(render);

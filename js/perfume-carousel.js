@@ -29,10 +29,14 @@
   // Preload
   PERFUMES.forEach((p) => { const img = new Image(); img.src = p.src; });
 
-  // Resize
+  // Resize (debounced)
+  let carouselResizeTimer;
   window.addEventListener('resize', () => {
-    isMobile = window.innerWidth < 640;
-    applyRoles();
+    clearTimeout(carouselResizeTimer);
+    carouselResizeTimer = setTimeout(() => {
+      isMobile = window.innerWidth < 640;
+      applyRoles();
+    }, 150);
   });
 
   // Navigate

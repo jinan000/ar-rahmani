@@ -208,11 +208,14 @@ const Animations = {
     let scrollAmount = 0;
     const speed = 0.5;
     let isPaused = false;
+    let isVisible = false;
+    let rafId = null;
 
     track.addEventListener('mouseenter', () => isPaused = true);
     track.addEventListener('mouseleave', () => isPaused = false);
 
     const autoScroll = () => {
+      if (!isVisible) { rafId = null; return; }
       if (!isPaused) {
         scrollAmount += speed;
         if (scrollAmount >= track.scrollWidth / 2) {
@@ -220,10 +223,18 @@ const Animations = {
         }
         track.scrollLeft = scrollAmount;
       }
-      requestAnimationFrame(autoScroll);
+      rafId = requestAnimationFrame(autoScroll);
     };
 
-    autoScroll();
+    // Only run when visible
+    const observer = new IntersectionObserver((entries) => {
+      isVisible = entries[0].isIntersecting;
+      if (isVisible && !rafId) {
+        rafId = requestAnimationFrame(autoScroll);
+      }
+    }, { rootMargin: '100px' });
+
+    observer.observe(track);
   },
 
   /* ----------------------------------------------------------

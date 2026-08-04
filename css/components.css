@@ -525,6 +525,8 @@
    ============================================================ */
 .cursor-dot {
   position: fixed;
+  top: 0;
+  left: 0;
   width: 8px;
   height: 8px;
   background: var(--color-gold);
@@ -532,9 +534,10 @@
   pointer-events: none;
   z-index: var(--z-cursor);
   mix-blend-mode: difference;
-  transform: translate(-50%, -50%) scale(1);
-  transition: transform 0.3s var(--ease-luxury),
-              background 0.3s var(--ease-luxury);
+  will-change: transform;
+  contain: layout style;
+  transform: translate3d(-50%, -50%, 0) scale(1);
+  transition: background 0.3s var(--ease-luxury);
 }
 
 .cursor-ring {
@@ -542,12 +545,10 @@
 }
 
 .cursor-dot.hovering {
-  transform: translate(-50%, -50%) scale(4);
   background: var(--color-gold-soft);
 }
 
 .cursor-dot.clicking {
-  transform: translate(-50%, -50%) scale(3);
   background: var(--color-gold);
 }
 

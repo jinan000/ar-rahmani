@@ -45,7 +45,11 @@ const HamoodScroll = {
 
     // Size the canvas
     this.resizeCanvas();
-    window.addEventListener('resize', () => this.resizeCanvas());
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => this.resizeCanvas(), 150);
+    });
 
     // Begin preloading frames
     this.preloadFrames();
@@ -93,10 +97,10 @@ const HamoodScroll = {
     };
     firstImg.src = `assets/frames/frame_0001.webp`;
 
-    // Background loader for remaining frames
+    // Background loader for remaining frames (6 concurrent connections via HTTP/2)
     const loadRemainingFrames = () => {
       let nextToLoad = 1;
-      const concurrency = 3;
+      const concurrency = 6;
 
       const loadNext = () => {
         if (nextToLoad >= this.totalFrames) return;
@@ -122,9 +126,9 @@ const HamoodScroll = {
 
     // Defer remaining frames until main thread settles
     if ('requestIdleCallback' in window) {
-      requestIdleCallback(() => loadRemainingFrames(), { timeout: 1000 });
+      requestIdleCallback(() => loadRemainingFrames(), { timeout: 800 });
     } else {
-      setTimeout(loadRemainingFrames, 300);
+      setTimeout(loadRemainingFrames, 200);
     }
   },
 

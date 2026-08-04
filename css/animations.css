@@ -403,3 +403,19 @@
 .hover-zoom:hover {
   transform: scale(1.08);
 }
+
+/* ============================================================
+   LAZY IMAGE FADE-IN
+   Smooth reveal for images that load progressively
+   ============================================================ */
+img[data-src] {
+  opacity: 0;
+  filter: blur(4px);
+  transition: opacity 0.5s var(--ease-luxury), filter 0.5s var(--ease-luxury);
+}
+
+img[data-src].loaded,
+img.loaded {
+  opacity: 1;
+  filter: blur(0);
+}

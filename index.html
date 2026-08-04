@@ -16,27 +16,41 @@
   <meta property="og:type" content="website">
   <title>Ar-Rahmani — Luxury Extrait de Parfum | Crafted Beyond Fragrance</title>
 
-  <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/design-system.css?v=1.2">
-  <link rel="stylesheet" href="css/animations.css?v=1.2">
-  <link rel="stylesheet" href="css/components.css?v=1.2">
-  <link rel="stylesheet" href="css/sections.css?v=1.2">
-  <link rel="stylesheet" href="css/perfume-carousel.css?v=1.0">
-
-  <!-- Preconnect to Google Fonts -->
+  <!-- DNS Prefetch & Preconnect for third-party origins -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://unpkg.com">
+
+  <!-- Critical CSS (above-the-fold) -->
+  <link rel="stylesheet" href="css/design-system.css?v=1.3">
+  <link rel="stylesheet" href="css/animations.css?v=1.3">
+  <link rel="stylesheet" href="css/components.css?v=1.3">
+  <link rel="stylesheet" href="css/sections.css?v=1.3">
+
+  <!-- Deferred CSS (below-the-fold sections) -->
+  <link rel="stylesheet" href="css/perfume-carousel.css?v=1.1" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/catalogue.css?v=1.1" media="print" onload="this.media='all'">
+  <noscript>
+    <link rel="stylesheet" href="css/perfume-carousel.css?v=1.1">
+    <link rel="stylesheet" href="css/catalogue.css?v=1.1">
+  </noscript>
+
+  <!-- Google Fonts — swap ensures text is visible during load -->
   <link
     href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Roboto+Flex:opsz,wdth,wght@8..144,25..151,100..1000&display=swap"
     rel="stylesheet">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/images/logo.png">
 
-  <!-- Preload critical frames -->
-  <link rel="preload" as="image" href="assets/frames/frame_0001.webp">
+  <!-- Preload critical assets (LCP candidates) -->
+  <link rel="preload" as="image" href="assets/frames/frame_0001.webp" fetchpriority="high">
+  <link rel="preload" as="image" href="assets/images/fulllogo.png" fetchpriority="high">
   <link rel="preload" as="image" href="assets/frames/frame_0002.webp">
   <link rel="preload" as="image" href="assets/frames/frame_0003.webp">
+  <link rel="preload" as="image" href="assets/images/hamood.png">
 </head>
 
 <body>
@@ -52,7 +66,7 @@
        ============================================================ -->
   <div class="loader" id="loader">
     <div class="loader-logo">
-      <img src="assets/images/fulllogo.png" alt="Ar-Rahmani Perfumes" class="loader-logo-img" fetchpriority="high">
+      <img src="assets/images/fulllogo.png" alt="Ar-Rahmani Perfumes" class="loader-logo-img" fetchpriority="high" width="320" height="80" decoding="sync">
     </div>
     <div class="loader-progress">
       <div class="loader-progress-bar" id="loader-progress-bar"></div>
@@ -68,6 +82,7 @@
       <div class="navbar-links">
         <a href="#about">About</a>
         <a href="#craftsmanship">Craftsmanship</a>
+        <a href="#catalogue">Collection</a>
       </div>
       <a href="#home" class="navbar-logo">
         <img src="assets/images/logo.png" alt="Ar-Rahmani" class="navbar-logo-img" fetchpriority="high">
@@ -90,6 +105,7 @@
       decoding="async">
     <a href="#about">About</a>
     <a href="#craftsmanship">Craftsmanship</a>
+    <a href="#catalogue">Collection</a>
     <a href="#journal">Journal</a>
     <a href="#contact">Contact</a>
   </div>
@@ -396,15 +412,15 @@
       <div class="pc-carousel">
         <!-- Item 0: HAMOOD -->
         <div class="pc-carousel__item" data-index="0" data-role="center">
-          <img src="assets/images/hamood.png" alt="HAMOOD Extrait de Parfum" draggable="false">
+          <img src="assets/images/hamood.png" alt="HAMOOD Extrait de Parfum" draggable="false" loading="lazy" decoding="async">
         </div>
         <!-- Item 1: SABR -->
         <div class="pc-carousel__item" data-index="1" data-role="right">
-          <img src="assets/images/sabr.png" alt="SABR Extrait de Parfum" draggable="false">
+          <img src="assets/images/sabr.png" alt="SABR Extrait de Parfum" draggable="false" loading="lazy" decoding="async">
         </div>
         <!-- Item 2: PARADISE -->
         <div class="pc-carousel__item" data-index="2" data-role="left">
-          <img src="assets/images/paradisee.png" alt="PARADISE Extrait de Parfum" draggable="false">
+          <img src="assets/images/paradisee.png" alt="PARADISE Extrait de Parfum" draggable="false" loading="lazy" decoding="async">
         </div>
       </div>
 
@@ -766,6 +782,88 @@
     </div>
   </section>
 
+  <!-- ============================================================
+       LUXURY FRAGRANCE CATALOGUE — Dynamic Shopify Collection
+       ============================================================ -->
+  <section class="catalogue" id="catalogue">
+    <!-- Ambient Background -->
+    <div class="catalogue-ambient">
+      <div class="catalogue-ambient-glow catalogue-ambient-glow--1"></div>
+      <div class="catalogue-ambient-glow catalogue-ambient-glow--2"></div>
+      <div class="catalogue-ambient-glow catalogue-ambient-glow--3"></div>
+      <canvas class="catalogue-dust-canvas" id="catalogue-dust"></canvas>
+    </div>
+
+    <div class="catalogue-inner">
+      <!-- Hero -->
+      <div class="catalogue-hero">
+        <!-- Collection Counter -->
+        <div class="catalogue-counter" id="catalogue-counter">
+          <span class="catalogue-counter-number" id="catalogue-counter-num">0</span>
+          <span id="catalogue-counter-label">Luxury Fragrances</span>
+        </div>
+
+        <span class="catalogue-badge">✦ The Collection ✦</span>
+        <h2 class="catalogue-heading">Discover<br><span class="text-gold-gradient">The Art of Fragrance</span></h2>
+        <p class="catalogue-intro">Explore the complete AR-RAHMANI collection of handcrafted perfumes inspired by timeless Arabian luxury.</p>
+      </div>
+
+      <!-- Toolbar: Filters, Search, Sort -->
+      <div class="catalogue-toolbar" id="catalogue-toolbar">
+        <div class="catalogue-filters" id="catalogue-filters">
+          <button class="catalogue-chip active" data-filter="all">All</button>
+          <button class="catalogue-chip" data-filter="extrait de parfum">Extrait de Parfum</button>
+          <button class="catalogue-chip" data-filter="parfum">Parfum</button>
+          <button class="catalogue-chip" data-filter="oriental">Oriental</button>
+          <button class="catalogue-chip" data-filter="woody">Woody</button>
+          <button class="catalogue-chip" data-filter="floral">Floral</button>
+          <button class="catalogue-chip" data-filter="fresh">Fresh</button>
+          <button class="catalogue-chip" data-filter="sweet">Sweet</button>
+          <button class="catalogue-chip" data-filter="oud">Oud</button>
+          <button class="catalogue-chip" data-filter="amber">Amber</button>
+          <button class="catalogue-chip" data-filter="unisex">Unisex</button>
+        </div>
+
+        <div class="catalogue-search-wrap">
+          <svg class="catalogue-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" class="catalogue-search" id="catalogue-search" placeholder="Search fragrances..." aria-label="Search fragrances">
+        </div>
+
+        <div class="catalogue-sort-wrap">
+          <select class="catalogue-sort" id="catalogue-sort" aria-label="Sort fragrances">
+            <option value="newest">Newest</option>
+            <option value="best-selling">Best Selling</option>
+            <option value="alphabetical">Alphabetical</option>
+            <option value="price-low">Price: Low → High</option>
+            <option value="price-high">Price: High → Low</option>
+          </select>
+          <svg class="catalogue-sort-arrow" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polyline points="1 1 5 5 9 1"></polyline>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Product Grid -->
+      <div class="catalogue-grid" id="catalogue-grid"></div>
+
+      <!-- Explore The Collection Button -->
+      <div class="catalogue-explore-wrap" id="catalogue-explore-wrap">
+        <button class="catalogue-explore-btn" id="catalogue-explore-btn">
+          <span>Explore The Collection</span>
+          <span class="btn-arrow">→</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick View Modal -->
+    <div class="cat-modal-overlay" id="cat-modal-overlay">
+      <div class="cat-modal" id="cat-modal"></div>
+    </div>
+  </section>
+
 
   <!-- ============================================================
        FOOTER
@@ -851,14 +949,18 @@
   </footer>
 
   <!-- ============================================================
-       SCRIPTS
+       SCRIPTS — Optimized Loading Strategy
+       Critical path: GSAP → Lenis → Loader → Hero modules
+       Deferred: Everything below the fold
        ============================================================ -->
-  <!-- GSAP -->
+
+  <!-- GSAP (critical for hero scroll animation) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <!-- Lenis Smooth Scroll -->
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
 
+  <!-- Critical-path scripts (hero + loader) -->
   <script src="js/loader.js"></script>
   <script src="js/particles.js"></script>
   <script src="js/cursor.js"></script>
@@ -870,8 +972,7 @@
   <!-- Premium Featured Product Showcase -->
   <script src="js/featured-showcase.js"></script>
 
-
-
+  <!-- Interaction modules -->
   <script src="js/animations.js"></script>
   <script src="js/fragrance-finder.js"></script>
   <script src="js/text-pressure.js"></script>
@@ -879,10 +980,11 @@
   <script src="js/perfume-carousel.js"></script>
   <script src="js/craftsmanship.js"></script>
 
-  <!-- Shopify Storefront Headless API Integration -->
-  <script src="js/shopify-config.js"></script>
-  <script src="js/shopify.js"></script>
-  <script src="js/shopify-cart-ui.js"></script>
+  <!-- Shopify Storefront Headless API Integration (deferred) -->
+  <script src="js/shopify-config.js" defer></script>
+  <script src="js/shopify.js" defer></script>
+  <script src="js/shopify-cart-ui.js" defer></script>
+  <script src="js/catalogue.js" defer></script>
 
   <script src="js/main.js"></script>
 </body>

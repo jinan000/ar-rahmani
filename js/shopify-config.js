@@ -5,7 +5,7 @@
 
 const SHOPIFY_CONFIG = {
   // Your Shopify Store domain (e.g. 'ar-rahmani.myshopify.com' or custom domain)
-  storeDomain: 'ar-rahmani.myshopify.com',
+  storeDomain: '7cszxa-9r.myshopify.com',
 
   // Storefront API Public Access Token provided by user
   storefrontAccessToken: '07a27dc9e5d8582f34c4d7b1c8559502',

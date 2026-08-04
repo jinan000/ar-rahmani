@@ -197,8 +197,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Recalculate everything on resize
+  // Recalculate everything on resize (debounced)
+  let craftResizeTimer;
   window.addEventListener("resize", () => {
-    ScrollTrigger.refresh();
+    clearTimeout(craftResizeTimer);
+    craftResizeTimer = setTimeout(() => ScrollTrigger.refresh(), 250);
   });
 });

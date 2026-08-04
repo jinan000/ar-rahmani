@@ -239,7 +239,7 @@ const ShopifyCartUI = {
     if (!this.cart) {
       this.cart = {
         id: 'local_cart_' + Date.now(),
-        checkoutUrl: 'https://' + (window.SHOPIFY_CONFIG?.storeDomain || 'ar-rahmani.myshopify.com') + '/cart',
+        checkoutUrl: 'https://' + (window.SHOPIFY_CONFIG?.storeDomain || '7cszxa-9r.myshopify.com') + '/cart',
         totalQuantity: 0,
         subtotal: '0.00',
         currency: 'USD',

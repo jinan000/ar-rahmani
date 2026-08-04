@@ -157,7 +157,7 @@ const FragranceFinder = {
         this.resultsContainer.innerHTML = fragrances.map(f => `
           <div class="product-card reveal-up revealed">
             <div class="product-card-image">
-              <img src="${f.image}" alt="${f.name}" loading="lazy">
+              <img src="${f.image}" alt="${f.name}" loading="lazy" decoding="async">
             </div>
             <div class="product-card-content">
               <div class="product-card-family">${f.family}</div>

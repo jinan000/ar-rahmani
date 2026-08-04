@@ -1,6 +1,6 @@
 /* ============================================================
    AR-RAHMANI — Gold Particle System
-   Lightweight Canvas-based particles
+   Lightweight Canvas-based particles (viewport-aware)
    ============================================================ */
 
 const Particles = {
@@ -10,6 +10,8 @@ const Particles = {
   maxParticles: 40,
   animationFrame: null,
   isRunning: false,
+  isVisible: true,
+  resizeTimer: null,
 
   init(canvasId) {
     this.canvas = document.getElementById(canvasId);
@@ -19,9 +21,28 @@ const Particles = {
     this.resize();
     this.createParticles();
     this.isRunning = true;
+    this.setupVisibilityObserver();
     this.animate();
 
-    window.addEventListener('resize', () => this.resize());
+    window.addEventListener('resize', () => {
+      clearTimeout(this.resizeTimer);
+      this.resizeTimer = setTimeout(() => this.resize(), 150);
+    });
+  },
+
+  setupVisibilityObserver() {
+    if (!this.canvas) return;
+    const parent = this.canvas.closest('section') || this.canvas.parentElement;
+    if (!parent) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      this.isVisible = entries[0].isIntersecting;
+      if (this.isVisible && this.isRunning && !this.animationFrame) {
+        this.animate();
+      }
+    }, { rootMargin: '100px' });
+
+    observer.observe(parent);
   },
 
   resize() {
@@ -59,6 +80,12 @@ const Particles = {
 
   animate() {
     if (!this.isRunning || !this.ctx) return;
+
+    // Skip rendering when offscreen — save GPU/CPU
+    if (!this.isVisible) {
+      this.animationFrame = null;
+      return;
+    }
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 

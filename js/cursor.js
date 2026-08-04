@@ -78,15 +78,14 @@ const Cursor = {
   animate() {
     if (this.isTouch) return;
 
-    // Smooth follow
+    // Smooth follow with GPU-composited transform (no layout thrash)
     const dotSpeed = 0.15;
 
     this.dotX += (this.mouseX - this.dotX) * dotSpeed;
     this.dotY += (this.mouseY - this.dotY) * dotSpeed;
 
     if (this.dot) {
-      this.dot.style.left = `${this.dotX}px`;
-      this.dot.style.top = `${this.dotY}px`;
+      this.dot.style.transform = `translate3d(${this.dotX}px, ${this.dotY}px, 0) translate(-50%, -50%)${this.isHovering ? ' scale(4)' : ' scale(1)'}`;
     }
 
     requestAnimationFrame(() => this.animate());

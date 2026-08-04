@@ -89,11 +89,23 @@ class DecayCard {
       this.cursor = { x: ev.clientX, y: ev.clientY };
     };
 
-    window.addEventListener('resize', this.handleResize);
+    // Debounced resize
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(this.handleResize, 150);
+    });
     window.addEventListener('mousemove', this.handleMouseMove);
 
-    // 3. Start animation loop
-    this.render();
+    // 3. Viewport-aware animation (pause when offscreen)
+    this.isVisible = false;
+    const observer = new IntersectionObserver((entries) => {
+      this.isVisible = entries[0].isIntersecting;
+      if (this.isVisible && !this.rafId) {
+        this.render();
+      }
+    }, { rootMargin: '100px' });
+    observer.observe(this.container);
   }
 
   lerp(a, b, n) {
@@ -111,6 +123,12 @@ class DecayCard {
   }
 
   render() {
+    // Pause when offscreen
+    if (!this.isVisible) {
+      this.rafId = null;
+      return;
+    }
+
     let targetX = this.lerp(this.imgValues.x, this.map(this.cursor.x, 0, this.winsize.width, -120, 120), 0.1);
     let targetY = this.lerp(this.imgValues.y, this.map(this.cursor.y, 0, this.winsize.height, -120, 120), 0.1);
     let targetRz = this.lerp(this.imgValues.rz, this.map(this.cursor.x, 0, this.winsize.width, -10, 10), 0.1);

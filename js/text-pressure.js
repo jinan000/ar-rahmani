@@ -106,7 +106,15 @@ class TextPressure {
     window.addEventListener('touchmove', this.handleTouchMove, { passive: true });
     window.addEventListener('resize', this.handleResize);
 
-    this.animate();
+    // Viewport-aware rendering — pause when offscreen
+    this.isVisible = false;
+    const observer = new IntersectionObserver((entries) => {
+      this.isVisible = entries[0].isIntersecting;
+      if (this.isVisible && !this.rafId) {
+        this.animate();
+      }
+    }, { rootMargin: '100px' });
+    observer.observe(this.container);
   }
 
   setSize() {
@@ -148,6 +156,12 @@ class TextPressure {
   }
 
   animate() {
+    // Pause when offscreen
+    if (!this.isVisible) {
+      this.rafId = null;
+      return;
+    }
+
     this.mouse.x += (this.cursor.x - this.mouse.x) / 15;
     this.mouse.y += (this.cursor.y - this.mouse.y) / 15;
 
