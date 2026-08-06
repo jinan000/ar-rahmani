@@ -252,9 +252,9 @@ const ShopifyCartUI = {
       existingLine.quantity += 1;
     } else {
       const imagesMap = {
-        'HAMOOD': 'assets/images/hamood.png',
-        'PARADISE': 'assets/images/paradisee.png',
-        'SABR': 'assets/images/sabr.png'
+        'HAMOOD': 'assets/images/hamood.webp',
+        'PARADISE': 'assets/images/paradisee.webp',
+        'SABR': 'assets/images/sabr.webp'
       };
       this.cart.lines.push({
         id: 'line_' + Date.now(),
@@ -264,7 +264,7 @@ const ShopifyCartUI = {
         price: parseFloat(price).toFixed(2),
         currency: 'USD',
         productTitle: name,
-        image: imagesMap[name] || 'assets/images/hamood.png'
+        image: imagesMap[name] || 'assets/images/hamood.webp'
       });
     }
 
@@ -360,7 +360,7 @@ const ShopifyCartUI = {
       itemsListEl.innerHTML = this.cart.lines.map(line => `
         <div class="cart-item" data-line-id="${line.id}">
           <div class="cart-item-image">
-            <img src="${line.image || 'assets/images/hamood.png'}" alt="${line.productTitle}">
+            <img src="${line.image || 'assets/images/hamood.webp'}" alt="${line.productTitle}">
           </div>
           <div class="cart-item-details">
             <div class="cart-item-header">

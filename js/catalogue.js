@@ -28,7 +28,7 @@ const Catalogue = {
    * Avoids downloading large 4000px original images.
    */
   getOptimizedImageUrl(url, width = 600) {
-    if (!url) return 'assets/images/hamood.png';
+    if (!url) return 'assets/images/hamood.webp';
     if (url.includes('cdn.shopify.com')) {
       return url.includes('?') ? `${url}&width=${width}` : `${url}?width=${width}`;
     }
@@ -643,7 +643,7 @@ const Catalogue = {
              alt="${this._escapeHtml(imageAlt)}"
              loading="${index < 16 ? 'eager' : 'lazy'}"
              decoding="async"
-             onerror="this.onerror=null; this.src='assets/images/hamood.png';">
+             onerror="this.onerror=null; this.src='assets/images/hamood.webp';">
         ${hasHoverImage ? `
         <img class="cat-card-bottle cat-card-bottle--hover" 
              src="${hoverImgUrl}"

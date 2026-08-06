@@ -10,91 +10,91 @@ const FragranceFinder = {
       family: 'Woody Oud',
       mood: ['dark-oud', 'statement', 'evening'],
       description: 'A commanding presence of rare oud with smoky undertones and royal amber.',
-      image: 'assets/images/collection-1.png'
+      image: 'assets/images/collection-1.webp'
     },
     {
       name: 'Sabr',
       family: 'Oriental',
       mood: ['dark-oud', 'evening'],
       description: 'Patience distilled — deep amber, sacred incense, and aged sandalwood.',
-      image: 'assets/images/collection-1.png'
+      image: 'assets/images/collection-1.webp'
     },
     {
       name: 'Rahna',
       family: 'Floral Oriental',
       mood: ['floral', 'romantic', 'sweet'],
       description: 'An enchanting bouquet of Damascus rose, jasmine, and soft musk.',
-      image: 'assets/images/collection-2.png'
+      image: 'assets/images/collection-2.webp'
     },
     {
       name: 'Baby Powder',
       family: 'Powdery Musk',
       mood: ['sweet', 'fresh', 'luxury-daily'],
       description: 'Clean innocence wrapped in powdery iris, white musk, and soft vanilla.',
-      image: 'assets/images/collection-2.png'
+      image: 'assets/images/collection-2.webp'
     },
     {
       name: 'Miami Breez',
       family: 'Fresh Aquatic',
       mood: ['fresh', 'luxury-daily'],
       description: 'Ocean winds meet citrus gardens — bergamot, sea salt, and driftwood.',
-      image: 'assets/images/collection-3.png'
+      image: 'assets/images/collection-3.webp'
     },
     {
       name: 'Mi Amor',
       family: 'Romantic Gourmand',
       mood: ['romantic', 'sweet', 'evening'],
       description: 'Love letter in a bottle — velvet rose, caramel, and warm tonka.',
-      image: 'assets/images/collection-3.png'
+      image: 'assets/images/collection-3.webp'
     },
     {
       name: 'Aura',
       family: 'Mystical Amber',
       mood: ['statement', 'evening', 'dark-oud'],
       description: 'An ethereal aura of golden amber, saffron, and mystical frankincense.',
-      image: 'assets/images/collection-1.png'
+      image: 'assets/images/collection-1.webp'
     },
     {
       name: 'Fathima',
       family: 'Floral Oud',
       mood: ['floral', 'romantic', 'statement'],
       description: 'Graceful femininity — Turkish rose, precious oud, and delicate saffron.',
-      image: 'assets/images/collection-2.png'
+      image: 'assets/images/collection-2.webp'
     },
     {
       name: 'Crystal Oud',
       family: 'Premium Oud',
       mood: ['dark-oud', 'statement', 'evening'],
       description: 'Crystal clarity meets ancient oud — transparent, powerful, unforgettable.',
-      image: 'assets/images/collection-3.png'
+      image: 'assets/images/collection-3.webp'
     },
     {
       name: 'Ramadan',
       family: 'Sacred Blend',
       mood: ['dark-oud', 'evening'],
       description: 'Spiritual elegance — blessed oud, bakhoor, and precious musk tahara.',
-      image: 'assets/images/collection-1.png'
+      image: 'assets/images/collection-1.webp'
     },
     {
       name: 'Bin Rahman',
       family: 'Royal Heritage',
       mood: ['dark-oud', 'statement'],
       description: 'A legacy in every drop — royal oud, leather, and aged Indian sandalwood.',
-      image: 'assets/images/collection-2.png'
+      image: 'assets/images/collection-2.webp'
     },
     {
       name: 'Oud400',
       family: 'Vintage Oud',
       mood: ['dark-oud', 'statement', 'evening'],
       description: 'Four centuries of oud mastery concentrated into one legendary extrait.',
-      image: 'assets/images/collection-3.png'
+      image: 'assets/images/collection-3.webp'
     },
     {
       name: 'Paradise Fusion',
       family: 'Exotic Blend',
       mood: ['fresh', 'sweet', 'luxury-daily', 'romantic'],
       description: 'A paradise of tropical fruits, white flowers, and silky musk.',
-      image: 'assets/images/collection-1.png'
+      image: 'assets/images/collection-1.webp'
     }
   ],
 

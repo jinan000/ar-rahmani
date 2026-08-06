@@ -6,9 +6,9 @@
   'use strict';
 
   const PERFUMES = [
-    { src: 'assets/images/hamood.png',   name: 'HAMOOD' },
-    { src: 'assets/images/sabr.png',     name: 'SABR' },
-    { src: 'assets/images/paradise.png', name: 'PARADISE' },
+    { src: 'assets/images/hamood.webp',   name: 'HAMOOD' },
+    { src: 'assets/images/sabr.webp',     name: 'SABR' },
+    { src: 'assets/images/paradise.webp', name: 'PARADISE' },
   ];
 
   const TOTAL = PERFUMES.length;
