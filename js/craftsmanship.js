@@ -1,10 +1,10 @@
 /* ============================================================
    AR-RAHMANI — Craftsmanship Animations (Horizontal Scroll Story)
-   PERMANENT BOUNCE-FREE FIX:
-   1. anticipatePin: 1 prevents 1-frame entry bounce on smooth scroll.
-   2. scrub: 1 provides buttery smooth horizontal scroll momentum.
-   3. NO mid-scroll ScrollTrigger.refresh() calls (removed ResizeObserver
-      and height polling which were forcing unpin/re-pin during scroll).
+   PERMANENT SINGLE MASTER TIMELINE IMPLEMENTATION:
+   - 1 Single ScrollTrigger instance for the entire section
+     (combines horizontal scroll + all parallax layers into one master timeline).
+   - scrub: true (1:1 instant scroll sync with zero lag/rebound on unpin).
+   - anticipatePin: 1 (seamless entry without 1-frame scroll-past jump).
    ============================================================ */
 
 (function() {
@@ -21,21 +21,28 @@
 
     if (!section || !scrollContainer) return;
 
-    // Calculate the total horizontal scroll distance
+    // Calculate total horizontal scroll distance
     const getScrollAmount = () => scrollContainer.scrollWidth - window.innerWidth;
 
-    // 1. Main Pin & Horizontal Scroll Animation
-    const tween = gsap.to(scrollContainer, {
-      x: () => -getScrollAmount(),
-      ease: "none",
+    // Parallax background layers
+    const smokeLayer = document.getElementById('craft-bg-smoke');
+    const lightLayer = document.getElementById('craft-bg-light');
+    const dustLayer = document.getElementById('craft-bg-dust');
+
+    // ============================================================
+    // SINGLE MASTER TIMELINE & SCROLLTRIGGER
+    // Consolidates container movement + all background parallax into
+    // ONE single ScrollTrigger to eliminate multi-trigger conflicts.
+    // ============================================================
+    const masterTl = gsap.timeline({
       scrollTrigger: {
         trigger: section,
         start: "top top",
         end: () => `+=${getScrollAmount()}`,
         pin: true,
         pinSpacing: true,
-        anticipatePin: 1, // Eliminates entry bounce on smooth scroll
-        scrub: 1,         // Smooth 1s momentum glide (no micro-stutters)
+        anticipatePin: 0, // Ensures pinning only starts when top reaches top, allowing showcase to complete 100%
+        scrub: true,       // 1:1 instant sync (no lag timers after unpin)
         invalidateOnRefresh: true,
         onUpdate: (self) => {
           if (progressBar) {
@@ -45,51 +52,24 @@
       }
     });
 
-    // 2. Cinematic Background Parallax
-    const smokeLayer = document.getElementById('craft-bg-smoke');
-    const lightLayer = document.getElementById('craft-bg-light');
-    const dustLayer = document.getElementById('craft-bg-dust');
+    // 1. Primary Horizontal Scroll Tween
+    masterTl.to(scrollContainer, {
+      x: () => -getScrollAmount(),
+      ease: "none"
+    }, 0);
 
+    // 2. Parallax Layers (all mapped directly to the master timeline at position 0)
     if (smokeLayer) {
-      gsap.to(smokeLayer, {
-        x: "-10%",
-        ease: "none",
-        scrollTrigger: {
-          trigger: section,
-          start: "top top",
-          end: () => `+=${getScrollAmount()}`,
-          scrub: 1
-        }
-      });
+      masterTl.to(smokeLayer, { x: "-10%", ease: "none" }, 0);
     }
-
     if (lightLayer) {
-      gsap.to(lightLayer, {
-        x: "-25%",
-        ease: "none",
-        scrollTrigger: {
-          trigger: section,
-          start: "top top",
-          end: () => `+=${getScrollAmount()}`,
-          scrub: 1
-        }
-      });
+      masterTl.to(lightLayer, { x: "-25%", ease: "none" }, 0);
     }
-
     if (dustLayer) {
-      gsap.to(dustLayer, {
-        x: "5%",
-        ease: "none",
-        scrollTrigger: {
-          trigger: section,
-          start: "top top",
-          end: () => `+=${getScrollAmount()}`,
-          scrub: 1
-        }
-      });
+      masterTl.to(dustLayer, { x: "5%", ease: "none" }, 0);
     }
 
-    // 3. Chapter Reveals (Using containerAnimation)
+    // 3. Chapter Reveals (Using containerAnimation mapped to masterTl)
     const craftSteps = document.querySelectorAll('.craft-step');
     const markers = document.querySelectorAll('.craft-marker');
 
@@ -106,7 +86,7 @@
       // Marker activation trigger
       ScrollTrigger.create({
         trigger: step,
-        containerAnimation: tween,
+        containerAnimation: masterTl,
         start: "center center",
         onEnter: () => marker && marker.classList.add('active'),
         onLeaveBack: () => marker && marker.classList.remove('active')
@@ -116,7 +96,7 @@
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: step,
-          containerAnimation: tween,
+          containerAnimation: masterTl,
           start: "left 70%",
           toggleActions: "play reverse play reverse"
         }
@@ -181,7 +161,7 @@
       }
     });
 
-    // 4. Handle Window Resize Safely (Debounced, strictly on user window resize)
+    // Handle window resize strictly when user resizes browser window
     let resizeTimer;
     window.addEventListener("resize", () => {
       clearTimeout(resizeTimer);
