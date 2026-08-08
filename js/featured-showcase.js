@@ -1,7 +1,6 @@
 /* ============================================================
    AR-RAHMANI — Premium Featured Product Showcase (Cinematic 3D)
-   Handles product switching, GSAP 3D cinematic transitions,
-   interactive parallax, and hardware-accelerated rendering loop.
+   Dedicated Showcase for Flagship Perfumes: HAMOOD, PARADISE, SABR
    ============================================================ */
 
 const FeaturedShowcase = {
@@ -12,12 +11,19 @@ const FeaturedShowcase = {
       subtitle: "PARFUM",
       label: "EXTRAIT DE PARFUM",
       desc: "A rich and opulent fragrance that embodies strength, elegance and timeless Arabic heritage.",
-      price: "$180.00",
+      price: "₹70",
+      currency: "INR",
       image: "assets/images/hamood.webp",
       scale: 2.2,
       heroSize: "85vh",
       previewSize: "240px",
       glowColor: "rgba(212, 175, 55, 0.08)",
+      selectedSize: "60ml",
+      shopifyVariantId: null,
+      variants: [
+        { id: "variant_hamood_60ml", title: "60ml", price: "70.0" },
+        { id: "variant_hamood_100ml", title: "100ml", price: "100.0" }
+      ],
       notes: {
         top: "Bergamot, Saffron, Cinnamon",
         heart: "Oud, Rose, Patchouli",
@@ -30,12 +36,19 @@ const FeaturedShowcase = {
       subtitle: "EXOTIC BLEND",
       label: "EXTRAIT DE PARFUM",
       desc: "A paradise of tropical fruits, white flowers, and silky musk.",
-      price: "$130.00",
+      price: "₹70",
+      currency: "INR",
       image: "assets/images/paradisee.webp",
       scale: 1.4,
       heroSize: "60vh",
       previewSize: "180px",
       glowColor: "rgba(100, 200, 180, 0.06)",
+      selectedSize: "60ml",
+      shopifyVariantId: null,
+      variants: [
+        { id: "variant_paradise_60ml", title: "60ml", price: "70.0" },
+        { id: "variant_paradise_100ml", title: "100ml", price: "100.0" }
+      ],
       notes: {
         top: "Tropical Fruits, Bergamot, Coconut",
         heart: "White Flowers, Jasmine, Tiare",
@@ -48,12 +61,19 @@ const FeaturedShowcase = {
       subtitle: "ORIENTAL",
       label: "EXTRAIT DE PARFUM",
       desc: "Patience distilled — deep amber, sacred incense, and aged sandalwood.",
-      price: "$150.00",
+      price: "₹70",
+      currency: "INR",
       image: "assets/images/sabr.webp",
       scale: 1.2,
       heroSize: "65vh",
       previewSize: "130px",
       glowColor: "rgba(180, 150, 100, 0.06)",
+      selectedSize: "60ml",
+      shopifyVariantId: null,
+      variants: [
+        { id: "variant_sabr_60ml", title: "60ml", price: "70.0" },
+        { id: "variant_sabr_100ml", title: "100ml", price: "100.0" }
+      ],
       notes: {
         top: "Incense, Bergamot, Pink Pepper",
         heart: "Amber, Sandalwood, Patchouli",
@@ -64,8 +84,6 @@ const FeaturedShowcase = {
 
   activeId: 0,
   isAnimating: false,
-
-  // Parallax and rendering state
   mouseX: 0,
   mouseY: 0,
   targetX: 0,
@@ -73,10 +91,45 @@ const FeaturedShowcase = {
   time: 0,
   rafId: null,
 
-  init() {
+  async init() {
     this.setupEventListeners();
-    this.updateCards(true); // true = initial setup without animation
+    await this.fetchShopifyProducts();
+    this.updateCards(true);
     this.startRenderLoop();
+  },
+
+  async fetchShopifyProducts() {
+    try {
+      if (typeof ShopifyAPI === 'undefined') return;
+      const shopifyProducts = await ShopifyAPI.getProducts(50);
+
+      if (shopifyProducts && shopifyProducts.length > 0) {
+        // Sync live Shopify Storefront API variant IDs and pricing directly to HAMOOD, PARADISE, and SABR
+        this.products.forEach(prod => {
+          const matched = shopifyProducts.find(sp => 
+            sp.title.toLowerCase().includes(prod.name.toLowerCase()) ||
+            prod.name.toLowerCase().includes(sp.title.toLowerCase())
+          );
+
+          if (matched) {
+            prod.shopifyId = matched.id;
+            const variants = matched.variants?.edges?.map(e => e.node) || [];
+            if (variants.length > 0) {
+              prod.variants = variants;
+              prod.selectedVariantId = variants[0].id;
+              prod.shopifyVariantId = variants[0].id;
+              const minPrice = matched.priceRange?.minVariantPrice;
+              if (minPrice) {
+                prod.price = `₹${parseFloat(variants[0].price?.amount || minPrice.amount).toFixed(0)}`;
+                prod.currency = minPrice.currencyCode || 'INR';
+              }
+            }
+          }
+        });
+      }
+    } catch (e) {
+      console.warn('Shopify sync info for showcase:', e);
+    }
   },
 
   setupEventListeners() {
@@ -85,30 +138,26 @@ const FeaturedShowcase = {
     const wishlistBtn = document.querySelector(".btn-wishlist");
     const container = document.querySelector(".showcase-container");
 
-    // Click triggers
-    if (leftCard) {
-      leftCard.addEventListener("click", () => {
-        this.switchProduct3D("left");
-      });
-    }
-
-    if (rightCard) {
-      rightCard.addEventListener("click", () => {
-        this.switchProduct3D("right");
-      });
-    }
+    if (leftCard) leftCard.addEventListener("click", () => this.switchProduct3D("left"));
+    if (rightCard) rightCard.addEventListener("click", () => this.switchProduct3D("right"));
 
     if (wishlistBtn) {
-      wishlistBtn.addEventListener("click", () => {
-        wishlistBtn.classList.toggle("active");
-      });
+      wishlistBtn.addEventListener("click", () => wishlistBtn.classList.toggle("active"));
     }
 
-    // --- Interactive Mouse Parallax ---
+    // Handle Size Variant Selector Buttons
+    document.addEventListener("click", (e) => {
+      const sizeBtn = e.target.closest(".size-btn");
+      if (sizeBtn) {
+        const selectedSize = sizeBtn.dataset.size;
+        this.selectVariantSize(selectedSize);
+      }
+    });
+
+    // Interactive Mouse Parallax
     if (container) {
       container.addEventListener("mousemove", (e) => {
         const rect = container.getBoundingClientRect();
-        // Normalize coordinates to -1 to 1
         this.targetX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
         this.targetY = ((e.clientY - rect.top) / rect.height) * 2 - 1;
       });
@@ -118,7 +167,6 @@ const FeaturedShowcase = {
         this.targetY = 0;
       });
 
-      // --- Touch Swipe (Mobile) ---
       let touchStartX = 0;
       container.addEventListener("touchstart", (e) => {
         touchStartX = e.touches[0].clientX;
@@ -129,33 +177,44 @@ const FeaturedShowcase = {
         if (touchStartX - touchEndX > 50) this.switchProduct3D("right");
         if (touchEndX - touchStartX > 50) this.switchProduct3D("left");
       });
-
-      // --- Mouse Wheel ---
-      let wheelTimeout;
-      container.addEventListener("wheel", (e) => {
-        // Prevent accidental vertical scrolls triggering side swipes
-        if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 20) {
-          e.preventDefault();
-          if (this.isAnimating) return;
-          clearTimeout(wheelTimeout);
-          wheelTimeout = setTimeout(() => {
-            if (e.deltaX > 0) this.switchProduct3D("right");
-            else this.switchProduct3D("left");
-          }, 50);
-        }
-      }, { passive: false });
     }
 
-    // --- Keyboard Arrows ---
     document.addEventListener("keydown", (e) => {
       if (this.isAnimating || !container) return;
       const rect = container.getBoundingClientRect();
-      // Only trigger if showcase is visible in viewport
       if (rect.top < window.innerHeight && rect.bottom > 0) {
         if (e.key === "ArrowRight") this.switchProduct3D("right");
         if (e.key === "ArrowLeft") this.switchProduct3D("left");
       }
     });
+  },
+
+  selectVariantSize(sizeTitle) {
+    const activeProduct = this.products[this.activeId];
+    if (!activeProduct || !activeProduct.variants) return;
+
+    const matchedVariant = activeProduct.variants.find(v => 
+      v.title.toLowerCase().includes(sizeTitle.toLowerCase())
+    );
+
+    if (matchedVariant) {
+      activeProduct.selectedVariantId = matchedVariant.id;
+      activeProduct.selectedSize = matchedVariant.title;
+      if (matchedVariant.price?.amount) {
+        activeProduct.price = `₹${parseFloat(matchedVariant.price.amount).toFixed(0)}`;
+      } else if (matchedVariant.price) {
+        activeProduct.price = `₹${parseFloat(matchedVariant.price).toFixed(0)}`;
+      }
+
+      const priceEl = document.getElementById("showcase-price");
+      const currencyEl = document.getElementById("showcase-currency");
+      if (priceEl) priceEl.textContent = activeProduct.price;
+      if (currencyEl) currencyEl.textContent = activeProduct.currency || "INR";
+
+      document.querySelectorAll(".size-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.size.toLowerCase() === sizeTitle.toLowerCase());
+      });
+    }
   },
 
   startRenderLoop() {
@@ -167,7 +226,6 @@ const FeaturedShowcase = {
     
     let isVisible = true;
 
-    // Use IntersectionObserver for efficient visibility detection
     if (showcaseSection) {
       const observer = new IntersectionObserver((entries) => {
         isVisible = entries[0].isIntersecting;
@@ -178,42 +236,34 @@ const FeaturedShowcase = {
       observer.observe(showcaseSection);
     }
 
-    // Viewport-aware hardware-accelerated loop
     const render = () => {
-      // Pause completely when offscreen
       if (!isVisible) {
         this.rafId = null;
         return;
       }
 
       if (!this.isAnimating && showcaseSection) {
-        this.time += 0.015; // Drives the 7-9s subtle breathing
+        this.time += 0.015;
 
-        // Smoothly interpolate mouse targets (lerp)
         this.mouseX += (this.targetX - this.mouseX) * 0.08;
         this.mouseY += (this.targetY - this.mouseY) * 0.08;
 
-        // 1. Calculate Breathing Motion
         const breatheY = Math.sin(this.time) * 8; 
         const breatheRot = Math.cos(this.time * 0.8) * 0.5; 
         const breatheScale = 1 + Math.sin(this.time * 1.2) * 0.005; 
 
-        // 2. Calculate Parallax Motion
         const parallaxRotY = this.mouseX * 6; 
         const parallaxRotX = -this.mouseY * 4;
         
-        // 3. Apply Transforms to Hero Bottle and Reflection
         const activeProduct = FeaturedShowcase.products.find(p => p.id === FeaturedShowcase.activeId);
         const baseScale = activeProduct ? activeProduct.scale : 2.2;
         const finalScale = baseScale * breatheScale;
         
-        const offsetX = 0;
-        const transformString = `translate3d(${offsetX}px, ${breatheY}px, 0) rotateX(${parallaxRotX}deg) rotateY(${parallaxRotY}deg) rotateZ(${breatheRot}deg) scale3d(${finalScale}, ${finalScale}, 1)`;
+        const transformString = `translate3d(0px, ${breatheY}px, 0) rotateX(${parallaxRotX}deg) rotateY(${parallaxRotY}deg) rotateZ(${breatheRot}deg) scale3d(${finalScale}, ${finalScale}, 1)`;
         
         if (heroImage) heroImage.style.transform = transformString;
         if (reflection) reflection.style.transform = transformString;
 
-        // 4. Dynamic Shadow
         const shadowScale = 1 - (breatheY / 40);
         const shadowX = -50 + this.mouseX * -10; 
         
@@ -222,7 +272,6 @@ const FeaturedShowcase = {
           shadow.style.opacity = 0.8 * shadowScale;
         }
 
-        // 5. Dynamic Glow Shift
         if (glow) {
           glow.style.transform = `translate3d(${this.mouseX * -20}px, ${this.mouseY * -20}px, 0)`;
         }
@@ -254,7 +303,6 @@ const FeaturedShowcase = {
     const nextProduct = this.products.find(p => p.id === targetId);
     this.activeId = targetId;
 
-    // Elements
     const heroImage = document.getElementById("showcase-hero-image");
     const reflection = document.getElementById("showcase-reflection-image");
     const shadow = document.getElementById("showcase-shadow");
@@ -265,20 +313,19 @@ const FeaturedShowcase = {
     const subtitle = document.getElementById("showcase-subtitle");
     const desc = document.getElementById("showcase-desc");
     const price = document.getElementById("showcase-price");
+    const currency = document.getElementById("showcase-currency");
     const btnBag = document.querySelector(".btn-add-bag");
     const btnWish = document.querySelector(".btn-wishlist");
     
     const leftCard = document.getElementById("preview-left");
     const rightCard = document.getElementById("preview-right");
 
-    // Clear continuous transforms before GSAP takes over
     if (heroImage) heroImage.style.transform = "";
     if (reflection) reflection.style.transform = "";
 
     const tl = gsap.timeline({
       onComplete: () => {
         this.isAnimating = false;
-        // Let rAF take over again cleanly
         gsap.set([heroImage, reflection], { clearProps: "all" });
       }
     });
@@ -286,22 +333,15 @@ const FeaturedShowcase = {
     const outX = direction === "left" ? 250 : -250;
     const inX = direction === "left" ? -250 : 250;
     const rotY = direction === "left" ? 18 : -18;
-
-    // High-end cinematic easing
     const cineEase = "cubic-bezier(.22,.61,.36,1)";
     
-    // Scale factors and Offsets
     const currentProduct = this.products.find(p => p.id === this.activeId);
     const currentScale = currentProduct ? currentProduct.scale : 2.2;
     const targetScale = nextProduct.scale;
-    const targetOffsetX = 0;
 
-    // ==========================================
-    // PHASE 1: EXIT CURRENT PRODUCT
-    // ==========================================
     tl.to([heroImage, reflection], {
       x: outX,
-      z: -150, // Move backward diagonally
+      z: -150,
       rotationY: rotY,
       rotationX: 2,
       rotationZ: 1,
@@ -315,8 +355,7 @@ const FeaturedShowcase = {
     tl.to(shadow, { opacity: 0, scale: 0.5, duration: 0.3, ease: "power2.inOut" }, 0);
     tl.to(glow, { scale: 0.8, opacity: 0, duration: 0.3, ease: "power2.inOut" }, 0);
 
-    // Staggered text exit
-    tl.to([label, title, subtitle, desc, price, ".showcase-notes-section", btnBag, btnWish], {
+    tl.to([label, title, subtitle, desc, price, "#showcase-variant-section", ".showcase-notes-section", btnBag, btnWish], {
       y: -15,
       opacity: 0,
       stagger: 0.02,
@@ -324,7 +363,6 @@ const FeaturedShowcase = {
       ease: "power2.in"
     }, 0);
     
-    // Side cards physically rotate and fade back
     tl.to([leftCard, rightCard], {
       opacity: 0,
       z: -50,
@@ -333,29 +371,29 @@ const FeaturedShowcase = {
       ease: "power2.in"
     }, 0);
 
-    // ==========================================
-    // MIDPOINT: UPDATE DOM CONTENT
-    // ==========================================
     tl.add(() => {
-      // Update text data
-      label.textContent = nextProduct.label;
-      title.textContent = nextProduct.name;
-      subtitle.textContent = nextProduct.subtitle;
-      desc.textContent = nextProduct.desc;
+      if (label) label.textContent = nextProduct.label;
+      if (title) title.textContent = nextProduct.name;
+      if (subtitle) subtitle.textContent = nextProduct.subtitle;
+      if (desc) desc.textContent = nextProduct.desc;
       
       const notesTop = document.getElementById("notes-top");
       const notesHeart = document.getElementById("notes-heart");
       const notesBase = document.getElementById("notes-base");
-      if(notesTop) notesTop.textContent = nextProduct.notes.top;
-      if(notesHeart) notesHeart.textContent = nextProduct.notes.heart;
-      if(notesBase) notesBase.textContent = nextProduct.notes.base;
+      if(notesTop) notesTop.textContent = nextProduct.notes?.top || "";
+      if(notesHeart) notesHeart.textContent = nextProduct.notes?.heart || "";
+      if(notesBase) notesBase.textContent = nextProduct.notes?.base || "";
       
-      price.textContent = nextProduct.price;
+      if (price) price.textContent = nextProduct.price;
+      if (currency) currency.textContent = nextProduct.currency || "INR";
+
+      document.querySelectorAll(".size-btn").forEach((btn, i) => {
+        btn.classList.toggle("active", i === 0);
+      });
 
       if (heroImage) {
         heroImage.src = nextProduct.image;
         heroImage.alt = nextProduct.name;
-        // Dynamic hero sizing
         heroImage.style.setProperty('--hero-size', nextProduct.heroSize);
       }
       
@@ -371,29 +409,23 @@ const FeaturedShowcase = {
       this.updateCards(false); 
     }, 0.35);
 
-    // ==========================================
-    // PHASE 2: ENTRANCE NEW PRODUCT
-    // ==========================================
-    // Camera-continuous smooth entry
     tl.fromTo([heroImage, reflection],
       { x: inX, z: -150, rotationY: -rotY, rotationX: 2, rotationZ: 1, scale: targetScale * 0.95, opacity: 0, filter: "blur(8px)" },
-      { x: targetOffsetX, z: 0, rotationY: 0, rotationX: 0, rotationZ: 0, scale: targetScale, opacity: 1, filter: "blur(0px)", duration: 0.8, ease: cineEase },
+      { x: 0, z: 0, rotationY: 0, rotationX: 0, rotationZ: 0, scale: targetScale, opacity: 1, filter: "blur(0px)", duration: 0.8, ease: cineEase },
       0.35
     );
 
     tl.to(shadow, { opacity: 0.8, scale: 1, duration: 0.8, ease: cineEase }, 0.35);
     tl.to(glow, { scale: 1, opacity: 1, duration: 0.8, ease: cineEase }, 0.35);
 
-    // Staggered text entrance
     tl.fromTo(label, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.4);
     tl.fromTo(title, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.45);
     tl.fromTo(subtitle, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.5);
     tl.fromTo(desc, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.55);
-    tl.fromTo(".showcase-notes-section", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.6);
+    tl.fromTo("#showcase-variant-section", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.6);
     tl.fromTo(price, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.65);
     tl.fromTo([btnBag, btnWish], { y: 20, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.05, duration: 0.6, ease: "power3.out" }, 0.7);
 
-    // Side cards slide in
     tl.fromTo([leftCard, rightCard],
       { opacity: 0, z: -50, rotationY: -rotY },
       { opacity: 1, z: 0, rotationY: 0, duration: 0.6, ease: cineEase },
@@ -442,9 +474,7 @@ const FeaturedShowcase = {
   }
 };
 
-/* ============================================================
-   BOOT
-   ============================================================ */
+// Boot
 (function () {
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => FeaturedShowcase.init());

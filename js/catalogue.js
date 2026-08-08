@@ -442,7 +442,7 @@ const Catalogue = {
       available: vEdge.node.availableForSale || false,
       quantityAvailable: vEdge.node.quantityAvailable || null,
       price: parseFloat(vEdge.node.price?.amount || 0).toFixed(2),
-      currency: vEdge.node.price?.currencyCode || 'USD',
+      currency: vEdge.node.price?.currencyCode || 'AED',
       compareAtPrice: vEdge.node.compareAtPrice
         ? parseFloat(vEdge.node.compareAtPrice.amount).toFixed(2)
         : null,
@@ -451,7 +451,7 @@ const Catalogue = {
 
     // Price
     const price = parseFloat(node.priceRange?.minVariantPrice?.amount || 0).toFixed(2);
-    const currency = node.priceRange?.minVariantPrice?.currencyCode || 'USD';
+    const currency = node.priceRange?.minVariantPrice?.currencyCode || 'AED';
     const compareAtPrice = node.compareAtPriceRange?.minVariantPrice?.amount
       ? parseFloat(node.compareAtPriceRange.minVariantPrice.amount).toFixed(2)
       : null;

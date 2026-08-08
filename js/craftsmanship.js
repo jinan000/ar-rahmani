@@ -19,29 +19,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // but we added padding to the container to handle start/end gracefully.
   const getScrollAmount = () => scrollContainer.scrollWidth - window.innerWidth;
 
-  // 1. Horizontal Scroll & Pinning Timeline (with smooth header entry hold)
-  const tween = gsap.timeline({
+  // 1. Horizontal Scroll & Pinning Tween
+  const tween = gsap.to(scrollContainer, {
+    x: () => -getScrollAmount(),
+    ease: "none",
     scrollTrigger: {
       trigger: section,
       start: "top top",
-      end: () => `+=${getScrollAmount() + window.innerWidth * 0.35}`,
+      end: () => `+=${getScrollAmount()}`,
       pin: true,
-      scrub: 1, // Smooth scrubbing
+      scrub: 0.1, // Fast 1:1 sync with Lenis — eliminates double-smoothing catch-up lag!
       invalidateOnRefresh: true,
       onUpdate: (self) => {
-        // Calculate progress bar width cleanly after the header hold
-        const scrollPct = Math.max(0, (self.progress - 0.1) / 0.9);
-        gsap.set(progressBar, { width: `calc(${scrollPct * 100}% - 50vw)` });
+        gsap.set(progressBar, { width: `calc(${self.progress * 100}% - 50vw)` });
       }
     }
-  });
-
-  // Hold header stationary & centered for initial 10% scroll before sliding steps
-  tween.to({}, { duration: 0.1 });
-  tween.to(scrollContainer, {
-    x: () => -getScrollAmount(),
-    ease: "none",
-    duration: 0.9
   });
 
   // 2. Cinematic Background Parallax

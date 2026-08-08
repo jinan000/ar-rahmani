@@ -714,7 +714,7 @@
 /* Steps Row */
 .craft-steps-row {
   display: flex;
-  padding-left: 10vw; 
+  padding-left: 20vw; 
   gap: 10vw; 
   align-items: center;
   height: 100vh;
@@ -1520,6 +1520,37 @@
 .showcase-notes-grid strong {
   color: var(--color-gold-soft);
   margin-right: 0.5rem;
+}
+
+.showcase-variant-section {
+  margin-bottom: 1.5rem;
+}
+
+.showcase-size-selector {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.size-btn {
+  padding: 0.45rem 1.25rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-gold-border);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-wide);
+  cursor: pointer;
+  transition: all 0.3s var(--ease-luxury);
+}
+
+.size-btn:hover,
+.size-btn.active {
+  border-color: var(--color-gold);
+  background: rgba(212, 175, 55, 0.18);
+  color: var(--color-gold-soft);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.25);
 }
 
 .showcase-purchase {

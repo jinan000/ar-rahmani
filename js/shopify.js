@@ -464,14 +464,14 @@ const ShopifyAPI = {
       checkoutUrl: cart.checkoutUrl,
       totalQuantity: cart.totalQuantity || 0,
       subtotal: cart.cost?.subtotalAmount?.amount ? parseFloat(cart.cost.subtotalAmount.amount).toFixed(2) : '0.00',
-      currency: cart.cost?.subtotalAmount?.currencyCode || 'USD',
+      currency: cart.cost?.subtotalAmount?.currencyCode || 'AED',
       lines: cart.lines?.edges?.map(edge => ({
         id: edge.node.id,
         quantity: edge.node.quantity,
         variantId: edge.node.merchandise.id,
         variantTitle: edge.node.merchandise.title,
         price: parseFloat(edge.node.merchandise.price.amount).toFixed(2),
-        currency: edge.node.merchandise.price.currencyCode,
+        currency: edge.node.merchandise.price.currencyCode || 'AED',
         productTitle: edge.node.merchandise.product.title,
         image: edge.node.merchandise.product.images?.edges[0]?.node?.url || ''
       })) || []

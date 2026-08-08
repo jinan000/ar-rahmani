@@ -71,7 +71,7 @@ const ShopifyCartUI = {
           <div class="cart-drawer-footer" id="cart-drawer-footer">
             <div class="cart-summary-row">
               <span>SUBTOTAL</span>
-              <span class="cart-subtotal-price" id="cart-subtotal">$0.00 USD</span>
+              <span class="cart-subtotal-price" id="cart-subtotal">0.00 AED</span>
             </div>
             <p class="cart-tax-shipping-note">Taxes and shipping calculated at checkout.</p>
             <button class="btn btn-primary cart-checkout-btn" id="cart-checkout-btn">
@@ -177,13 +177,16 @@ const ShopifyCartUI = {
         const activeItem = FeaturedShowcase.products.find(p => p.id === FeaturedShowcase.activeId);
         if (activeItem) {
           productName = activeItem.name;
-          price = activeItem.price.replace('$', '').replace(' USD', '').trim();
-          variantId = activeItem.shopifyVariantId || null;
+          price = activeItem.price.replace('₹', '').replace('$', '').replace(' INR', '').replace(' USD', '').trim();
+          variantId = activeItem.selectedVariantId || activeItem.shopifyVariantId || null;
         }
       }
 
-      // If variantId is not available, check matched shopify products
-      if (!variantId && this.shopifyProducts.length > 0) {
+      // Check if variantId is a valid published Shopify GID
+      const isRealShopifyVariant = variantId && typeof variantId === 'string' && variantId.startsWith('gid://shopify/ProductVariant/');
+
+      // If variantId is not available or not GID, check matched shopify products
+      if (!isRealShopifyVariant && this.shopifyProducts.length > 0) {
         const matched = this.shopifyProducts.find(p => 
           p.title.toLowerCase().includes(productName.toLowerCase()) || 
           productName.toLowerCase().includes(p.title.toLowerCase())
@@ -193,21 +196,19 @@ const ShopifyCartUI = {
         }
       }
 
-      // If no Shopify cart exists, create one
-      if (!this.cart || !this.cart.id) {
-        if (variantId) {
+      const validGid = variantId && typeof variantId === 'string' && variantId.startsWith('gid://shopify/ProductVariant/');
+
+      // If valid Shopify variant exists, update Storefront API Cart
+      if (validGid) {
+        if (!this.cart || !this.cart.id || this.cart.id.startsWith('local_cart_')) {
           this.cart = await ShopifyAPI.createCart([{ merchandiseId: variantId, quantity: 1 }]);
           localStorage.setItem(this.cartIdKey, this.cart.id);
         } else {
-          // Fallback mock line item stored locally if storefront has not published exact product variants yet
-          this.addLocalFallbackItem(productName, price);
+          this.cart = await ShopifyAPI.addToCart(this.cart.id, [{ merchandiseId: variantId, quantity: 1 }]);
         }
       } else {
-        if (variantId) {
-          this.cart = await ShopifyAPI.addToCart(this.cart.id, [{ merchandiseId: variantId, quantity: 1 }]);
-        } else {
-          this.addLocalFallbackItem(productName, price);
-        }
+        // Dynamic fallback for offline/unpublished product variants
+        this.addLocalFallbackItem(productName, price);
       }
 
       buttonElement.innerHTML = `<span>ADDED TO BAG ✓</span>`;
@@ -219,9 +220,9 @@ const ShopifyCartUI = {
       }, 300);
 
     } catch (error) {
-      console.error('Error adding to Shopify cart:', error);
-      // Local fallback on connection or missing variant error
-      this.addLocalFallbackItem("HAMOOD", "180.00");
+      console.warn('Shopify Cart Notice:', error.message);
+      // Dynamic local fallback using active product name and price
+      this.addLocalFallbackItem(productName, price);
       this.renderCart();
       this.openDrawer();
     } finally {
@@ -236,18 +237,26 @@ const ShopifyCartUI = {
    * Fallback for offline or unpublished variant testing
    */
   addLocalFallbackItem(name, price) {
+    let selectedSize = '60ml';
+    if (typeof FeaturedShowcase !== 'undefined' && FeaturedShowcase.products) {
+      const activeItem = FeaturedShowcase.products.find(p => p.id === FeaturedShowcase.activeId);
+      if (activeItem && activeItem.selectedSize) {
+        selectedSize = activeItem.selectedSize;
+      }
+    }
+
     if (!this.cart) {
       this.cart = {
         id: 'local_cart_' + Date.now(),
         checkoutUrl: 'https://' + (window.SHOPIFY_CONFIG?.storeDomain || '7cszxa-9r.myshopify.com') + '/cart',
         totalQuantity: 0,
         subtotal: '0.00',
-        currency: 'USD',
+        currency: 'INR',
         lines: []
       };
     }
 
-    const existingLine = this.cart.lines.find(l => l.productTitle === name);
+    const existingLine = this.cart.lines.find(l => l.productTitle === name && l.variantTitle.includes(selectedSize));
     if (existingLine) {
       existingLine.quantity += 1;
     } else {
@@ -260,9 +269,9 @@ const ShopifyCartUI = {
         id: 'line_' + Date.now(),
         quantity: 1,
         variantId: 'variant_fallback_' + Date.now(),
-        variantTitle: 'Extrait de Parfum / 50ml',
+        variantTitle: `Extrait de Parfum / ${selectedSize}`,
         price: parseFloat(price).toFixed(2),
-        currency: 'USD',
+        currency: 'INR',
         productTitle: name,
         image: imagesMap[name] || 'assets/images/hamood.webp'
       });
@@ -327,7 +336,7 @@ const ShopifyCartUI = {
   renderCart() {
     const totalQty = this.cart ? this.cart.totalQuantity : 0;
     const subtotal = this.cart ? this.cart.subtotal : '0.00';
-    const currency = this.cart ? this.cart.currency : 'USD';
+    const currency = this.cart && this.cart.currency && this.cart.currency !== 'USD' ? this.cart.currency : 'AED';
 
     // Update Badges & Counts
     const badge = document.getElementById('cart-badge');
@@ -339,7 +348,7 @@ const ShopifyCartUI = {
       badge.classList.toggle('has-items', totalQty > 0);
     }
     if (drawerCount) drawerCount.textContent = `(${totalQty} item${totalQty === 1 ? '' : 's'})`;
-    if (subtotalEl) subtotalEl.textContent = `$${subtotal} ${currency}`;
+    if (subtotalEl) subtotalEl.textContent = `${subtotal} ${currency}`;
 
     // Render items list
     const itemsListEl = document.getElementById('cart-items-list');
@@ -357,7 +366,9 @@ const ShopifyCartUI = {
     if (footerEl) footerEl.style.display = 'block';
 
     if (itemsListEl) {
-      itemsListEl.innerHTML = this.cart.lines.map(line => `
+      itemsListEl.innerHTML = this.cart.lines.map(line => {
+        const itemCurr = line.currency && line.currency !== 'USD' ? line.currency : 'AED';
+        return `
         <div class="cart-item" data-line-id="${line.id}">
           <div class="cart-item-image">
             <img src="${line.image || 'assets/images/hamood.webp'}" alt="${line.productTitle}">
@@ -374,11 +385,12 @@ const ShopifyCartUI = {
                 <span class="qty-num">${line.quantity}</span>
                 <button class="qty-btn" onclick="ShopifyCartUI.updateQuantity('${line.id}', ${line.quantity + 1})" aria-label="Increase">&plus;</button>
               </div>
-              <span class="cart-item-price">$${(parseFloat(line.price) * line.quantity).toFixed(2)} ${line.currency}</span>
+              <span class="cart-item-price">${(parseFloat(line.price) * line.quantity).toFixed(2)} ${itemCurr}</span>
             </div>
           </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
     }
   },
 
