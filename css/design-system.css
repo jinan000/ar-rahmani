@@ -431,3 +431,56 @@ img {
 .showcase-container {
   contain: layout style;
 }
+
+/* ============================================================
+   MOBILE RESOLUTIONS — DISABLE ALL HOVER ANIMATIONS & TRANSFORMS
+   Disables sticky hover states, scale shifts, image swapping, 
+   and hover glows across all elements on mobile viewports.
+   ============================================================ */
+@media (max-width: 992px), (hover: none) {
+  .btn:hover,
+  .btn-primary:hover,
+  .btn-ghost:hover,
+  .btn-add-bag:hover,
+  .cat-card:hover,
+  .feature-card:hover,
+  .ingredient-card:hover,
+  .product-card:hover,
+  .signature-card:hover,
+  .testimonial-card:hover,
+  .showcase-nav-group:hover,
+  .arrow-btn-standalone:hover,
+  .preview-card-box:hover,
+  .size-btn:hover,
+  .btn-wishlist:hover,
+  .catalogue-chip:hover,
+  .catalogue-search:hover,
+  .cat-btn-cart:hover,
+  .cat-btn-details:hover,
+  .navbar-links a:hover,
+  .nav-cart-btn:hover,
+  .instagram-item:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+  }
+
+  .cat-card:hover img,
+  .product-card:hover img,
+  .ingredient-card:hover img,
+  .signature-card:hover img,
+  .instagram-item:hover img,
+  .feature-card:hover .feature-card-icon,
+  .feature-card:hover .feature-card-icon svg {
+    transform: none !important;
+    filter: none !important;
+  }
+
+  /* Prevent image swap on mobile hover for product cards */
+  .cat-card:hover .cat-card-bottle--primary {
+    opacity: 1 !important;
+  }
+  .cat-card:hover .cat-card-bottle--hover {
+    opacity: 0 !important;
+  }
+}
