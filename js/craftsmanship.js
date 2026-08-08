@@ -170,6 +170,15 @@
       }, 250);
     });
 
+    // Handle BFCache (back/forward cache) navigation when user returns from checkout
+    window.addEventListener("pageshow", () => {
+      setTimeout(() => {
+        if (typeof ScrollTrigger !== 'undefined') {
+          ScrollTrigger.refresh();
+        }
+      }, 150);
+    });
+
     // Initial calculation after all elements are painted
     setTimeout(() => {
       ScrollTrigger.refresh();

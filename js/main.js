@@ -22,17 +22,55 @@ const App = {
     Cursor.init();
     FragranceFinder.init();
 
+    // Configure browser scroll restoration for smooth GSAP/Lenis synchronization
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
     this.initLenis();
 
     this.setupLazyLoading();
     this.setupMobileMenu();
     this.setupNewsletterForm();
+    this.setupBFCacheRestoration();
 
     // Prefers reduced motion
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       Particles.destroy();
       if (this.lenis) this.lenis.destroy();
     }
+  },
+
+  /* ----------------------------------------------------------
+     BFCache & BACK NAVIGATION RESTORATION
+     Handles returning from Shopify checkout / external tabs / back button.
+     Refreshes GSAP ScrollTrigger pin spacers so sections never bounce.
+     ---------------------------------------------------------- */
+  setupBFCacheRestoration() {
+    // 1. Pageshow handler (fires on back/forward cache navigation)
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted || (window.performance && window.performance.navigation && window.performance.navigation.type === 2)) {
+        if (this.lenis) {
+          this.lenis.start();
+        }
+        if (typeof ScrollTrigger !== 'undefined') {
+          setTimeout(() => {
+            ScrollTrigger.refresh();
+          }, 150);
+        }
+      }
+    });
+
+    // 2. Visibility change handler (fires when returning from checkout tab)
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        if (typeof ScrollTrigger !== 'undefined') {
+          setTimeout(() => {
+            ScrollTrigger.refresh();
+          }, 150);
+        }
+      }
+    });
   },
 
   /* ----------------------------------------------------------
