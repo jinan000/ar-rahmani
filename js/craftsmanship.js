@@ -29,8 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
       end: () => `+=${getScrollAmount()}`,
       pin: true,
       pinSpacing: true,
-      anticipatePin: 1, // Pre-renders pinning state cleanly to eliminate any jump!
-      scrub: 0.1, // Fast 1:1 sync with Lenis — eliminates double-smoothing catch-up lag!
+      anticipatePin: 0,
+      scrub: true,
       invalidateOnRefresh: true,
       onUpdate: (self) => {
         gsap.set(progressBar, { width: `calc(${self.progress * 100}% - 50vw)` });
@@ -195,13 +195,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Recalculate everything on resize (debounced)
+  // Recalculate everything on resize & image load to prevent layout jumps permanently
   let craftResizeTimer;
-  window.addEventListener("resize", () => {
+  const refreshScroll = () => {
     clearTimeout(craftResizeTimer);
-    craftResizeTimer = setTimeout(() => ScrollTrigger.refresh(), 250);
+    craftResizeTimer = setTimeout(() => ScrollTrigger.refresh(), 150);
+  };
+
+  window.addEventListener("resize", refreshScroll);
+  window.addEventListener("load", refreshScroll);
+
+  // Refresh when images inside craftsmanship finish loading
+  scrollContainer.querySelectorAll('img').forEach(img => {
+    if (img.complete) return;
+    img.addEventListener('load', refreshScroll);
   });
 
-  // Delayed refresh to ensure DOM is fully laid out
   setTimeout(() => ScrollTrigger.refresh(), 300);
 });
