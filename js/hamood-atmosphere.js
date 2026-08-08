@@ -80,7 +80,7 @@ const HamoodAtmosphere = {
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     // Adjust particle count for mobile
-    this.maxParticles = this.width < 768 ? 10 : 20;
+    this.maxParticles = this.width < 768 ? 8 : 15;
   },
 
   /* ----------------------------------------------------------
@@ -127,6 +127,13 @@ const HamoodAtmosphere = {
       return;
     }
 
+    // Throttle to ~30fps for ambient particles
+    this._frameSkip = !this._frameSkip;
+    if (this._frameSkip) {
+      this.animationFrame = requestAnimationFrame(() => this.animate());
+      return;
+    }
+
     this.ctx.clearRect(0, 0, this.width, this.height);
 
     // Adjust particle visibility based on scroll
@@ -160,30 +167,15 @@ const HamoodAtmosphere = {
       const effectiveOpacity = p.opacity * densityFactor;
       if (effectiveOpacity < 0.01) return;
 
-      this.ctx.save();
+      // Simple dot — no per-particle gradient (GPU friendly)
       this.ctx.globalAlpha = effectiveOpacity;
-
-      // Outer glow
-      const gradient = this.ctx.createRadialGradient(
-        p.x, p.y, 0,
-        p.x, p.y, p.size * 5
-      );
-      gradient.addColorStop(0, `hsla(${p.hue}, ${p.saturation}%, ${p.lightness}%, 0.25)`);
-      gradient.addColorStop(1, `hsla(${p.hue}, ${p.saturation}%, ${p.lightness}%, 0)`);
-      this.ctx.fillStyle = gradient;
-      this.ctx.beginPath();
-      this.ctx.arc(p.x, p.y, p.size * 5, 0, Math.PI * 2);
-      this.ctx.fill();
-
-      // Core particle
       this.ctx.fillStyle = `hsla(${p.hue}, ${p.saturation}%, ${p.lightness + 15}%, ${effectiveOpacity})`;
       this.ctx.beginPath();
-      this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      this.ctx.arc(p.x, p.y, p.size * 1.5, 0, Math.PI * 2);
       this.ctx.fill();
-
-      this.ctx.restore();
     });
 
+    this.ctx.globalAlpha = 1;
     this.animationFrame = requestAnimationFrame(() => this.animate());
   },
 

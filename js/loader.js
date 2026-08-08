@@ -1,72 +1,111 @@
 /* ============================================================
    AR-RAHMANI — Loader
-   Luxury Loading Screen
+   Luxury Loading Screen with Real-Time Progressive Readout
    ============================================================ */
 
 const Loader = {
   el: null,
   progressBar: null,
-  progress: 0,
-  minDisplayTime: 500,
+  percentEl: null,
+  targetProgress: 0,
+  currentProgress: 0,
+  isCompleting: false,
+  isFinished: false,
   startTime: 0,
+  minDisplayTime: 2000, // 2 seconds min display time for smooth frame preloading
+  rafId: null,
 
   init() {
     this.el = document.getElementById('loader');
     this.progressBar = document.getElementById('loader-progress-bar');
+    this.percentEl = document.getElementById('loader-percent');
     if (!this.el || !this.progressBar) return;
 
     this.startTime = Date.now();
     document.body.style.overflow = 'hidden';
-    this.simulateProgress();
+
+    // Baseline initial progress
+    this.targetProgress = 5;
+
+    // Start continuous smooth animation loop
+    this.animate();
+
+    // Fallback: auto complete after 3.5 seconds
+    setTimeout(() => {
+      this.complete();
+    }, 3500);
   },
 
-  simulateProgress() {
-    const steps = [
-      { target: 40, delay: 100 },
-      { target: 80, delay: 250 },
-      { target: 95, delay: 400 },
-    ];
+  animate() {
+    if (this.isFinished) return;
 
-    steps.forEach(({ target, delay }) => {
-      setTimeout(() => {
-        this.setProgress(target);
-      }, delay);
-    });
-
-    // Final step once DOM is ready or fast timeout
-    let loaded = false;
-    const finishLoader = () => {
-      if (loaded) return;
-      loaded = true;
-      this.setProgress(100);
-      setTimeout(() => this.hide(), 200);
-    };
-
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-      setTimeout(finishLoader, 150);
-    } else {
-      document.addEventListener('DOMContentLoaded', finishLoader);
-      window.addEventListener('load', finishLoader);
+    // Smooth incremental step-by-step progress (0% -> 1% -> 2% ... -> 100%)
+    if (this.currentProgress < this.targetProgress) {
+      const step = Math.min(1.8, (this.targetProgress - this.currentProgress) * 0.12 + 0.4);
+      this.currentProgress += step;
+    } else if (this.isCompleting && this.currentProgress < 100) {
+      this.currentProgress += 1.2;
     }
-    // Fallback: dismiss after 450ms maximum
-    setTimeout(finishLoader, 450);
-  },
 
-  setProgress(value) {
-    this.progress = value;
+    if (this.currentProgress > 100) this.currentProgress = 100;
+
+    const rounded = Math.floor(this.currentProgress);
     if (this.progressBar) {
-      this.progressBar.style.width = `${value}%`;
+      this.progressBar.style.width = `${rounded}%`;
     }
+    if (this.percentEl) {
+      this.percentEl.textContent = `${rounded}%`;
+    }
+
+    // Hide when 100% reached and min display time passed
+    if (rounded >= 100 && (Date.now() - this.startTime) >= this.minDisplayTime) {
+      this.hide();
+      return;
+    }
+
+    this.rafId = requestAnimationFrame(() => this.animate());
+  },
+
+  setProgress(val) {
+    const clamped = Math.max(0, Math.min(98, val));
+    if (clamped > this.targetProgress) {
+      this.targetProgress = clamped;
+    }
+  },
+
+  updateProgress(loadedCount, totalCount) {
+    if (totalCount <= 0) return;
+    const ratio = Math.min(1, loadedCount / totalCount);
+    // Smoothly scale real frame count to 5-92% range
+    const pct = 5 + Math.round(ratio * 87);
+    this.setProgress(pct);
+  },
+
+  complete() {
+    if (this.isCompleting) return;
+    this.isCompleting = true;
+    this.targetProgress = 100;
   },
 
   hide() {
+    if (this.isFinished) return;
+    this.isFinished = true;
+    
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId);
+    }
+
+    if (this.progressBar) this.progressBar.style.width = '100%';
+    if (this.percentEl) this.percentEl.textContent = '100%';
+
     if (this.el) {
       this.el.classList.add('loaded');
       document.body.style.overflow = '';
-      // Remove from DOM after animation
       setTimeout(() => {
-        this.el.remove();
-      }, 1000);
+        if (this.el && this.el.parentNode) {
+          this.el.remove();
+        }
+      }, 800);
     }
   }
 };

@@ -1,9 +1,11 @@
 /* ============================================================
    AR-RAHMANI — Main
-   App initialization, lazy loading, mobile menu
+   App initialization, Lenis smooth scrolling, lazy loading, mobile menu
    ============================================================ */
 
 const App = {
+  lenis: null,
+
   init() {
     // Wait for DOM
     if (document.readyState === 'loading') {
@@ -34,33 +36,67 @@ const App = {
   },
 
   /* ----------------------------------------------------------
-     LENIS SMOOTH SCROLL
+     LENIS SMOOTH SCROLL (Ultra-Luxury Inertia & Smooth Anchor Links)
      ---------------------------------------------------------- */
   initLenis() {
     try {
+      if (typeof Lenis === 'undefined') {
+        console.warn('Lenis library not loaded.');
+        return;
+      }
+
       this.lenis = new Lenis({
-        duration: 0.8, // Responsive, crisp, fast scroll without inertia lag
+        duration: 1.2,
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         orientation: 'vertical',
+        gestureOrientation: 'vertical',
         smoothWheel: true,
         wheelMultiplier: 1.0,
+        touchMultiplier: 1.5,
+        infinite: false,
       });
 
-      // Connect Lenis to GSAP ScrollTrigger
-      this.lenis.on('scroll', ScrollTrigger.update);
+      // Expose globally for other modules
+      window.lenis = this.lenis;
 
-      gsap.ticker.add((time) => {
-        this.lenis.raf(time * 1000);
+      // Synchronize Lenis scroll updates with GSAP ScrollTrigger
+      this.lenis.on('scroll', () => {
+        if (typeof ScrollTrigger !== 'undefined') {
+          ScrollTrigger.update();
+        }
       });
 
-      gsap.ticker.lagSmoothing(0);
+      // Tie Lenis RAF loop directly into GSAP's central ticker
+      if (typeof gsap !== 'undefined') {
+        gsap.ticker.add((time) => {
+          this.lenis.raf(time * 1000);
+        });
+        gsap.ticker.lagSmoothing(0);
+      }
+
+      // Smooth scroll handler for all anchor links (#about, #craftsmanship, #catalogue, etc.)
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', (e) => {
+          const targetId = anchor.getAttribute('href');
+          if (targetId === '#' || targetId.length <= 1) return;
+          const targetEl = document.querySelector(targetId);
+          if (targetEl) {
+            e.preventDefault();
+            this.lenis.scrollTo(targetEl, {
+              offset: 0,
+              duration: 1.4,
+              easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+            });
+          }
+        });
+      });
     } catch (e) {
-      console.warn('Lenis not loaded, using native scroll.');
+      console.warn('Lenis smooth scroll error:', e);
     }
   },
 
   /* ----------------------------------------------------------
-     LAZY LOADING (Enhanced: larger prefetch margin, decode async)
+     LAZY LOADING
      ---------------------------------------------------------- */
   setupLazyLoading() {
     const images = document.querySelectorAll('img[data-src]');
@@ -72,7 +108,6 @@ const App = {
             const src = img.dataset.src;
             img.removeAttribute('data-src');
 
-            // Use decode() for non-blocking image decode
             if ('decode' in img) {
               img.src = src;
               img.decoding = 'async';
@@ -91,18 +126,16 @@ const App = {
             imgObserver.unobserve(img);
           }
         });
-      }, { rootMargin: '600px' }); // Start loading 600px before viewport
+      }, { rootMargin: '600px' });
 
       images.forEach(img => imgObserver.observe(img));
     } else {
-      // Fallback: load all
       images.forEach(img => {
         img.src = img.dataset.src;
         img.removeAttribute('data-src');
       });
     }
 
-    // Also set decoding=async on all non-critical images
     document.querySelectorAll('img:not([fetchpriority="high"])').forEach(img => {
       if (!img.hasAttribute('decoding')) {
         img.decoding = 'async';
@@ -125,6 +158,15 @@ const App = {
       toggle.classList.toggle('active');
       mobileNav.classList.toggle('active');
       document.body.style.overflow = mobileNav.classList.contains('active') ? 'hidden' : '';
+    });
+
+    // Close mobile nav when clicking a link
+    mobileNav.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        toggle.classList.remove('active');
+        mobileNav.classList.remove('active');
+        document.body.style.overflow = '';
+      });
     });
   },
 

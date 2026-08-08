@@ -52,7 +52,7 @@ const Particles = {
     this.canvas.height = parent.offsetHeight;
 
     // Adjust particle count based on viewport
-    this.maxParticles = window.innerWidth < 768 ? 20 : 40;
+    this.maxParticles = window.innerWidth < 768 ? 12 : 25;
   },
 
   createParticles() {
@@ -105,28 +105,15 @@ const Particles = {
         this.particles[i].y = this.canvas.height + 10;
       }
 
-      // Draw particle with gold glow
-      this.ctx.save();
+      // Draw simple particle dot (no per-particle gradient — GPU friendly)
       this.ctx.globalAlpha = p.opacity;
-
-      // Outer glow
-      const gradient = this.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 4);
-      gradient.addColorStop(0, 'rgba(212, 175, 55, 0.3)');
-      gradient.addColorStop(1, 'rgba(212, 175, 55, 0)');
-      this.ctx.fillStyle = gradient;
-      this.ctx.beginPath();
-      this.ctx.arc(p.x, p.y, p.size * 4, 0, Math.PI * 2);
-      this.ctx.fill();
-
-      // Core particle
       this.ctx.fillStyle = `rgba(245, 230, 163, ${p.opacity})`;
       this.ctx.beginPath();
       this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
       this.ctx.fill();
-
-      this.ctx.restore();
     });
 
+    this.ctx.globalAlpha = 1;
     this.animationFrame = requestAnimationFrame(() => this.animate());
   },
 

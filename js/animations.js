@@ -80,14 +80,21 @@ const Animations = {
   },
 
   updateParallax() {
+    if (!this.parallaxElements.length) return;
+    const scrollY = this.scrollY;
+    const viewH = window.innerHeight;
+
     this.parallaxElements.forEach(el => {
       const speed = parseFloat(el.dataset.parallax) || 0.1;
-      const rect = el.getBoundingClientRect();
-      const visible = rect.top < window.innerHeight && rect.bottom > 0;
+      // Use offsetTop instead of getBoundingClientRect to avoid forced layout
+      const elTop = el.offsetTop;
+      const elH = el.offsetHeight;
+      const top = elTop - scrollY;
 
-      if (visible) {
-        const offset = (rect.top - window.innerHeight / 2) * speed;
-        el.style.transform = `translateY(${offset}px)`;
+      // Only apply if visible in viewport
+      if (top < viewH && top + elH > 0) {
+        const offset = (top - viewH / 2) * speed;
+        el.style.transform = `translate3d(0, ${offset}px, 0)`;
       }
     });
   },
@@ -154,11 +161,11 @@ const Animations = {
 
     this.lastScrollY = this.scrollY;
 
-    // Active section tracking
+    // Active section tracking (using offsetTop to avoid forced layout)
     let current = '';
     this.sections.forEach(section => {
-      const rect = section.getBoundingClientRect();
-      if (rect.top <= 200) {
+      const sectionTop = section.offsetTop - this.scrollY;
+      if (sectionTop <= 200) {
         current = section.id;
       }
     });

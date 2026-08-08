@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
     timeline.to(linesArray, {
       y: 0,
       opacity: 1,
-      filter: "blur(0px)",
       duration: 1.2,
       stagger: 0.15,
       ease: "power3.out"
@@ -23,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
     timeline.to(linesArray, {
       y: -20,
       opacity: 0,
-      filter: "blur(5px)",
       duration: 1,
       stagger: 0.1,
       ease: "power2.inOut"
@@ -91,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
   masterTl.to(slides.hamood.img, {
     scale: 0.95,
     opacity: 0,
-    filter: "blur(10px)",
     duration: 1.5,
     ease: "power2.inOut"
   }, tSabrIn);
@@ -101,8 +98,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // SABR Image Reveal (Morphing feel)
   masterTl.fromTo(slides.sabr.img, 
-    { scale: 0.9, opacity: 0, filter: "blur(10px)", y: 20 },
-    { scale: 1, opacity: 1, filter: "blur(0px)", y: -10, duration: 2, ease: "power2.out" },
+    { scale: 0.9, opacity: 0, y: 20 },
+    { scale: 1, opacity: 1, y: -10, duration: 2, ease: "power2.out" },
     tSabrIn + 0.5
   );
 
@@ -122,7 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
   masterTl.to(slides.sabr.img, {
     scale: 0.95,
     opacity: 0,
-    filter: "blur(10px)",
     duration: 1.5,
     ease: "power2.inOut"
   }, tParadiseIn);
@@ -132,8 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // PARADISE Image Reveal
   masterTl.fromTo(slides.paradise.img, 
-    { scale: 0.9, opacity: 0, filter: "blur(10px)", y: 20 },
-    { scale: 1, opacity: 1, filter: "blur(0px)", y: -10, duration: 2, ease: "power2.out" },
+    { scale: 0.9, opacity: 0, y: 20 },
+    { scale: 1, opacity: 1, y: -10, duration: 2, ease: "power2.out" },
     tParadiseIn + 0.5
   );
 

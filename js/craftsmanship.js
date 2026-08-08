@@ -19,24 +19,29 @@ document.addEventListener("DOMContentLoaded", () => {
   // but we added padding to the container to handle start/end gracefully.
   const getScrollAmount = () => scrollContainer.scrollWidth - window.innerWidth;
 
-  // 1. Horizontal Scroll & Pinning Tween
-  const tween = gsap.to(scrollContainer, {
-    x: () => -getScrollAmount(),
-    ease: "none",
+  // 1. Horizontal Scroll & Pinning Timeline (with smooth header entry hold)
+  const tween = gsap.timeline({
     scrollTrigger: {
       trigger: section,
-      start: "top -15%", // Pin slightly higher to reduce empty space at the top
-      end: () => `+=${getScrollAmount()}`,
+      start: "top top",
+      end: () => `+=${getScrollAmount() + window.innerWidth * 0.35}`,
       pin: true,
       scrub: 1, // Smooth scrubbing
       invalidateOnRefresh: true,
       onUpdate: (self) => {
-        // Animate the gold timeline width based on scrub progress.
-        // Subtracting 50vw keeps the tip of the line perfectly centered on the screen, 
-        // matching the "left center" trigger for the chapters!
-        gsap.set(progressBar, { width: `calc(${self.progress * 100}% - 50vw)` });
+        // Calculate progress bar width cleanly after the header hold
+        const scrollPct = Math.max(0, (self.progress - 0.1) / 0.9);
+        gsap.set(progressBar, { width: `calc(${scrollPct * 100}% - 50vw)` });
       }
     }
+  });
+
+  // Hold header stationary & centered for initial 10% scroll before sliding steps
+  tween.to({}, { duration: 0.1 });
+  tween.to(scrollContainer, {
+    x: () => -getScrollAmount(),
+    ease: "none",
+    duration: 0.9
   });
 
   // 2. Cinematic Background Parallax
@@ -50,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ease: "none",
     scrollTrigger: {
       trigger: section,
-      start: "top -15%",
+      start: "top top",
       end: () => `+=${getScrollAmount()}`,
       scrub: true
     }
@@ -61,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ease: "none",
     scrollTrigger: {
       trigger: section,
-      start: "top -15%",
+      start: "top top",
       end: () => `+=${getScrollAmount()}`,
       scrub: true
     }
@@ -72,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ease: "none",
     scrollTrigger: {
       trigger: section,
-      start: "top -15%",
+      start: "top top",
       end: () => `+=${getScrollAmount()}`,
       scrub: true
     }
@@ -133,7 +138,6 @@ document.addEventListener("DOMContentLoaded", () => {
     tl.to(bottleImg, {
       opacity: 1,
       scale: 1,
-      filter: 'blur(0px)',
       y: 0,
       duration: 0.6,
       ease: "power3.out",

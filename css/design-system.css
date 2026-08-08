@@ -397,10 +397,7 @@ ul, ol {
   contain-intrinsic-size: auto 800px;
 }
 
-.craftsmanship {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 100vh;
-}
+/* Craftsmanship uses GSAP pin: true — content-visibility breaks pinning */
 
 /* GPU layer promotion for heavy animation containers */
 .hero-canvas,

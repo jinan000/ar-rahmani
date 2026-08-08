@@ -76,10 +76,11 @@ const HamoodScroll = {
   },
 
   /* ----------------------------------------------------------
-     FRAME PRELOADING (Fast Progressive Loading)
+     FRAME PRELOADING (Buffered Batch Loading for Smooth Scroll)
      ---------------------------------------------------------- */
   preloadFrames() {
-    let loaded = 0;
+    let loadedCount = 0;
+    const initialTargetBuffer = 60; // Require initial 60 frames loaded before dismissing loader
     const self = this;
     
     // Initialize frames array
@@ -87,48 +88,56 @@ const HamoodScroll = {
       this.frames[i] = null;
     }
 
-    // High priority: load frame 0 immediately for instant display
+    // High priority: load frame 0 immediately for instant display behind loader
     const firstImg = new Image();
     firstImg.onload = () => {
       self.frames[0] = firstImg;
       self.currentFrame = 0;
       self.renderFrame(0);
-      self.onReady(); // Instant ready!
+      loadedCount++;
+      if (window.Loader && typeof window.Loader.updateProgress === 'function') {
+        window.Loader.updateProgress(loadedCount, initialTargetBuffer);
+      }
     };
     firstImg.src = `assets/frames/frame_0001.webp`;
 
-    // Background loader for remaining frames (6 concurrent connections via HTTP/2)
-    const loadRemainingFrames = () => {
-      let nextToLoad = 1;
-      const concurrency = 6;
+    // Concurrently load frames in batches (8 concurrent connections)
+    let nextToLoad = 1;
+    const concurrency = 8;
 
-      const loadNext = () => {
-        if (nextToLoad >= this.totalFrames) return;
-        const i = nextToLoad++;
-        const img = new Image();
-        const frameNum = String(i + 1).padStart(4, '0');
-        img.onload = () => {
-          self.frames[i] = img;
-          loaded++;
-          loadNext();
-        };
-        img.onerror = () => {
-          loaded++;
-          loadNext();
-        };
-        img.src = `assets/frames/frame_${frameNum}.webp`;
+    const loadNext = () => {
+      if (nextToLoad >= this.totalFrames) return;
+      const i = nextToLoad++;
+      const img = new Image();
+      const frameNum = String(i + 1).padStart(4, '0');
+
+      const onFrameLoaded = () => {
+        self.frames[i] = img;
+        loadedCount++;
+
+        // Report progress to Loader for the initial buffer
+        if (window.Loader && typeof window.Loader.updateProgress === 'function') {
+          window.Loader.updateProgress(loadedCount, initialTargetBuffer);
+        }
+
+        // When initial buffer of 50+ frames is ready, declare site ready and complete loader
+        if (loadedCount >= 50 && !self.isReady) {
+          self.onReady();
+          if (window.Loader && typeof window.Loader.complete === 'function') {
+            window.Loader.complete();
+          }
+        }
+
+        loadNext();
       };
 
-      for (let c = 0; c < concurrency; c++) {
-        loadNext();
-      }
+      img.onload = onFrameLoaded;
+      img.onerror = onFrameLoaded;
+      img.src = `assets/frames/frame_${frameNum}.webp`;
     };
 
-    // Defer remaining frames until main thread settles
-    if ('requestIdleCallback' in window) {
-      requestIdleCallback(() => loadRemainingFrames(), { timeout: 800 });
-    } else {
-      setTimeout(loadRemainingFrames, 200);
+    for (let c = 0; c < concurrency; c++) {
+      loadNext();
     }
   },
 

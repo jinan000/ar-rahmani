@@ -30,10 +30,8 @@
   <link rel="stylesheet" href="css/sections.css?v=1.3">
 
   <!-- Deferred CSS (below-the-fold sections) -->
-  <link rel="stylesheet" href="css/perfume-carousel.css?v=1.1" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/catalogue.css?v=1.1" media="print" onload="this.media='all'">
   <noscript>
-    <link rel="stylesheet" href="css/perfume-carousel.css?v=1.1">
     <link rel="stylesheet" href="css/catalogue.css?v=1.1">
   </noscript>
 
@@ -71,7 +69,10 @@
     <div class="loader-progress">
       <div class="loader-progress-bar" id="loader-progress-bar"></div>
     </div>
-    <div class="loader-tagline">Luxury Extrait de Parfum</div>
+    <div class="loader-status">
+      <span class="loader-tagline">Luxury Extrait de Parfum</span>
+      <span class="loader-percent" id="loader-percent">0%</span>
+    </div>
   </div>
 
   <!-- ============================================================
@@ -385,80 +386,7 @@
     </div>
   </section>
 
-  <!-- ============================================================
-       PERFUME CAROUSEL — Full-Viewport Showcase
-       ============================================================ -->
-  <section class="pc-hero" id="pc-hero">
-    <div class="pc-hero__viewport">
 
-      <!-- Grain overlay -->
-      <div class="pc-grain"></div>
-
-      <!-- Ambient glow behind center bottle -->
-      <div class="pc-glow"></div>
-
-      <!-- Bottom vignette fade -->
-      <div class="pc-vignette"></div>
-
-      <!-- Giant ghost text -->
-      <div class="pc-ghost-text">
-        <span>HAMOOD</span>
-      </div>
-
-      <!-- Top-left brand label -->
-      <div class="pc-brand">AR-RAHMANI</div>
-
-      <!-- Carousel -->
-      <div class="pc-carousel">
-        <!-- Item 0: HAMOOD -->
-        <div class="pc-carousel__item" data-index="0" data-role="center">
-          <img src="assets/images/hamood.webp" alt="HAMOOD Extrait de Parfum" draggable="false" loading="lazy" decoding="async">
-        </div>
-        <!-- Item 1: SABR -->
-        <div class="pc-carousel__item" data-index="1" data-role="right">
-          <img src="assets/images/sabr.webp" alt="SABR Extrait de Parfum" draggable="false" loading="lazy" decoding="async">
-        </div>
-        <!-- Item 2: PARADISE -->
-        <div class="pc-carousel__item" data-index="2" data-role="left">
-          <img src="assets/images/paradisee.webp" alt="PARADISE Extrait de Parfum" draggable="false" loading="lazy" decoding="async">
-        </div>
-      </div>
-
-      <!-- Bottom-left info & nav -->
-      <div class="pc-info">
-        <p class="pc-info__label">AR-RAHMANI COLLECTION</p>
-        <p class="pc-info__desc">
-          Handcrafted with the world's rarest ingredients.
-          The finish is a vision, the craft is flawless.
-          Extrait de Parfum — unmatched depth and longevity. Discover now.
-        </p>
-        <div class="pc-info__nav">
-          <button class="pc-info__btn" id="pc-btn-prev" aria-label="Previous perfume">
-            <svg viewBox="0 0 24 24">
-              <line x1="19" y1="12" x2="5" y2="12" />
-              <polyline points="12 19 5 12 12 5" />
-            </svg>
-          </button>
-          <button class="pc-info__btn" id="pc-btn-next" aria-label="Next perfume">
-            <svg viewBox="0 0 24 24">
-              <line x1="5" y1="12" x2="19" y2="12" />
-              <polyline points="12 5 19 12 12 19" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- Bottom-right discover link -->
-      <a href="#showcase" class="pc-discover">
-        DISCOVER IT
-        <svg viewBox="0 0 24 24">
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
-      </a>
-
-    </div>
-  </section>
 
   <!-- ============================================================
        CRAFTSMANSHIP
@@ -977,7 +905,6 @@
   <script src="js/fragrance-finder.js"></script>
   <script src="js/text-pressure.js"></script>
   <script src="js/decay-card.js"></script>
-  <script src="js/perfume-carousel.js"></script>
   <script src="js/craftsmanship.js"></script>
 
   <!-- Shopify Storefront Headless API Integration (deferred) -->

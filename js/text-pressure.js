@@ -1,6 +1,6 @@
 /**
  * TextPressure - Vanilla JS Port
- * Ported from React component to Vanilla JS.
+ * Ported from React component to Vanilla JS with Ambient Sine Wave Loop.
  */
 
 class TextPressure {
@@ -28,6 +28,8 @@ class TextPressure {
     
     this.mouse = { x: 0, y: 0 };
     this.cursor = { x: 0, y: 0 };
+    this.time = 0;
+    this.isMouseActive = false;
     this.rafId = null;
 
     this.init();
@@ -37,7 +39,7 @@ class TextPressure {
     // Build DOM structure
     this.container.style.position = 'relative';
     this.container.style.width = '100%';
-    this.container.style.height = '100%'; // let it size dynamically if needed
+    this.container.style.height = '100%';
     this.container.style.background = 'transparent';
 
     this.titleEl = document.createElement('h2');
@@ -73,32 +75,38 @@ class TextPressure {
 
     this.container.appendChild(this.titleEl);
 
-    // Initial positioning
-    const rect = this.container.getBoundingClientRect();
-    this.mouse.x = rect.left + rect.width / 2;
-    this.mouse.y = rect.top + rect.height / 2;
-    this.cursor.x = this.mouse.x;
-    this.cursor.y = this.mouse.y;
-
     this.setSize();
+    requestAnimationFrame(() => this.cacheOffsets());
 
     // Event listeners
+    let mouseTimer;
     this.handleMouseMove = e => {
       this.cursor.x = e.clientX;
       this.cursor.y = e.clientY;
+      this.isMouseActive = true;
+      clearTimeout(mouseTimer);
+      mouseTimer = setTimeout(() => {
+        this.isMouseActive = false;
+      }, 2500);
     };
+
     this.handleTouchMove = e => {
       const t = e.touches[0];
       this.cursor.x = t.clientX;
       this.cursor.y = t.clientY;
+      this.isMouseActive = true;
+      clearTimeout(mouseTimer);
+      mouseTimer = setTimeout(() => {
+        this.isMouseActive = false;
+      }, 2500);
     };
     
-    // Resize with debounce
     let timeoutId;
     this.handleResize = () => {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
         this.setSize();
+        requestAnimationFrame(() => this.cacheOffsets());
       }, 100);
     };
 
@@ -106,14 +114,17 @@ class TextPressure {
     window.addEventListener('touchmove', this.handleTouchMove, { passive: true });
     window.addEventListener('resize', this.handleResize);
 
-    // Viewport-aware rendering — pause when offscreen
+    // Viewport-aware rendering
     this.isVisible = false;
     const observer = new IntersectionObserver((entries) => {
       this.isVisible = entries[0].isIntersecting;
-      if (this.isVisible && !this.rafId) {
-        this.animate();
+      if (this.isVisible) {
+        this.cacheOffsets();
+        if (!this.rafId) {
+          this.animate();
+        }
       }
-    }, { rootMargin: '100px' });
+    }, { rootMargin: '150px' });
     observer.observe(this.container);
   }
 
@@ -123,25 +134,26 @@ class TextPressure {
     const containerW = this.container.getBoundingClientRect().width;
     let newFontSize = containerW / (this.chars.length / 2);
     newFontSize = Math.max(newFontSize, this.minFontSize);
-    
-    // Let's cap font size so it doesn't get ridiculously large on ultrawide
     const maxFontSize = 120; 
     newFontSize = Math.min(newFontSize, maxFontSize);
 
     this.titleEl.style.fontSize = `${newFontSize}px`;
     this.titleEl.style.lineHeight = '1';
+  }
 
-    if (this.scale) {
-      requestAnimationFrame(() => {
-        const textRect = this.titleEl.getBoundingClientRect();
-        const containerH = this.container.getBoundingClientRect().height;
-        if (textRect.height > 0) {
-          const yRatio = containerH / textRect.height;
-          this.titleEl.style.transform = `scale(1, ${yRatio})`;
-          this.titleEl.style.transformOrigin = 'center top';
-        }
-      });
-    }
+  cacheOffsets() {
+    if (!this.titleEl || !this.container) return;
+    const containerRect = this.container.getBoundingClientRect();
+    if (containerRect.width === 0) return;
+
+    this.cachedMaxDist = containerRect.width / 2;
+    this.spanOffsets = this.spans.map(span => {
+      const rect = span.getBoundingClientRect();
+      return {
+        x: (rect.left - containerRect.left) + rect.width / 2,
+        y: (rect.top - containerRect.top) + rect.height / 2
+      };
+    });
   }
 
   dist(a, b) {
@@ -156,24 +168,43 @@ class TextPressure {
   }
 
   animate() {
-    // Pause when offscreen
     if (!this.isVisible) {
       this.rafId = null;
       return;
     }
 
-    this.mouse.x += (this.cursor.x - this.mouse.x) / 15;
-    this.mouse.y += (this.cursor.y - this.mouse.y) / 15;
+    this.time += 0.025;
 
-    if (this.titleEl) {
-      const titleRect = this.titleEl.getBoundingClientRect();
-      const maxDist = titleRect.width / 2;
+    // Get current container position in viewport
+    const containerRect = this.container.getBoundingClientRect();
+    const centerX = containerRect.left + containerRect.width / 2;
+    const centerY = containerRect.top + containerRect.height / 2;
 
-      this.spans.forEach(span => {
-        const rect = span.getBoundingClientRect();
+    // Continuous ambient wave loop position across text
+    const maxDist = this.cachedMaxDist || (containerRect.width / 2) || 300;
+    const ambientX = centerX + Math.sin(this.time * 1.5) * (maxDist * 0.85);
+    const ambientY = centerY + Math.cos(this.time * 1.1) * 25;
+
+    // Target position: mouse when actively hovering/moving, ambient wave loop when idle
+    const targetX = this.isMouseActive ? this.cursor.x : ambientX;
+    const targetY = this.isMouseActive ? this.cursor.y : ambientY;
+
+    this.mouse.x += (targetX - this.mouse.x) / 10;
+    this.mouse.y += (targetY - this.mouse.y) / 10;
+
+    if (!this.spanOffsets || this.spanOffsets.length === 0) {
+      this.cacheOffsets();
+    }
+
+    if (this.titleEl && this.spanOffsets) {
+      this.spans.forEach((span, i) => {
+        const offset = this.spanOffsets[i];
+        if (!offset) return;
+
+        // Compute char center dynamically in viewport space (scroll-proof!)
         const charCenter = {
-          x: rect.x + rect.width / 2,
-          y: rect.y + rect.height / 2
+          x: containerRect.left + offset.x,
+          y: containerRect.top + offset.y
         };
 
         const d = this.dist(this.mouse, charCenter);

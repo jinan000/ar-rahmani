@@ -80,16 +80,14 @@
   }
 }
 
-/* --- Blur Reveal --- */
+/* --- Blur Reveal (GPU optimized — no filter:blur) --- */
 @keyframes blurReveal {
   from {
     opacity: 0;
-    filter: blur(20px);
     transform: scale(1.05);
   }
   to {
     opacity: 1;
-    filter: blur(0);
     transform: scale(1);
   }
 }
@@ -300,15 +298,13 @@
   transform: scale(1);
 }
 
-/* Blur Reveal */
+/* Blur Reveal — uses opacity+scale instead of filter:blur for GPU perf */
 .reveal-blur {
   opacity: 0;
-  filter: blur(15px);
-  transform: scale(1.03);
+  transform: scale(1.06);
 }
 .reveal-blur.revealed {
   opacity: 1;
-  filter: blur(0);
   transform: scale(1);
 }
 
@@ -368,6 +364,7 @@
    ============================================================ */
 .parallax {
   will-change: transform;
+  contain: layout style;
 }
 
 /* ============================================================

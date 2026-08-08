@@ -575,6 +575,8 @@
 .craftsmanship {
   background: var(--color-bg-secondary);
   position: relative;
+  padding: 0 !important;
+  margin: 0 !important;
   /* GSAP ScrollTrigger will pin the wrapper and add the required padding/height */
 }
 
@@ -645,7 +647,7 @@
 /* Horizontal Timeline */
 .craft-timeline-horizontal {
   position: absolute;
-  top: 55%; /* Moved down slightly to perfectly balance visual mass */
+  top: 51%; /* Shifted downwards to 51% */
   left: 100vw; 
   width: calc(100% - 100vw);
   height: 2px;
@@ -676,7 +678,7 @@
 /* Markers (Now positioned inside each step) */
 .craft-step > .craft-marker {
   position: absolute;
-  top: 55%;
+  top: 51%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 14px;
@@ -733,7 +735,7 @@
 /* Top Anchored (Image) */
 .craft-step-top {
   position: absolute;
-  bottom: calc(45% + 60px); /* 45% from bottom = 55% from top. Plus 60px connector gap. */
+  bottom: calc(49% + 20px); /* 49% from bottom = 51% from top */
   width: 100%;
   display: flex;
   justify-content: center;
@@ -742,7 +744,7 @@
 /* Bottom Anchored (Text) */
 .craft-step-bottom {
   position: absolute;
-  top: calc(55% + 40px); /* Just below the 55% timeline */
+  top: calc(51% + 20px); /* Just below the 51% timeline */
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -753,10 +755,10 @@
 /* Vertical Gold Connector */
 .craft-connector {
   position: absolute;
-  bottom: 45%; /* Starts exactly at the 55% timeline */
+  bottom: 49%; /* Starts at the 51% timeline */
   left: 50%;
   width: 1px;
-  height: 60px; /* Shorter connector keeps visual mass compact */
+  height: 35px;
   background: var(--color-gold);
   transform: translateX(-50%) scaleY(0);
   transform-origin: bottom; 
@@ -766,7 +768,7 @@
 /* Content Typography & Alignment */
 .craft-step-number {
   font-family: var(--font-heading);
-  font-size: clamp(4rem, 8vw, 6rem); /* Reduced size per request */
+  font-size: clamp(4rem, 8vw, 6rem);
   font-weight: 300;
   line-height: 1;
   color: transparent;
@@ -774,7 +776,6 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  /* Removed transform here, letting GSAP fully control it to prevent misalignment */
   z-index: -1;
   opacity: 0;
 }
@@ -811,8 +812,8 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   width: 100%;
-  height: 40vh;
-  max-height: 360px;
+  height: 35vh;
+  max-height: 300px;
   object-fit: cover;
 }
 
@@ -833,9 +834,8 @@
   height: auto;
   border-radius: var(--radius-lg);
   opacity: 0;
-  transform: scale(0.9) translateY(40px); /* Reduced float distance */
-  filter: blur(14px);
-  will-change: transform, filter, opacity;
+  transform: scale(0.9) translateY(40px);
+  will-change: transform, opacity;
 }
 
 /* Legacy media query fixes */
