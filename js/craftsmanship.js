@@ -1,15 +1,16 @@
 /* ============================================================
    AR-RAHMANI — Craftsmanship Animations (Horizontal Scroll Story)
-   PERMANENT FIX: Initializes on window.load (not DOMContentLoaded)
-   so ALL images, fonts, CSS, and layout are 100% settled before
-   GSAP calculates pin positions. Self-heals on any layout change.
+   PERMANENT BOUNCE-FREE FIX:
+   1. anticipatePin: 1 prevents 1-frame entry bounce on smooth scroll.
+   2. scrub: 1 provides buttery smooth horizontal scroll momentum.
+   3. NO mid-scroll ScrollTrigger.refresh() calls (removed ResizeObserver
+      and height polling which were forcing unpin/re-pin during scroll).
    ============================================================ */
 
 (function() {
   "use strict";
 
   function initCraftsmanship() {
-    // Ensure GSAP and ScrollTrigger are available
     if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
 
     gsap.registerPlugin(ScrollTrigger);
@@ -23,7 +24,7 @@
     // Calculate the total horizontal scroll distance
     const getScrollAmount = () => scrollContainer.scrollWidth - window.innerWidth;
 
-    // 1. Horizontal Scroll & Pinning Tween
+    // 1. Main Pin & Horizontal Scroll Animation
     const tween = gsap.to(scrollContainer, {
       x: () => -getScrollAmount(),
       ease: "none",
@@ -33,8 +34,8 @@
         end: () => `+=${getScrollAmount()}`,
         pin: true,
         pinSpacing: true,
-        anticipatePin: 0,
-        scrub: true,
+        anticipatePin: 1, // Eliminates entry bounce on smooth scroll
+        scrub: 1,         // Smooth 1s momentum glide (no micro-stutters)
         invalidateOnRefresh: true,
         onUpdate: (self) => {
           if (progressBar) {
@@ -57,7 +58,7 @@
           trigger: section,
           start: "top top",
           end: () => `+=${getScrollAmount()}`,
-          scrub: true
+          scrub: 1
         }
       });
     }
@@ -70,7 +71,7 @@
           trigger: section,
           start: "top top",
           end: () => `+=${getScrollAmount()}`,
-          scrub: true
+          scrub: 1
         }
       });
     }
@@ -83,7 +84,7 @@
           trigger: section,
           start: "top top",
           end: () => `+=${getScrollAmount()}`,
-          scrub: true
+          scrub: 1
         }
       });
     }
@@ -111,7 +112,7 @@
         onLeaveBack: () => marker && marker.classList.remove('active')
       });
 
-      // Build the reveal timeline
+      // Build chapter reveal timeline
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: step,
@@ -121,12 +122,10 @@
         }
       });
 
-      // Connector line grows
       if (connector) {
         tl.to(connector, { scaleY: 1, duration: 0.3, ease: "power2.out" }, 0);
       }
 
-      // Image reveals
       if (imageWrapper) {
         tl.to(imageWrapper, {
           clipPath: 'polygon(0 0, 150% 0, 100% 100%, -50% 100%)',
@@ -145,28 +144,23 @@
         }, 0.2);
       }
 
-      // Number watermark
       if (number) {
         gsap.set(number, { xPercent: -50, yPercent: -50, y: 40 });
         tl.to(number, { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }, 0.3);
       }
 
-      // Heading
       if (title) {
         tl.to(title, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 0.4);
       }
 
-      // Divider
       if (divider) {
         tl.to(divider, { width: '100%', duration: 0.5, ease: "power3.inOut" }, 0.5);
       }
 
-      // Paragraph
       if (text) {
         tl.to(text, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 0.5);
       }
 
-      // Float animation
       let floatTween;
       function startFloating(element) {
         if (floatTween) floatTween.kill();
@@ -187,69 +181,26 @@
       }
     });
 
-    // ============================================================
-    // PERMANENT SELF-HEALING: Detect ANY document height change
-    // and refresh ScrollTrigger automatically.
-    // This prevents bounce/jump no matter what CSS changes happen.
-    // ============================================================
-    let lastDocHeight = document.documentElement.scrollHeight;
-    let refreshTimer;
-
-    const safeRefresh = () => {
-      clearTimeout(refreshTimer);
-      refreshTimer = setTimeout(() => {
+    // 4. Handle Window Resize Safely (Debounced, strictly on user window resize)
+    let resizeTimer;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
         ScrollTrigger.refresh();
-        lastDocHeight = document.documentElement.scrollHeight;
-      }, 200);
-    };
+      }, 250);
+    });
 
-    // Resize handler
-    window.addEventListener("resize", safeRefresh);
-
-    // Self-healing: poll document height every 500ms for the first 5 seconds.
-    // If height changes (due to dynamic content, lazy images, font swap),
-    // refresh ScrollTrigger immediately.
-    let pollCount = 0;
-    const heightPoll = setInterval(() => {
-      pollCount++;
-      const currentHeight = document.documentElement.scrollHeight;
-      if (currentHeight !== lastDocHeight) {
-        lastDocHeight = currentHeight;
-        ScrollTrigger.refresh();
-      }
-      if (pollCount >= 10) clearInterval(heightPoll); // Stop after 5 seconds
-    }, 500);
-
-    // ResizeObserver on sections above craftsmanship to catch layout shifts
-    if (typeof ResizeObserver !== 'undefined') {
-      const sectionsAbove = [];
-      let sibling = section.previousElementSibling;
-      while (sibling) {
-        sectionsAbove.push(sibling);
-        sibling = sibling.previousElementSibling;
-      }
-
-      if (sectionsAbove.length > 0) {
-        const ro = new ResizeObserver(safeRefresh);
-        sectionsAbove.forEach(el => ro.observe(el));
-      }
-    }
-
-    console.log('[Craftsmanship] Initialized with permanent self-healing.');
+    // Initial calculation after all elements are painted
+    setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 200);
   }
 
-  // ============================================================
-  // CRITICAL: Initialize on window.load, NOT DOMContentLoaded.
-  // This ensures ALL images, fonts, CSS transitions, and dynamic
-  // content are fully rendered before GSAP calculates pin positions.
-  // ============================================================
+  // Initialize on window load when images, fonts, and DOM layout are 100% complete
   if (document.readyState === 'complete') {
-    // Page already loaded (e.g. script loaded dynamically)
     initCraftsmanship();
   } else {
     window.addEventListener("load", () => {
-      // Small delay to let Lenis, reveal animations, and any
-      // post-load layout shifts fully settle before pinning.
       setTimeout(initCraftsmanship, 100);
     });
   }
