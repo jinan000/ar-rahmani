@@ -484,3 +484,80 @@ img {
     opacity: 0 !important;
   }
 }
+
+/* ============================================================
+   MOBILE PERFORMANCE OVERHAUL (≤768px Only — 60 FPS Target)
+   ============================================================ */
+@media (max-width: 768px) {
+  /* 1. GPU Acceleration & Repaint Prevention */
+  .reveal,
+  .reveal-up,
+  .reveal-down,
+  .reveal-left,
+  .reveal-right,
+  .reveal-scale,
+  .cat-card,
+  .feature-card,
+  .ingredient-card,
+  .product-card {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  /* 2. 70% Blur Reduction — Replace heavy backdrop-filters with translucent dark backgrounds */
+  *, *::before, *::after {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .navbar-inner,
+  .cat-modal-overlay,
+  .cat-modal,
+  .cat-card,
+  .product-card,
+  .glass-card,
+  .feature-card,
+  .ingredient-card,
+  .showcase-container,
+  .cart-drawer,
+  .cart-drawer-footer,
+  .preview-card-box {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: rgba(10, 10, 10, 0.94) !important;
+  }
+
+  /* 3. Disable Heavy Filter Blurs & Glowing Shadows on Mobile */
+  .craft-bg-layer.smoke,
+  .craft-bg-layer.light,
+  .craft-bg-layer.dust,
+  .showcase-glow,
+  .showcase-smoke,
+  .hero-glow,
+  .hero-smoke-overlay,
+  .hero-vignette {
+    filter: none !important;
+    box-shadow: none !important;
+    opacity: 0.12 !important;
+  }
+
+  /* 4. Requirement 9: Pure CSS Sticky Navigation for Mobile Header */
+  .navbar {
+    position: sticky !important;
+    top: 0 !important;
+    transform: none !important;
+    transition: background-color 0.3s ease !important;
+  }
+
+  /* 5. Requirement 5: Section Rendering Containment */
+  section {
+    contain: layout paint style;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 600px;
+  }
+
+  .hero {
+    contain: layout paint style;
+    content-visibility: visible !important;
+  }
+}

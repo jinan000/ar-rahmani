@@ -14,6 +14,9 @@ const Particles = {
   resizeTimer: null,
 
   init(canvasId) {
+    // Disable continuous particle loop on mobile screens (≤768px) for 60 FPS performance
+    if (window.innerWidth <= 768 || ('ontouchstart' in window && window.innerWidth <= 1024)) return;
+
     this.canvas = document.getElementById(canvasId);
     if (!this.canvas) return;
 

@@ -39,12 +39,14 @@ const Catalogue = {
    * Preload primary and hover images for rapid hover response.
    */
   preloadImages(products) {
-    products.slice(0, 16).forEach(product => {
+    const isMobile = window.innerWidth <= 768;
+    const limit = isMobile ? 4 : 16;
+    products.slice(0, limit).forEach(product => {
       if (product.images[0]?.url) {
         const img1 = new Image();
         img1.src = this.getOptimizedImageUrl(product.images[0].url, 600);
       }
-      if (product.images[1]?.url) {
+      if (!isMobile && product.images[1]?.url) {
         const img2 = new Image();
         img2.src = this.getOptimizedImageUrl(product.images[1].url, 600);
       }
@@ -1337,7 +1339,7 @@ const Catalogue = {
   },
 
   animateDust() {
-    if (!this.dustCtx || !this.dustCanvas) return;
+    if (!this.dustCtx || !this.dustCanvas || window.innerWidth <= 768) return;
 
     // Skip when offscreen
     if (!this.dustVisible) {

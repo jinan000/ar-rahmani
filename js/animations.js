@@ -1,6 +1,6 @@
 /* ============================================================
    AR-RAHMANI — Animations Controller
-   Scroll reveals, parallax, 3D tilt, counter animations
+   Mobile-Optimized (≤768px 60 FPS Engine)
    ============================================================ */
 
 const Animations = {
@@ -12,34 +12,43 @@ const Animations = {
   ticking: false,
 
   init() {
-    this.setupRevealObserver();
-    this.setupParallax();
-    this.setupTiltCards();
-    this.setupNavbar();
+    const isMobile = window.innerWidth <= 768;
+
+    this.setupRevealObserver(isMobile);
+    
+    // Only initialize mouse parallax & 3D tilt on desktop screens
+    if (!isMobile) {
+      this.setupParallax();
+      this.setupTiltCards();
+      this.setupNavbar();
+    }
+    
     this.setupSmoothScrollLinks();
     this.setupTestimonialScroll();
 
-    // Passive scroll listener
-    window.addEventListener('scroll', () => {
-      this.scrollY = window.scrollY;
-      if (!this.ticking) {
-        requestAnimationFrame(() => {
-          this.onScroll();
-          this.ticking = false;
-        });
-        this.ticking = true;
-      }
-    }, { passive: true });
+    // Passive scroll listener (desktop only)
+    if (!isMobile) {
+      window.addEventListener('scroll', () => {
+        this.scrollY = window.scrollY;
+        if (!this.ticking) {
+          requestAnimationFrame(() => {
+            this.onScroll();
+            this.ticking = false;
+          });
+          this.ticking = true;
+        }
+      }, { passive: true });
+    }
   },
 
   /* ----------------------------------------------------------
-     INTERSECTION OBSERVER — Scroll Reveal
+     INTERSECTION OBSERVER — Scroll Reveal (Mobile 1-Shot)
      ---------------------------------------------------------- */
-  setupRevealObserver() {
+  setupRevealObserver(isMobile) {
     const options = {
       root: null,
-      rootMargin: '0px 0px -80px 0px',
-      threshold: 0.1
+      rootMargin: isMobile ? '0px 0px -40px 0px' : '0px 0px -80px 0px',
+      threshold: 0.05
     };
 
     this.revealObserver = new IntersectionObserver((entries) => {
@@ -51,11 +60,19 @@ const Animations = {
           if (entry.target.hasAttribute('data-stagger')) {
             const children = entry.target.querySelectorAll('.reveal-up, .reveal-left, .reveal-right, .reveal-scale, .reveal-blur');
             children.forEach((child, i) => {
-              child.style.transitionDelay = `${i * 0.12}s`;
-              setTimeout(() => child.classList.add('revealed'), 10);
+              child.style.transitionDelay = isMobile ? `${i * 0.06}s` : `${i * 0.12}s`;
+              setTimeout(() => {
+                child.classList.add('revealed');
+                // Requirement 10: Clear will-change after animation to free GPU memory
+                setTimeout(() => { child.style.willChange = 'auto'; }, 600);
+              }, 10);
             });
           }
 
+          // Requirement 10: Clear will-change after animation
+          setTimeout(() => { entry.target.style.willChange = 'auto'; }, 600);
+
+          // Requirement 2: Trigger ONCE, never replay repeatedly
           this.revealObserver.unobserve(entry.target);
         }
       });
@@ -73,7 +90,7 @@ const Animations = {
   },
 
   /* ----------------------------------------------------------
-     PARALLAX
+     PARALLAX (Desktop Only)
      ---------------------------------------------------------- */
   setupParallax() {
     this.parallaxElements = document.querySelectorAll('[data-parallax]');
@@ -86,12 +103,10 @@ const Animations = {
 
     this.parallaxElements.forEach(el => {
       const speed = parseFloat(el.dataset.parallax) || 0.1;
-      // Use offsetTop instead of getBoundingClientRect to avoid forced layout
       const elTop = el.offsetTop;
       const elH = el.offsetHeight;
       const top = elTop - scrollY;
 
-      // Only apply if visible in viewport
       if (top < viewH && top + elH > 0) {
         const offset = (top - viewH / 2) * speed;
         el.style.transform = `translate3d(0, ${offset}px, 0)`;
@@ -100,7 +115,7 @@ const Animations = {
   },
 
   /* ----------------------------------------------------------
-     3D TILT CARDS
+     3D TILT CARDS (Desktop Only)
      ---------------------------------------------------------- */
   setupTiltCards() {
     this.tiltCards = document.querySelectorAll('.product-card');
@@ -122,7 +137,6 @@ const Animations = {
 
     card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
 
-    // Move the glow effect
     const glowX = (x / rect.width) * 100;
     const glowY = (y / rect.height) * 100;
     card.style.setProperty('--glow-x', `${glowX}%`);
@@ -134,7 +148,7 @@ const Animations = {
   },
 
   /* ----------------------------------------------------------
-     NAVBAR SCROLL BEHAVIOR
+     NAVBAR SCROLL BEHAVIOR (Desktop Only)
      ---------------------------------------------------------- */
   setupNavbar() {
     this.navbar = document.getElementById('navbar');
@@ -148,7 +162,6 @@ const Animations = {
     if (this.scrollY > 80) {
       this.navbar.classList.add('scrolled');
       
-      // Hide when scrolling down, show when scrolling up
       if (this.scrollY > this.lastScrollY) {
         this.navbar.classList.add('hidden');
       } else {
@@ -161,7 +174,6 @@ const Animations = {
 
     this.lastScrollY = this.scrollY;
 
-    // Active section tracking (using offsetTop to avoid forced layout)
     let current = '';
     this.sections.forEach(section => {
       const sectionTop = section.offsetTop - this.scrollY;
@@ -192,7 +204,6 @@ const Animations = {
           const y = target.getBoundingClientRect().top + window.scrollY - offset;
           window.scrollTo({ top: y, behavior: 'smooth' });
 
-          // Close mobile nav if open
           const mobileNav = document.getElementById('mobile-nav');
           const menuToggle = document.getElementById('menu-toggle');
           if (mobileNav && mobileNav.classList.contains('active')) {
@@ -206,47 +217,34 @@ const Animations = {
   },
 
   /* ----------------------------------------------------------
-     TESTIMONIAL AUTO-SCROLL
+     TESTIMONIAL SCROLL
      ---------------------------------------------------------- */
   setupTestimonialScroll() {
-    const track = document.getElementById('testimonial-track');
+    const track = document.querySelector('.testimonial-track');
     if (!track) return;
 
-    let scrollAmount = 0;
-    const speed = 0.5;
-    let isPaused = false;
-    let isVisible = false;
-    let rafId = null;
+    let isDown = false;
+    let startX;
+    let scrollLeft;
 
-    track.addEventListener('mouseenter', () => isPaused = true);
-    track.addEventListener('mouseleave', () => isPaused = false);
+    track.addEventListener('mousedown', (e) => {
+      isDown = true;
+      startX = e.pageX - track.offsetLeft;
+      scrollLeft = track.scrollLeft;
+    });
 
-    const autoScroll = () => {
-      if (!isVisible) { rafId = null; return; }
-      if (!isPaused) {
-        scrollAmount += speed;
-        if (scrollAmount >= track.scrollWidth / 2) {
-          scrollAmount = 0;
-        }
-        track.scrollLeft = scrollAmount;
-      }
-      rafId = requestAnimationFrame(autoScroll);
-    };
+    track.addEventListener('mouseleave', () => { isDown = false; });
+    track.addEventListener('mouseup', () => { isDown = false; });
 
-    // Only run when visible
-    const observer = new IntersectionObserver((entries) => {
-      isVisible = entries[0].isIntersecting;
-      if (isVisible && !rafId) {
-        rafId = requestAnimationFrame(autoScroll);
-      }
-    }, { rootMargin: '100px' });
-
-    observer.observe(track);
+    track.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - track.offsetLeft;
+      const walk = (x - startX) * 2;
+      track.scrollLeft = scrollLeft - walk;
+    });
   },
 
-  /* ----------------------------------------------------------
-     MAIN SCROLL HANDLER
-     ---------------------------------------------------------- */
   onScroll() {
     this.updateNavbar();
     this.updateParallax();
