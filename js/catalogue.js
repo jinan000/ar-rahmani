@@ -10,7 +10,7 @@ const Catalogue = {
   /* ---- State ---- */
   allProducts: [],
   filteredProducts: [],
-  displayedCount: 16,
+  displayedCount: 13,
   showAll: false,
   activeFilter: 'all',
   searchQuery: '',
@@ -629,11 +629,11 @@ const Catalogue = {
 
     // Price formatting
     const isZero = parseFloat(product.price) === 0;
-    const priceDisplay = isZero ? '$180.00' : `$${product.price}`;
-    const currencyDisplay = isZero ? 'USD' : product.currency;
+    const priceDisplay = isZero ? '180.00' : `${product.price}`;
+    const currencyDisplay = 'AED';
 
     const compareAtHTML = product.compareAtPrice && parseFloat(product.compareAtPrice) > parseFloat(product.price)
-      ? `<span style="text-decoration: line-through; opacity: 0.5; font-size: 0.85em; margin-right: 6px;">$${product.compareAtPrice}</span>`
+      ? `<span style="text-decoration: line-through; opacity: 0.5; font-size: 0.85em; margin-right: 6px;">${product.compareAtPrice}</span>`
       : '';
 
     card.innerHTML = `
@@ -658,22 +658,21 @@ const Catalogue = {
         <h3 class="cat-card-name" title="${this._escapeHtml(product.title)}">${this._escapeHtml(product.title)}</h3>
         ${family ? `<div class="cat-card-family">${this._escapeHtml(family)}</div>` : ''}
         <p class="cat-card-desc">${this._escapeHtml(truncatedDesc)}</p>
-        <div class="cat-card-price">${compareAtHTML}${priceDisplay}<span class="cat-card-currency">${currencyDisplay}</span></div>
+        <div class="cat-card-price">${compareAtHTML}${priceDisplay} <span class="cat-card-currency">${currencyDisplay}</span></div>
         <div class="cat-card-actions">
           <button class="cat-btn-cart btn-add-bag" data-variant-id="${product.variants[0]?.id || ''}" data-product-title="${this._escapeHtml(product.title)}" data-price="${priceDisplay}">
-            <span>Add to Cart</span>
+            <span>ADD TO BAG</span>
           </button>
           <button class="cat-btn-details" data-handle="${product.handle}">
-            <span>View Details</span>
+            <span>VIEW DETAILS</span>
           </button>
         </div>
       </div>
     `;
 
-    // Quick View on "View Details" click
-    const detailsBtn = card.querySelector('.cat-btn-details');
-    detailsBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
+    // Card-wide click opens View Details modal (unless clicking Add to Bag)
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.cat-btn-cart') || e.target.closest('.btn-add-bag')) return;
       this.openModal(product);
     });
 
@@ -902,7 +901,16 @@ const Catalogue = {
   /* ============================================================
      QUICK VIEW MODAL
      ============================================================ */
-  openModal(product) {
+  openModal(productOrHandle) {
+    let product = productOrHandle;
+    if (typeof productOrHandle === 'string') {
+      product = this.allProducts.find(p => p.handle === productOrHandle || p.id === productOrHandle);
+    }
+    if (!product && this.allProducts.length > 0) {
+      product = this.allProducts[0];
+    }
+    if (!product) return;
+
     this.modalProduct = product;
     this.modalImageIndex = 0;
     this.renderModal(product);
@@ -910,6 +918,7 @@ const Catalogue = {
     if (this.modalOverlay) {
       this.modalOverlay.classList.add('open');
       document.body.style.overflow = 'hidden';
+      if (window.lenis) window.lenis.stop();
     }
   },
 
@@ -917,15 +926,16 @@ const Catalogue = {
     if (this.modalOverlay) {
       this.modalOverlay.classList.remove('open');
       document.body.style.overflow = '';
+      if (window.lenis) window.lenis.start();
     }
     this.modalProduct = null;
   },
 
   renderModal(product) {
-    if (!this.modalEl) return;
+    if (!this.modalEl || !product) return;
 
-    const images = product.images;
-    const mainImage = images[this.modalImageIndex]?.url || '';
+    const images = product.images || [];
+    const mainImage = images[this.modalImageIndex]?.url || images[0]?.url || 'assets/images/hamood.webp';
     const concentration = product.concentration || product.productType || 'Parfum';
     const family = product.fragranceFamily || '';
 
@@ -997,7 +1007,7 @@ const Catalogue = {
     const checkoutUrl = `https://${(window.SHOPIFY_CONFIG?.storeDomain || '7cszxa-9r.myshopify.com')}`;
 
     const compareAtHTML = product.compareAtPrice && parseFloat(product.compareAtPrice) > parseFloat(product.price)
-      ? `<span class="cat-modal-compare-price" style="text-decoration: line-through; opacity: 0.5; font-size: 0.9em; margin-right: 8px;">$${product.compareAtPrice}</span>`
+      ? `<span class="cat-modal-compare-price" style="text-decoration: line-through; opacity: 0.5; font-size: 0.9em; margin-right: 8px;">${product.compareAtPrice}</span>`
       : '';
 
     this.modalEl.innerHTML = `
@@ -1022,8 +1032,8 @@ const Catalogue = {
 
         <div class="cat-modal-price-wrap">
           ${compareAtHTML}
-          <span class="cat-modal-price">$${product.price}</span>
-          <span class="cat-modal-price-currency">${product.currency}</span>
+          <span class="cat-modal-price">${product.price}</span>
+          <span class="cat-modal-price-currency">AED</span>
         </div>
 
         <div class="cat-modal-actions">

@@ -11,12 +11,12 @@ const FeaturedShowcase = {
       subtitle: "PARFUM",
       label: "EXTRAIT DE PARFUM",
       desc: "A rich and opulent fragrance that embodies strength, elegance and timeless Arabic heritage.",
-      price: "₹70",
-      currency: "INR",
-      image: "assets/images/hamood.webp",
-      scale: 2.2,
-      heroSize: "85vh",
-      previewSize: "240px",
+      price: "70",
+      currency: "AED",
+      image: "assets/images/4.webp",
+      scale: 1.35,
+      heroSize: "58vh",
+      previewSize: "100px",
       glowColor: "rgba(212, 175, 55, 0.08)",
       selectedSize: "60ml",
       shopifyVariantId: null,
@@ -36,12 +36,12 @@ const FeaturedShowcase = {
       subtitle: "EXOTIC BLEND",
       label: "EXTRAIT DE PARFUM",
       desc: "A paradise of tropical fruits, white flowers, and silky musk.",
-      price: "₹70",
-      currency: "INR",
-      image: "assets/images/paradisee.webp",
-      scale: 1.4,
-      heroSize: "60vh",
-      previewSize: "180px",
+      price: "70",
+      currency: "AED",
+      image: "assets/images/5.webp",
+      scale: 1.35,
+      heroSize: "58vh",
+      previewSize: "100px",
       glowColor: "rgba(100, 200, 180, 0.06)",
       selectedSize: "60ml",
       shopifyVariantId: null,
@@ -61,12 +61,12 @@ const FeaturedShowcase = {
       subtitle: "ORIENTAL",
       label: "EXTRAIT DE PARFUM",
       desc: "Patience distilled — deep amber, sacred incense, and aged sandalwood.",
-      price: "₹70",
-      currency: "INR",
+      price: "70",
+      currency: "AED",
       image: "assets/images/sabr.webp",
-      scale: 1.2,
-      heroSize: "65vh",
-      previewSize: "130px",
+      scale: 1.35,
+      heroSize: "58vh",
+      previewSize: "100px",
       glowColor: "rgba(180, 150, 100, 0.06)",
       selectedSize: "60ml",
       shopifyVariantId: null,
@@ -120,8 +120,8 @@ const FeaturedShowcase = {
               prod.shopifyVariantId = variants[0].id;
               const minPrice = matched.priceRange?.minVariantPrice;
               if (minPrice) {
-                prod.price = `₹${parseFloat(variants[0].price?.amount || minPrice.amount).toFixed(0)}`;
-                prod.currency = minPrice.currencyCode || 'INR';
+                prod.price = `${parseFloat(variants[0].price?.amount || minPrice.amount).toFixed(0)}`;
+                prod.currency = minPrice.currencyCode || 'AED';
               }
             }
           }
@@ -201,15 +201,15 @@ const FeaturedShowcase = {
       activeProduct.selectedVariantId = matchedVariant.id;
       activeProduct.selectedSize = matchedVariant.title;
       if (matchedVariant.price?.amount) {
-        activeProduct.price = `₹${parseFloat(matchedVariant.price.amount).toFixed(0)}`;
+        activeProduct.price = `${parseFloat(matchedVariant.price.amount).toFixed(0)}`;
       } else if (matchedVariant.price) {
-        activeProduct.price = `₹${parseFloat(matchedVariant.price).toFixed(0)}`;
+        activeProduct.price = `${parseFloat(matchedVariant.price).toFixed(0)}`;
       }
 
       const priceEl = document.getElementById("showcase-price");
       const currencyEl = document.getElementById("showcase-currency");
       if (priceEl) priceEl.textContent = activeProduct.price;
-      if (currencyEl) currencyEl.textContent = activeProduct.currency || "INR";
+      if (currencyEl) currencyEl.textContent = activeProduct.currency || "AED";
 
       document.querySelectorAll(".size-btn").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.size.toLowerCase() === sizeTitle.toLowerCase());
@@ -256,7 +256,7 @@ const FeaturedShowcase = {
         const parallaxRotX = -this.mouseY * 4;
         
         const activeProduct = FeaturedShowcase.products.find(p => p.id === FeaturedShowcase.activeId);
-        const baseScale = activeProduct ? activeProduct.scale : 2.2;
+        const baseScale = activeProduct ? activeProduct.scale : 1.35;
         const finalScale = baseScale * breatheScale;
         
         const transformString = `translate3d(0px, ${breatheY}px, 0) rotateX(${parallaxRotX}deg) rotateY(${parallaxRotY}deg) rotateZ(${breatheRot}deg) scale3d(${finalScale}, ${finalScale}, 1)`;
@@ -336,7 +336,7 @@ const FeaturedShowcase = {
     const cineEase = "cubic-bezier(.22,.61,.36,1)";
     
     const currentProduct = this.products.find(p => p.id === this.activeId);
-    const currentScale = currentProduct ? currentProduct.scale : 2.2;
+    const currentScale = currentProduct ? currentProduct.scale : 1.35;
     const targetScale = nextProduct.scale;
 
     tl.to([heroImage, reflection], {
@@ -385,7 +385,7 @@ const FeaturedShowcase = {
       if(notesBase) notesBase.textContent = nextProduct.notes?.base || "";
       
       if (price) price.textContent = nextProduct.price;
-      if (currency) currency.textContent = nextProduct.currency || "INR";
+      if (currency) currency.textContent = nextProduct.currency || "AED";
 
       document.querySelectorAll(".size-btn").forEach((btn, i) => {
         btn.classList.toggle("active", i === 0);

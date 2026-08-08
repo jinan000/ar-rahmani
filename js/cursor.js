@@ -53,21 +53,22 @@ const Cursor = {
   },
 
   setupHoverTargets() {
-    const hoverables = document.querySelectorAll(
-      'a, button, .btn, .product-card, .mood-pill, .ingredient-card, .instagram-item, .feature-card, .testimonial-card, .cat-card'
-    );
-
-    hoverables.forEach(el => {
-      el.addEventListener('mouseenter', () => {
+    document.addEventListener('mouseover', (e) => {
+      const target = e.target.closest('a, button, .btn, .product-card, .mood-pill, .ingredient-card, .instagram-item, .feature-card, .testimonial-card, .cat-card, .cat-modal-close, .cat-modal-thumb, .size-btn, .btn-wishlist, .preview-card-box, .arrow-btn-standalone');
+      if (target) {
         this.isHovering = true;
         if (this.dot) this.dot.classList.add('hovering');
         if (this.ring) this.ring.classList.add('hovering');
-      });
-      el.addEventListener('mouseleave', () => {
+      }
+    });
+
+    document.addEventListener('mouseout', (e) => {
+      const target = e.target.closest('a, button, .btn, .product-card, .mood-pill, .ingredient-card, .instagram-item, .feature-card, .testimonial-card, .cat-card, .cat-modal-close, .cat-modal-thumb, .size-btn, .btn-wishlist, .preview-card-box, .arrow-btn-standalone');
+      if (target) {
         this.isHovering = false;
         if (this.dot) this.dot.classList.remove('hovering');
         if (this.ring) this.ring.classList.remove('hovering');
-      });
+      }
     });
   },
 

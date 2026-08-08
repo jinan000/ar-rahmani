@@ -28,6 +28,8 @@ document.addEventListener("DOMContentLoaded", () => {
       start: "top top",
       end: () => `+=${getScrollAmount()}`,
       pin: true,
+      pinSpacing: true,
+      anticipatePin: 1, // Pre-renders pinning state cleanly to eliminate any jump!
       scrub: 0.1, // Fast 1:1 sync with Lenis — eliminates double-smoothing catch-up lag!
       invalidateOnRefresh: true,
       onUpdate: (self) => {
@@ -199,4 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
     clearTimeout(craftResizeTimer);
     craftResizeTimer = setTimeout(() => ScrollTrigger.refresh(), 250);
   });
+
+  // Delayed refresh to ensure DOM is fully laid out
+  setTimeout(() => ScrollTrigger.refresh(), 300);
 });

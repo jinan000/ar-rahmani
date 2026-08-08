@@ -251,7 +251,7 @@ const ShopifyCartUI = {
         checkoutUrl: 'https://' + (window.SHOPIFY_CONFIG?.storeDomain || '7cszxa-9r.myshopify.com') + '/cart',
         totalQuantity: 0,
         subtotal: '0.00',
-        currency: 'INR',
+        currency: 'AED',
         lines: []
       };
     }
@@ -271,7 +271,7 @@ const ShopifyCartUI = {
         variantId: 'variant_fallback_' + Date.now(),
         variantTitle: `Extrait de Parfum / ${selectedSize}`,
         price: parseFloat(price).toFixed(2),
-        currency: 'INR',
+        currency: 'AED',
         productTitle: name,
         image: imagesMap[name] || 'assets/images/hamood.webp'
       });

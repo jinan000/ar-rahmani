@@ -531,8 +531,8 @@
   background: var(--color-gold);
   border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 50%;
-  pointer-events: none;
-  z-index: var(--z-cursor);
+  pointer-events: none !important;
+  z-index: 9999999 !important;
   box-shadow: 0 0 12px rgba(212, 175, 55, 0.8);
   will-change: transform, width, height;
   transform: translate3d(-50%, -50%, 0);

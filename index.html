@@ -295,41 +295,41 @@
         </div>
         <div class="showcase-shadow" id="showcase-shadow"></div>
         <div class="hero-bottle-wrapper" id="hero-bottle-wrapper">
-          <img src="assets/images/hamood.webp" alt="HAMOOD" class="showcase-hero-bottle" id="showcase-hero-image"
-            style="--hero-size: 85vh; transform: scale(2.2);" loading="lazy" decoding="async">
+          <img src="assets/images/4.webp" alt="HAMOOD" class="showcase-hero-bottle" id="showcase-hero-image"
+            style="--hero-size: 58vh;" loading="lazy" decoding="async">
         </div>
         <div class="showcase-reflection" id="showcase-reflection">
-          <img src="assets/images/hamood.webp" alt="" id="showcase-reflection-image"
-            style="--hero-size: 85vh; transform: scale(2.2);" loading="lazy" decoding="async">
+          <img src="assets/images/4.webp" alt="" id="showcase-reflection-image"
+            style="--hero-size: 58vh;" loading="lazy" decoding="async">
         </div>
       </div>
 
-      <!-- Left Preview Card -->
-      <div class="preview-card-trigger preview-card-left" id="preview-left" data-target="1">
-        <div class="preview-card-inner">
+      <!-- Left Navigation Group (Arrow + Preview Card Box) -->
+      <div class="showcase-nav-group showcase-nav-left" id="preview-left" data-target="1">
+        <button class="arrow-btn-standalone arrow-left" aria-label="Previous product">
+          <span>‹</span>
+        </button>
+        <div class="preview-card-box">
           <div class="preview-card-image">
-            <img src="assets/images/paradisee.webp" alt="PARADISE" id="preview-left-image" style="--preview-size: 180px;"
+            <img src="assets/images/5.webp" alt="PARADISE" id="preview-left-image" style="--preview-size: 85px;"
               loading="lazy" decoding="async">
           </div>
           <h4 class="preview-card-name" id="preview-left-name">PARADISE</h4>
           <span class="preview-card-price" id="preview-left-price">70 AED</span>
         </div>
-        <button class="arrow-trigger arrow-left" aria-label="Previous product">
-          <span>‹</span>
-        </button>
       </div>
 
-      <!-- Right Preview Card -->
-      <div class="preview-card-trigger preview-card-right" id="preview-right" data-target="2">
-        <div class="preview-card-inner">
+      <!-- Right Navigation Group (Preview Card Box + Arrow) -->
+      <div class="showcase-nav-group showcase-nav-right" id="preview-right" data-target="2">
+        <div class="preview-card-box">
           <div class="preview-card-image">
-            <img src="assets/images/sabr.webp" alt="SABR" id="preview-right-image" style="--preview-size: 130px;"
+            <img src="assets/images/sabr.webp" alt="SABR" id="preview-right-image" style="--preview-size: 85px;"
               loading="lazy" decoding="async">
           </div>
           <h4 class="preview-card-name" id="preview-right-name">SABR</h4>
           <span class="preview-card-price" id="preview-right-price">70 AED</span>
         </div>
-        <button class="arrow-trigger arrow-right" aria-label="Next product">
+        <button class="arrow-btn-standalone arrow-right" aria-label="Next product">
           <span>›</span>
         </button>
       </div>
@@ -789,15 +789,10 @@
       <!-- Explore The Collection Button -->
       <div class="catalogue-explore-wrap" id="catalogue-explore-wrap">
         <button class="catalogue-explore-btn" id="catalogue-explore-btn">
-          <span>Explore The Collection</span>
+          <span>EXPLORE ALL COLLECTION</span>
           <span class="btn-arrow">→</span>
         </button>
       </div>
-    </div>
-
-    <!-- Quick View Modal -->
-    <div class="cat-modal-overlay" id="cat-modal-overlay">
-      <div class="cat-modal" id="cat-modal"></div>
     </div>
   </section>
 
@@ -921,6 +916,11 @@
   <script src="js/shopify.js" defer></script>
   <script src="js/shopify-cart-ui.js" defer></script>
   <script src="js/catalogue.js" defer></script>
+
+  <!-- Quick View Modal (Top-level viewport fixed popup) -->
+  <div class="cat-modal-overlay" id="cat-modal-overlay">
+    <div class="cat-modal" id="cat-modal"></div>
+  </div>
 
   <script src="js/main.js"></script>
 </body>
