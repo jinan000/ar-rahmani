@@ -71,6 +71,17 @@ const App = {
         }
       }
     });
+
+    // 3. Image load settlement handler (refreshes ScrollTrigger metrics as images load)
+    document.querySelectorAll('img').forEach(img => {
+      if (!img.complete) {
+        img.addEventListener('load', () => {
+          if (typeof ScrollTrigger !== 'undefined') {
+            setTimeout(() => ScrollTrigger.refresh(), 50);
+          }
+        }, { once: true });
+      }
+    });
   },
 
   /* ----------------------------------------------------------

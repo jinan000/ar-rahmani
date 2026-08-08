@@ -1,10 +1,12 @@
 /* ============================================================
    AR-RAHMANI — Craftsmanship Animations (Horizontal Scroll Story)
-   PERMANENT SINGLE MASTER TIMELINE IMPLEMENTATION:
-   - 1 Single ScrollTrigger instance for the entire section
-     (combines horizontal scroll + all parallax layers into one master timeline).
-   - scrub: true (1:1 instant scroll sync with zero lag/rebound on unpin).
-   - anticipatePin: 1 (seamless entry without 1-frame scroll-past jump).
+   NATIVE CSS STICKY SCROLL ENGINE:
+   - Outer section #craftsmanship has CSS height: 350vh.
+   - Inner container #craft-pin-wrapper has CSS position: sticky; top: 0; height: 100vh.
+   - Browser compositor natively handles viewport pinning.
+   - GSAP ScrollTrigger purely maps window scroll progress (start: "top top", end: "bottom bottom")
+     to translate x from 0 to -getScrollAmount().
+   - ZERO GSAP DOM pinning, ZERO pin-spacers, ZERO BFCache/back-button/checkout bugs!
    ============================================================ */
 
 (function() {
@@ -21,7 +23,7 @@
 
     if (!section || !scrollContainer) return;
 
-    // Calculate total horizontal scroll distance
+    // Total horizontal scroll distance calculation
     const getScrollAmount = () => scrollContainer.scrollWidth - window.innerWidth;
 
     // Parallax background layers
@@ -30,20 +32,17 @@
     const dustLayer = document.getElementById('craft-bg-dust');
 
     // ============================================================
-    // SINGLE MASTER TIMELINE & SCROLLTRIGGER
-    // Consolidates container movement + all background parallax into
-    // ONE single ScrollTrigger to eliminate multi-trigger conflicts.
+    // MASTER TIMELINE: Pure scroll-driven translation mapped to
+    // native CSS position: sticky track (#craftsmanship)
     // ============================================================
     const masterTl = gsap.timeline({
       scrollTrigger: {
         trigger: section,
         start: "top top",
-        end: () => `+=${getScrollAmount()}`,
-        pin: true,
-        pinSpacing: true,
-        anticipatePin: 0, // Ensures pinning only starts when top reaches top, allowing showcase to complete 100%
-        scrub: true,       // 1:1 instant sync (no lag timers after unpin)
+        end: "bottom bottom",
+        scrub: true,
         invalidateOnRefresh: true,
+        refreshPriority: 1,
         onUpdate: (self) => {
           if (progressBar) {
             gsap.set(progressBar, { width: `calc(${self.progress * 100}% - 50vw)` });
@@ -52,13 +51,13 @@
       }
     });
 
-    // 1. Primary Horizontal Scroll Tween
+    // 1. Primary Horizontal Scroll Translation
     masterTl.to(scrollContainer, {
       x: () => -getScrollAmount(),
       ease: "none"
     }, 0);
 
-    // 2. Parallax Layers (all mapped directly to the master timeline at position 0)
+    // 2. Parallax Layers
     if (smokeLayer) {
       masterTl.to(smokeLayer, { x: "-10%", ease: "none" }, 0);
     }
@@ -161,7 +160,7 @@
       }
     });
 
-    // Handle window resize strictly when user resizes browser window
+    // Window resize handler
     let resizeTimer;
     window.addEventListener("resize", () => {
       clearTimeout(resizeTimer);
@@ -170,7 +169,7 @@
       }, 250);
     });
 
-    // Handle BFCache (back/forward cache) navigation when user returns from checkout
+    // Handle BFCache (back/forward cache) navigation
     window.addEventListener("pageshow", () => {
       setTimeout(() => {
         if (typeof ScrollTrigger !== 'undefined') {
@@ -179,13 +178,12 @@
       }, 150);
     });
 
-    // Initial calculation after all elements are painted
+    // Initial calculation after paints
     setTimeout(() => {
       ScrollTrigger.refresh();
     }, 200);
   }
 
-  // Initialize on window load when images, fonts, and DOM layout are 100% complete
   if (document.readyState === 'complete') {
     initCraftsmanship();
   } else {

@@ -423,13 +423,16 @@
   position: relative;
   border-radius: var(--radius-lg);
   overflow: hidden;
+  width: 100%;
 }
 
 .story-image img {
+  width: 100%;
   max-width: 100%;
   height: auto;
   display: block;
   border-radius: var(--radius-lg);
+  object-fit: cover;
 }
 
 
@@ -573,15 +576,17 @@
    CRAFTSMANSHIP SECTION (Horizontal Scroll Story)
    ============================================================ */
 .craftsmanship {
-  background: var(--color-bg-secondary);
   position: relative;
+  height: 350vh;
+  background: var(--color-bg-secondary);
   padding: 0 !important;
   margin: 0 !important;
-  /* GSAP ScrollTrigger will pin the wrapper and add the required padding/height */
 }
 
-.craft-pin-wrapper {
-  position: relative;
+.craft-pin-wrapper,
+.craft-sticky-container {
+  position: sticky;
+  top: 0;
   width: 100%;
   height: 100vh;
   overflow: hidden;
@@ -1257,7 +1262,14 @@
   }
 
   .story-image {
-    aspect-ratio: 16 / 9;
+    aspect-ratio: auto;
+    width: 100%;
+  }
+
+  .story-image img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
   }
 
   .story-grid.reverse > * {
@@ -1314,7 +1326,34 @@
   }
 
   .why-us-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .feature-card {
+    padding: 1.5rem 0.85rem;
+    border-radius: 18px;
+  }
+
+  .feature-card-icon {
+    width: 52px;
+    height: 52px;
+    margin-bottom: 0.8rem;
+  }
+
+  .feature-card-icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .feature-card-title {
+    font-size: clamp(1.05rem, 3.5vw, 1.25rem);
+    margin-bottom: 0.35rem;
+  }
+
+  .feature-card-text {
+    font-size: 0.76rem;
+    line-height: 1.4;
   }
 
   .footer-top {
@@ -1933,47 +1972,178 @@
 }
 
 @media (max-width: 992px) {
-  .showcase-container {
-    grid-template-columns: 1fr;
-    gap: 3rem;
+  .showcase-section {
     height: auto;
-    padding: 3rem 2rem calc(3rem + 120px);
+    min-height: 100vh;
+    max-height: none;
+    padding: 2rem 0;
   }
 
-  .showcase-col-center {
-    height: 350px;
-  }
-
-  .preview-card-trigger {
-    top: 50%;
-  }
-
-  .preview-card-left {
-    left: 15px;
-  }
-
-  .preview-card-right {
-    right: 15px;
-  }
-
-  .showcase-feature-bar {
-    padding: 0 1rem;
-    flex-wrap: wrap;
-    height: auto;
-    padding: 1rem;
-    gap: 1rem;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 768px) {
   .showcase-container {
-    width: 95vw;
+    display: flex;
+    flex-direction: column;
+    width: 94vw;
+    height: auto;
+    max-height: none;
+    padding: 2.5rem 1.5rem calc(2.5rem + 80px);
+    gap: 1.5rem;
+    position: relative;
     border-radius: 24px;
   }
 
+  /* Hide product preview card boxes on mobile — keep standalone arrows ONLY */
+  .preview-card-box {
+    display: none !important;
+  }
+
+  /* Position standalone circular navigation arrows on mobile edges */
+  .showcase-nav-group {
+    position: absolute;
+    top: 40%;
+    transform: translateY(-50%);
+    z-index: 25;
+    gap: 0;
+  }
+
+  .showcase-nav-left {
+    left: 0.8rem;
+  }
+
+  .showcase-nav-right {
+    right: 0.8rem;
+  }
+
+  .arrow-btn-standalone {
+    width: 44px;
+    height: 44px;
+    background: rgba(10, 10, 10, 0.85);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* Align Left Column Text & Controls */
+  .showcase-col-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    z-index: 10;
+  }
+
   .showcase-title {
-    font-size: var(--text-4xl);
+    font-size: clamp(2.5rem, 8vw, 3.8rem);
+    text-align: center;
+  }
+
+  .showcase-subtitle {
+    text-align: center;
+  }
+
+  .showcase-divider {
+    margin: 0.8rem auto;
+  }
+
+  .showcase-desc {
+    text-align: center;
+    max-width: 90%;
+    margin: 0 auto 1.2rem;
+  }
+
+  .showcase-notes-section {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto 1.2rem;
+    text-align: center;
+  }
+
+  .showcase-notes-grid p {
+    text-align: center;
+  }
+
+  .showcase-variant-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.2rem;
+  }
+
+  .showcase-purchase {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto;
+  }
+
+  .showcase-actions {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .btn-add-bag {
+    flex: 1;
+    max-width: 240px;
+  }
+
+  .showcase-col-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    position: relative;
+    margin: 1.5rem auto 0;
+    padding: 1rem 0;
+  }
+
+  .hero-bottle-wrapper {
+    height: auto;
+    max-height: 300px;
+    margin-bottom: 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  .showcase-hero-bottle,
+  .showcase-reflection img {
+    height: auto !important;
+    max-height: 260px !important;
+    max-width: 85% !important;
+    object-fit: contain !important;
+  }
+
+  .pedestal-container {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+  }
+
+  .marble-pedestal {
+    width: 220px;
+    height: 32px;
+  }
+
+  .showcase-shadow {
+    bottom: 0;
+    width: 200px;
+  }
+
+  .showcase-feature-bar {
+    padding: 1rem;
+    flex-wrap: wrap;
+    height: auto;
+    gap: 1rem;
+    justify-content: center;
   }
 
   .showcase-feature-item {
