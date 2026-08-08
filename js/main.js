@@ -94,6 +94,8 @@ const App = {
         return;
       }
 
+      const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 768);
+
       this.lenis = new Lenis({
         duration: 1.2,
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -101,7 +103,8 @@ const App = {
         gestureOrientation: 'vertical',
         smoothWheel: true,
         wheelMultiplier: 1.0,
-        touchMultiplier: 1.5,
+        touchMultiplier: 0,   // Disable touch hijacking on mobile so native touch scroll never freezes
+        smoothTouch: false,   // 100% native smooth touch scrolling on iOS & Android
         infinite: false,
       });
 

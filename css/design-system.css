@@ -163,6 +163,8 @@ html {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   overflow-x: clip;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
@@ -173,6 +175,8 @@ body {
   color: var(--color-text-primary);
   background-color: var(--color-bg-primary);
   overflow-x: clip;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
   cursor: none;
 }
 
@@ -395,6 +399,16 @@ ul, ol {
 .footer {
   content-visibility: auto;
   contain-intrinsic-size: auto 800px;
+}
+
+@media (max-width: 768px) {
+  .story,
+  .ingredients,
+  .why-us,
+  .catalogue,
+  .footer {
+    content-visibility: visible !important;
+  }
 }
 
 /* Craftsmanship uses GSAP pin: true — content-visibility breaks pinning */
