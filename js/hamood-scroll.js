@@ -80,7 +80,8 @@ const HamoodScroll = {
      ---------------------------------------------------------- */
   preloadFrames() {
     let loadedCount = 0;
-    const initialTargetBuffer = 60; // Require initial 60 frames loaded before dismissing loader
+    const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 768);
+    const initialTargetBuffer = isMobile ? 80 : 60; // Buffer 80 frames on mobile so Story 01 & 02 frames are pre-loaded
     const self = this;
     
     // Initialize frames array
@@ -93,6 +94,7 @@ const HamoodScroll = {
     firstImg.onload = () => {
       self.frames[0] = firstImg;
       self.currentFrame = 0;
+      self.lastDrawnIndex = 0;
       self.renderFrame(0);
       loadedCount++;
       if (window.Loader && typeof window.Loader.updateProgress === 'function') {
@@ -101,9 +103,9 @@ const HamoodScroll = {
     };
     firstImg.src = `assets/frames/frame_0001.webp`;
 
-    // Concurrently load frames in batches (8 concurrent connections)
+    // Concurrently load frames (4 stream connections on mobile to preserve CPU, 8 on desktop)
     let nextToLoad = 1;
-    const concurrency = 8;
+    const concurrency = isMobile ? 4 : 8;
 
     const loadNext = () => {
       if (nextToLoad >= this.totalFrames) return;
@@ -120,8 +122,8 @@ const HamoodScroll = {
           window.Loader.updateProgress(loadedCount, initialTargetBuffer);
         }
 
-        // When initial buffer of 50+ frames is ready, declare site ready and complete loader
-        if (loadedCount >= 50 && !self.isReady) {
+        // When initial buffer is ready, declare site ready and complete loader
+        if (loadedCount >= initialTargetBuffer && !self.isReady) {
           self.onReady();
           if (window.Loader && typeof window.Loader.complete === 'function') {
             window.Loader.complete();
@@ -214,26 +216,32 @@ const HamoodScroll = {
      ---------------------------------------------------------- */
   renderFrame(index) {
     if (!this.ctx) return;
-    const img = this.frames[index];
+    let img = this.frames[index];
 
     if (!img || !img.complete || img.naturalWidth === 0) {
-      // Frame not loaded yet — find nearest loaded frame
-      for (let offset = 1; offset < 30; offset++) {
-        const prev = this.frames[index - offset];
-        if (prev && prev.complete && prev.naturalWidth > 0) {
-          this.drawCover(prev);
-          return;
-        }
-        const next = this.frames[index + offset];
-        if (next && next.complete && next.naturalWidth > 0) {
-          this.drawCover(next);
-          return;
+      // If target frame is still pending, use last successfully rendered frame
+      if (this.lastDrawnIndex >= 0 && this.frames[this.lastDrawnIndex]) {
+        img = this.frames[this.lastDrawnIndex];
+      } else {
+        for (let offset = 1; offset < 30; offset++) {
+          const prev = this.frames[index - offset];
+          if (prev && prev.complete && prev.naturalWidth > 0) {
+            img = prev;
+            break;
+          }
+          const next = this.frames[index + offset];
+          if (next && next.complete && next.naturalWidth > 0) {
+            img = next;
+            break;
+          }
         }
       }
-      return;
     }
 
-    this.drawCover(img);
+    if (img && img.complete && img.naturalWidth > 0) {
+      this.lastDrawnIndex = index;
+      this.drawCover(img);
+    }
   },
 
   /* ----------------------------------------------------------
