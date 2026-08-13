@@ -1151,22 +1151,20 @@ const Catalogue = {
      ============================================================ */
   async handleBuyNow(product) {
     const variantId = product.variants[0]?.id;
+    const domain = window.SHOPIFY_CONFIG?.storeDomain || '7cszxa-9r.myshopify.com';
+
     if (!variantId) {
-      const domain = window.SHOPIFY_CONFIG?.storeDomain || '7cszxa-9r.myshopify.com';
       window.open(`https://${domain}/products/${product.handle}`, '_blank');
       return;
     }
 
     try {
-      const cart = await ShopifyAPI.createCart([{ merchandiseId: variantId, quantity: 1 }]);
-      if (cart?.checkoutUrl) {
-        const url = new URL(cart.checkoutUrl);
-        url.searchParams.set('return_to', 'https://arrahmaniperfumes.ae');
-        window.location.href = url.toString();
-      }
+      // Use Shopify Cart Permalink to support the return_to parameter natively
+      const numericId = variantId.split('/').pop();
+      const returnUrl = encodeURIComponent('https://arrahmaniperfumes.ae');
+      window.location.href = `https://${domain}/cart/${numericId}:1?return_to=${returnUrl}`;
     } catch (err) {
       console.error('Buy Now error:', err);
-      const domain = window.SHOPIFY_CONFIG?.storeDomain || '7cszxa-9r.myshopify.com';
       window.open(`https://${domain}/products/${product.handle}`, '_blank');
     }
   },

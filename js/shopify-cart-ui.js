@@ -125,10 +125,18 @@ const ShopifyCartUI = {
     const checkoutBtn = document.getElementById('cart-checkout-btn');
     if (checkoutBtn) {
       checkoutBtn.addEventListener('click', () => {
-        if (this.cart && this.cart.checkoutUrl) {
-          const url = new URL(this.cart.checkoutUrl);
-          url.searchParams.set('return_to', 'https://arrahmaniperfumes.ae');
-          window.location.href = url.toString();
+        if (this.cart && this.cart.lines && this.cart.lines.length > 0) {
+          const domain = window.SHOPIFY_CONFIG?.storeDomain || '7cszxa-9r.myshopify.com';
+          const items = this.cart.lines.map(line => {
+            const numericId = line.variantId.split('/').pop();
+            return `${numericId}:${line.quantity}`;
+          }).join(',');
+          
+          const returnUrl = encodeURIComponent('https://arrahmaniperfumes.ae');
+          window.location.href = `https://${domain}/cart/${items}?return_to=${returnUrl}`;
+        } else if (this.cart && this.cart.checkoutUrl) {
+          // Fallback to Storefront API checkout URL (ignores return_to)
+          window.location.href = this.cart.checkoutUrl;
         } else {
           this.showToast('Checkout URL unavailable', true);
         }
