@@ -1160,7 +1160,9 @@ const Catalogue = {
     try {
       const cart = await ShopifyAPI.createCart([{ merchandiseId: variantId, quantity: 1 }]);
       if (cart?.checkoutUrl) {
-        window.location.href = cart.checkoutUrl;
+        const url = new URL(cart.checkoutUrl);
+        url.searchParams.set('return_to', 'https://arrahmaniperfumes.ae');
+        window.location.href = url.toString();
       }
     } catch (err) {
       console.error('Buy Now error:', err);

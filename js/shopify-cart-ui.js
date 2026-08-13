@@ -126,7 +126,9 @@ const ShopifyCartUI = {
     if (checkoutBtn) {
       checkoutBtn.addEventListener('click', () => {
         if (this.cart && this.cart.checkoutUrl) {
-          window.location.href = this.cart.checkoutUrl;
+          const url = new URL(this.cart.checkoutUrl);
+          url.searchParams.set('return_to', 'https://arrahmaniperfumes.ae');
+          window.location.href = url.toString();
         } else {
           this.showToast('Checkout URL unavailable', true);
         }
