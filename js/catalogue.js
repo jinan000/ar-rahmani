@@ -1026,20 +1026,36 @@ const Catalogue = {
         ${family ? `<div class="cat-modal-family">${this._escapeHtml(family)}</div>` : ''}
 
         <div class="cat-modal-divider"></div>
-
         <p class="cat-modal-desc">${this._escapeHtml(product.description)}</p>
 
         ${notesHTML}
         ${perfHTML}
 
+        ${product.variants && product.variants.length > 0 && !(product.variants.length === 1 && product.variants[0].title === 'Default Title') ? `
+        <div class="cat-modal-variants">
+          <div class="cat-modal-notes-title" style="margin-bottom: 10px;">Select Size</div>
+          <div class="cat-modal-variant-options" style="display: flex; gap: 10px; margin-bottom: 20px;">
+            ${product.variants.map((v, i) => `
+              <button class="cat-modal-variant-btn ${i === 0 ? 'active' : ''}" 
+                      style="padding: 8px 16px; border: 1px solid var(--color-gold-dim); background: ${i === 0 ? 'var(--color-gold-dim)' : 'transparent'}; color: var(--color-light); border-radius: 4px; cursor: pointer; transition: all 0.3s ease;"
+                      data-id="${v.id}" 
+                      data-price="${v.price}"
+                      data-compare="${v.compareAtPrice || ''}">
+                ${this._escapeHtml(v.title)}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+        ` : ''}
+
         <div class="cat-modal-price-wrap">
           ${compareAtHTML}
-          <span class="cat-modal-price">${product.price}</span>
+          <span class="cat-modal-price" id="cat-modal-price-display">${product.price}</span>
           <span class="cat-modal-price-currency">AED</span>
         </div>
 
         <div class="cat-modal-actions">
-          <button class="cat-btn-cart btn-add-bag" data-variant-id="${variantId}" data-product-title="${this._escapeHtml(product.title)}" data-price="${product.price}">
+          <button class="cat-btn-cart btn-add-bag" id="cat-modal-add-bag" data-variant-id="${variantId}" data-product-title="${this._escapeHtml(product.title)}" data-price="${product.price}">
             <span>Add to Cart</span>
           </button>
           <button class="cat-btn-details" id="cat-modal-buy-now" data-variant-id="${variantId}">
@@ -1052,6 +1068,38 @@ const Catalogue = {
     // Event listeners for modal
     const closeBtn = document.getElementById('cat-modal-close-btn');
     if (closeBtn) closeBtn.addEventListener('click', () => this.closeModal());
+
+    // Variant Selection Logic
+    const variantBtns = this.modalEl.querySelectorAll('.cat-modal-variant-btn');
+    const priceDisplay = document.getElementById('cat-modal-price-display');
+    const addBagBtn = document.getElementById('cat-modal-add-bag');
+    const variantBuyBtn = document.getElementById('cat-modal-buy-now');
+
+    variantBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Update active state visually
+        variantBtns.forEach(b => {
+          b.classList.remove('active');
+          b.style.background = 'transparent';
+        });
+        btn.classList.add('active');
+        btn.style.background = 'var(--color-gold-dim)';
+
+        // Update Price
+        const newPrice = btn.dataset.price;
+        if (priceDisplay) priceDisplay.textContent = newPrice;
+
+        // Update Button variant IDs
+        const newId = btn.dataset.id;
+        if (addBagBtn) {
+          addBagBtn.dataset.variantId = newId;
+          addBagBtn.dataset.price = newPrice;
+        }
+        if (variantBuyBtn) {
+          variantBuyBtn.dataset.variantId = newId;
+        }
+      });
+    });
 
     // Thumbnail click
     this.modalEl.querySelectorAll('.cat-modal-thumb').forEach(thumb => {
@@ -1151,20 +1199,20 @@ const Catalogue = {
      ============================================================ */
   async handleBuyNow(product) {
     const variantId = product.variants[0]?.id;
-    const domain = window.SHOPIFY_CONFIG?.storeDomain || '7cszxa-9r.myshopify.com';
-
     if (!variantId) {
+      const domain = window.SHOPIFY_CONFIG?.storeDomain || '7cszxa-9r.myshopify.com';
       window.open(`https://${domain}/products/${product.handle}`, '_blank');
       return;
     }
 
     try {
-      // Use Shopify Cart Permalink to support the return_to parameter natively
-      const numericId = variantId.split('/').pop();
-      const returnUrl = encodeURIComponent('https://arrahmaniperfumes.ae');
-      window.location.href = `https://${domain}/cart/${numericId}:1?return_to=${returnUrl}`;
+      const cart = await ShopifyAPI.createCart([{ merchandiseId: variantId, quantity: 1 }]);
+      if (cart?.checkoutUrl) {
+        window.location.href = cart.checkoutUrl;
+      }
     } catch (err) {
       console.error('Buy Now error:', err);
+      const domain = window.SHOPIFY_CONFIG?.storeDomain || '7cszxa-9r.myshopify.com';
       window.open(`https://${domain}/products/${product.handle}`, '_blank');
     }
   },

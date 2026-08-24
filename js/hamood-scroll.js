@@ -177,7 +177,7 @@ const HamoodScroll = {
       trigger: '.hero',
       start: 'top top',
       end: 'bottom bottom',
-      scrub: 0.1, // Smooth interpolation syncing with scroll
+      scrub: 0, // Instant interpolation syncing with scroll
       onUpdate(trigger) {
         const progress = trigger.progress;
         const frameIndex = Math.min(

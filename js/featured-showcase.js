@@ -11,18 +11,17 @@ const FeaturedShowcase = {
       subtitle: "PARFUM",
       label: "EXTRAIT DE PARFUM",
       desc: "A rich and opulent fragrance that embodies strength, elegance and timeless Arabic heritage.",
-      price: "70",
+      price: "140",
       currency: "AED",
       image: "assets/images/4.webp",
       scale: 1.35,
       heroSize: "58vh",
       previewSize: "100px",
       glowColor: "rgba(212, 175, 55, 0.08)",
-      selectedSize: "60ml",
+      selectedSize: "80ml",
       shopifyVariantId: null,
       variants: [
-        { id: "variant_hamood_60ml", title: "60ml", price: "70.0" },
-        { id: "variant_hamood_100ml", title: "100ml", price: "100.0" }
+        { id: "variant_hamood_80ml", title: "80ml", price: "140.0" }
       ],
       notes: {
         top: "Bergamot, Saffron, Cinnamon",
@@ -32,22 +31,21 @@ const FeaturedShowcase = {
     },
     {
       id: 1,
-      name: "PARADISE",
+      name: "PARADISE FUSION",
       subtitle: "EXOTIC BLEND",
       label: "EXTRAIT DE PARFUM",
       desc: "A paradise of tropical fruits, white flowers, and silky musk.",
-      price: "70",
+      price: "140",
       currency: "AED",
       image: "assets/images/5.webp",
       scale: 1.35,
       heroSize: "58vh",
       previewSize: "100px",
       glowColor: "rgba(100, 200, 180, 0.06)",
-      selectedSize: "60ml",
+      selectedSize: "50ml",
       shopifyVariantId: null,
       variants: [
-        { id: "variant_paradise_60ml", title: "60ml", price: "70.0" },
-        { id: "variant_paradise_100ml", title: "100ml", price: "100.0" }
+        { id: "variant_paradise_50ml", title: "50ml", price: "140.0" }
       ],
       notes: {
         top: "Tropical Fruits, Bergamot, Coconut",
@@ -61,18 +59,17 @@ const FeaturedShowcase = {
       subtitle: "ORIENTAL",
       label: "EXTRAIT DE PARFUM",
       desc: "Patience distilled — deep amber, sacred incense, and aged sandalwood.",
-      price: "70",
+      price: "140",
       currency: "AED",
       image: "assets/images/sabr.webp",
       scale: 1.35,
       heroSize: "58vh",
       previewSize: "100px",
       glowColor: "rgba(180, 150, 100, 0.06)",
-      selectedSize: "60ml",
+      selectedSize: "100ml",
       shopifyVariantId: null,
       variants: [
-        { id: "variant_sabr_60ml", title: "60ml", price: "70.0" },
-        { id: "variant_sabr_100ml", title: "100ml", price: "100.0" }
+        { id: "variant_sabr_100ml", title: "100ml", price: "140.0" }
       ],
       notes: {
         top: "Incense, Bergamot, Pink Pepper",
@@ -94,6 +91,16 @@ const FeaturedShowcase = {
   async init() {
     this.setupEventListeners();
     await this.fetchShopifyProducts();
+    
+    // Update initial size buttons for active product
+    const sizeSelector = document.getElementById("showcase-size-selector");
+    const activeProduct = this.products[this.activeId];
+    if (sizeSelector && activeProduct && activeProduct.variants) {
+      sizeSelector.innerHTML = activeProduct.variants.map((v, i) => 
+        `<button class="size-btn ${i === 0 ? 'active' : ''}" data-size="${v.title}">${v.title}</button>`
+      ).join('');
+    }
+
     this.updateCards(true);
     this.startRenderLoop();
   },
@@ -387,9 +394,16 @@ const FeaturedShowcase = {
       if (price) price.textContent = nextProduct.price;
       if (currency) currency.textContent = nextProduct.currency || "AED";
 
-      document.querySelectorAll(".size-btn").forEach((btn, i) => {
-        btn.classList.toggle("active", i === 0);
-      });
+      const sizeSelector = document.getElementById("showcase-size-selector");
+      if (sizeSelector && nextProduct.variants) {
+        sizeSelector.innerHTML = nextProduct.variants.map((v, i) => 
+          `<button class="size-btn ${i === 0 ? 'active' : ''}" data-size="${v.title}">${v.title}</button>`
+        ).join('');
+      } else {
+        document.querySelectorAll(".size-btn").forEach((btn, i) => {
+          btn.classList.toggle("active", i === 0);
+        });
+      }
 
       if (heroImage) {
         heroImage.src = nextProduct.image;

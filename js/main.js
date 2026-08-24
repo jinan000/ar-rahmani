@@ -97,12 +97,12 @@ const App = {
       const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 768);
 
       this.lenis = new Lenis({
-        duration: 1.2,
+        duration: 1.5,
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         orientation: 'vertical',
         gestureOrientation: 'vertical',
         smoothWheel: true,
-        wheelMultiplier: 1.0,
+        wheelMultiplier: 0.85,
         touchMultiplier: 0,   // Disable touch hijacking on mobile so native touch scroll never freezes
         smoothTouch: false,   // 100% native smooth touch scrolling on iOS & Android
         infinite: false,
