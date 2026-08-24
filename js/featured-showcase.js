@@ -101,8 +101,28 @@ const FeaturedShowcase = {
       ).join('');
     }
 
+    this.updateInitialUI();
     this.updateCards(true);
     this.startRenderLoop();
+  },
+
+  updateInitialUI() {
+    const activeProduct = this.products[this.activeId];
+    if (!activeProduct) return;
+
+    const label = document.getElementById("showcase-label");
+    const title = document.getElementById("showcase-title");
+    const subtitle = document.getElementById("showcase-subtitle");
+    const desc = document.getElementById("showcase-desc");
+    const price = document.getElementById("showcase-price");
+    const currency = document.getElementById("showcase-currency");
+
+    if (label) label.textContent = activeProduct.label;
+    if (title) title.textContent = activeProduct.name;
+    if (subtitle) subtitle.textContent = activeProduct.subtitle;
+    if (desc) desc.textContent = activeProduct.desc;
+    if (price) price.textContent = activeProduct.price;
+    if (currency) currency.textContent = activeProduct.currency || "AED";
   },
 
   async fetchShopifyProducts() {
@@ -120,11 +140,15 @@ const FeaturedShowcase = {
 
           if (matched) {
             prod.shopifyId = matched.id;
+            prod.name = matched.title.toUpperCase();
+            if (matched.description) prod.desc = matched.description;
+            
             const variants = matched.variants?.edges?.map(e => e.node) || [];
             if (variants.length > 0) {
               prod.variants = variants;
               prod.selectedVariantId = variants[0].id;
               prod.shopifyVariantId = variants[0].id;
+              prod.selectedSize = variants[0].title;
               const minPrice = matched.priceRange?.minVariantPrice;
               if (minPrice) {
                 prod.price = `${parseFloat(variants[0].price?.amount || minPrice.amount).toFixed(0)}`;
