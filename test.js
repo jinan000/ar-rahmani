@@ -1,4 +1,4 @@
-const endpoint = 'https://7cszxa-9r.myshopify.com/api/2024-04/graphql.json';
+const endpoint = 'https://7cszxa-9r.myshopify.com/api/2024-10/graphql.json';
 const token = '07a27dc9e5d8582f34c4d7b1c8559502';
 async function test() {
   const query = `
@@ -14,7 +14,6 @@ async function test() {
                   title
                   availableForSale
                   quantityAvailable
-                  price { amount }
                 }
               }
             }
