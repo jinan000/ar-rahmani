@@ -479,12 +479,12 @@ const ShopifyAPI = {
     return {
       id: cart.id,
       checkoutUrl: cart.checkoutUrl,
-      totalQuantity: cart.totalQuantity || 0,
+      totalQuantity: parseInt(cart.totalQuantity) || 0,
       subtotal: cart.cost?.subtotalAmount?.amount ? parseFloat(cart.cost.subtotalAmount.amount).toFixed(2) : '0.00',
       currency: cart.cost?.subtotalAmount?.currencyCode || 'AED',
       lines: cart.lines?.edges?.map(edge => ({
         id: edge.node.id,
-        quantity: edge.node.quantity,
+        quantity: parseInt(edge.node.quantity) || 1, // ensure it's an integer, fallback to 1 if missing for some reason
         variantId: edge.node.merchandise.id,
         variantTitle: edge.node.merchandise.title,
         availableForSale: edge.node.merchandise.availableForSale !== false,

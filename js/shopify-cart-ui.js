@@ -184,9 +184,16 @@ const ShopifyCartUI = {
       try {
         const existingCart = await ShopifyAPI.getCart(savedCartId);
         if (existingCart) {
-          this.cart = existingCart;
-          this.renderCart();
-          return;
+          // Verify cart is not corrupted with 0 quantity lines
+          const hasZeroQty = existingCart.lines && existingCart.lines.some(l => l.quantity <= 0);
+          if (!hasZeroQty) {
+            this.cart = existingCart;
+            this.renderCart();
+            return;
+          } else {
+            console.warn('Recovered cart contained invalid 0-quantity lines. Creating new cart...');
+            localStorage.removeItem(this.cartIdKey);
+          }
         }
       } catch (err) {
         console.log('Saved cart expired or invalid, creating new one...');
@@ -290,54 +297,6 @@ const ShopifyCartUI = {
     }
   },
 
-  /**
-   * Fallback for offline or unpublished variant testing
-   */
-  addLocalFallbackItem(name, price) {
-    let selectedSize = '60ml';
-    if (typeof FeaturedShowcase !== 'undefined' && FeaturedShowcase.products) {
-      const activeItem = FeaturedShowcase.products.find(p => p.id === FeaturedShowcase.activeId);
-      if (activeItem && activeItem.selectedSize) {
-        selectedSize = activeItem.selectedSize;
-      }
-    }
-
-    if (!this.cart) {
-      this.cart = {
-        id: 'local_cart_' + Date.now(),
-        checkoutUrl: 'https://' + (window.SHOPIFY_CONFIG?.storeDomain || '7cszxa-9r.myshopify.com') + '/cart',
-        totalQuantity: 0,
-        subtotal: '0.00',
-        currency: 'AED',
-        lines: []
-      };
-    }
-
-    const existingLine = this.cart.lines.find(l => l.productTitle === name && l.variantTitle.includes(selectedSize));
-    if (existingLine) {
-      existingLine.quantity += 1;
-    } else {
-      const imagesMap = {
-        'HAMOOD': 'assets/images/hamood.webp',
-        'PARADISE': 'assets/images/paradisee.webp',
-        'SABR': 'assets/images/sabr.webp'
-      };
-      this.cart.lines.push({
-        id: 'line_' + Date.now(),
-        quantity: 1,
-        variantId: 'variant_fallback_' + Date.now(),
-        variantTitle: `Extrait de Parfum / ${selectedSize}`,
-        price: parseFloat(price).toFixed(2),
-        currency: 'AED',
-        productTitle: name,
-        image: imagesMap[name] || 'assets/images/hamood.webp'
-      });
-    }
-
-    this.cart.totalQuantity = this.cart.lines.reduce((sum, item) => sum + item.quantity, 0);
-    const subtotal = this.cart.lines.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
-    this.cart.subtotal = subtotal.toFixed(2);
-  },
 
   /**
    * Update quantity of line item
@@ -360,18 +319,12 @@ const ShopifyCartUI = {
       try {
         this.cart = await ShopifyAPI.updateCartItem(this.cart.id, lineId, newQty);
       } catch (e) {
-        console.warn('Shopify quantity update error, falling back locally', e);
+        console.error('Shopify quantity update error:', e);
+        this.showToast('Failed to update quantity', true);
       }
     }
-
-    // Local fallback update
-    const line = this.cart.lines.find(l => l.id === lineId);
-    if (line) {
-      line.quantity = newQty;
-      this.cart.totalQuantity = this.cart.lines.reduce((sum, item) => sum + item.quantity, 0);
-      const subtotal = this.cart.lines.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
-      this.cart.subtotal = subtotal.toFixed(2);
-    }
+    
+    // Rerender with the strictly synced Shopify cart state
     this.renderCart();
   },
 
@@ -383,15 +336,10 @@ const ShopifyCartUI = {
       try {
         this.cart = await ShopifyAPI.removeCartItem(this.cart.id, [lineId]);
       } catch (e) {
-        console.warn('Shopify remove item error', e);
+        console.error('Shopify remove item error', e);
       }
     }
-
-    // Local update
-    this.cart.lines = this.cart.lines.filter(l => l.id !== lineId);
-    this.cart.totalQuantity = this.cart.lines.reduce((sum, item) => sum + item.quantity, 0);
-    const subtotal = this.cart.lines.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
-    this.cart.subtotal = subtotal.toFixed(2);
+    
     this.renderCart();
   },
 
