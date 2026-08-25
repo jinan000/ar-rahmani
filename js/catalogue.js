@@ -443,6 +443,7 @@ const Catalogue = {
       title: vEdge.node.title,
       available: vEdge.node.availableForSale || false,
       quantityAvailable: vEdge.node.quantityAvailable || null,
+      currentlyNotInStock: vEdge.node.currentlyNotInStock || false,
       price: parseFloat(vEdge.node.price?.amount || 0).toFixed(2),
       currency: vEdge.node.price?.currencyCode || 'AED',
       compareAtPrice: vEdge.node.compareAtPrice
@@ -676,13 +677,6 @@ const Catalogue = {
     card.addEventListener('click', (e) => {
       if (e.target.closest('.cat-btn-cart') || e.target.closest('.btn-add-bag')) return;
       this.openModal(product);
-    });
-
-    // Add to Cart handler
-    const cartBtn = card.querySelector('.cat-btn-cart');
-    cartBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.handleAddToCart(cartBtn, product);
     });
 
     return card;
@@ -1142,55 +1136,6 @@ const Catalogue = {
     const mainImg = document.getElementById('cat-modal-main-image');
     if (mainImg) {
       mainImg.style.transition = 'opacity 300ms var(--ease-luxury), transform 300ms var(--ease-luxury)';
-    }
-  },
-
-  /* ============================================================
-     ADD TO CART — Integrates with existing ShopifyCartUI
-     ============================================================ */
-  async handleAddToCart(button, product) {
-    const originalHTML = button.innerHTML;
-    button.innerHTML = `<span>Adding...</span>`;
-    button.disabled = true;
-
-    try {
-      const variantId = product.variants[0]?.id || button.dataset.variantId;
-
-      if (typeof ShopifyCartUI !== 'undefined') {
-        // Use existing cart infrastructure
-        if (!ShopifyCartUI.cart || !ShopifyCartUI.cart.id) {
-          if (variantId) {
-            ShopifyCartUI.cart = await ShopifyAPI.createCart([{ merchandiseId: variantId, quantity: 1 }]);
-            localStorage.setItem(ShopifyCartUI.cartIdKey, ShopifyCartUI.cart.id);
-          } else {
-            ShopifyCartUI.addLocalFallbackItem(product.title, product.price);
-          }
-        } else {
-          if (variantId) {
-            ShopifyCartUI.cart = await ShopifyAPI.addToCart(ShopifyCartUI.cart.id, [{ merchandiseId: variantId, quantity: 1 }]);
-          } else {
-            ShopifyCartUI.addLocalFallbackItem(product.title, product.price);
-          }
-        }
-
-        button.innerHTML = `<span>Added ✓</span>`;
-        ShopifyCartUI.showToast(`${product.title} added to your bag`);
-        ShopifyCartUI.renderCart();
-
-        setTimeout(() => ShopifyCartUI.openDrawer(), 300);
-      }
-    } catch (err) {
-      console.error('Add to cart error:', err);
-      if (typeof ShopifyCartUI !== 'undefined') {
-        ShopifyCartUI.addLocalFallbackItem(product.title, product.price);
-        ShopifyCartUI.renderCart();
-        ShopifyCartUI.openDrawer();
-      }
-    } finally {
-      setTimeout(() => {
-        button.innerHTML = originalHTML;
-        button.disabled = false;
-      }, 1800);
     }
   },
 

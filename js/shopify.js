@@ -66,10 +66,11 @@ const ShopifyAPI = {
               }
               variants(first: 10) {
                 edges {
-                  node {
                     id
                     title
                     availableForSale
+                    quantityAvailable
+                    currentlyNotInStock
                     price {
                       amount
                       currencyCode
@@ -113,10 +114,11 @@ const ShopifyAPI = {
           }
           variants(first: 10) {
             edges {
-              node {
                 id
                 title
                 availableForSale
+                quantityAvailable
+                currentlyNotInStock
                 price {
                   amount
                   currencyCode
@@ -161,6 +163,9 @@ const ShopifyAPI = {
                     ... on ProductVariant {
                       id
                       title
+                      availableForSale
+                      quantityAvailable
+                      currentlyNotInStock
                       price {
                         amount
                         currencyCode
@@ -224,13 +229,16 @@ const ShopifyAPI = {
                 id
                 quantity
                 merchandise {
-                  ... on ProductVariant {
-                    id
-                    title
-                    price {
-                      amount
-                      currencyCode
-                    }
+                    ... on ProductVariant {
+                      id
+                      title
+                      availableForSale
+                      quantityAvailable
+                      currentlyNotInStock
+                      price {
+                        amount
+                        currencyCode
+                      }
                     product {
                       title
                       handle
@@ -285,6 +293,9 @@ const ShopifyAPI = {
                     ... on ProductVariant {
                       id
                       title
+                      availableForSale
+                      quantityAvailable
+                      currentlyNotInStock
                       price {
                         amount
                         currencyCode
@@ -351,6 +362,9 @@ const ShopifyAPI = {
                     ... on ProductVariant {
                       id
                       title
+                      availableForSale
+                      quantityAvailable
+                      currentlyNotInStock
                       price {
                         amount
                         currencyCode
@@ -418,6 +432,9 @@ const ShopifyAPI = {
                     ... on ProductVariant {
                       id
                       title
+                      availableForSale
+                      quantityAvailable
+                      currentlyNotInStock
                       price {
                         amount
                         currencyCode
@@ -470,6 +487,9 @@ const ShopifyAPI = {
         quantity: edge.node.quantity,
         variantId: edge.node.merchandise.id,
         variantTitle: edge.node.merchandise.title,
+        availableForSale: edge.node.merchandise.availableForSale !== false,
+        quantityAvailable: edge.node.merchandise.quantityAvailable,
+        currentlyNotInStock: edge.node.merchandise.currentlyNotInStock === true,
         price: parseFloat(edge.node.merchandise.price.amount).toFixed(2),
         currency: edge.node.merchandise.price.currencyCode || 'AED',
         productTitle: edge.node.merchandise.product.title,

@@ -145,7 +145,38 @@ const ShopifyCartUI = {
   },
 
   /**
-   * Load existing Shopify cart from localStorage or create new
+   * showOutOfStockModal(productTitle, variantTitle) {
+    const existing = document.getElementById('out-of-stock-modal');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'out-of-stock-modal';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(5px);';
+    
+    const modal = document.createElement('div');
+    modal.style.cssText = 'background:var(--color-dark-surface, #111);padding:30px;border-radius:8px;border:1px solid var(--color-gold-dim, #c0a062);max-width:400px;text-align:center;color:white;font-family:var(--font-sans, sans-serif);';
+    
+    modal.innerHTML = `
+      <h2 style="color:var(--color-gold, #d4af37);margin-bottom:15px;text-transform:uppercase;letter-spacing:1px;font-size:1.5rem;">Out of stock</h2>
+      <p style="margin-bottom:20px;font-size:0.9rem;line-height:1.5;opacity:0.8;">These items are no longer available and cannot be added to your cart.</p>
+      <div style="margin-bottom:25px;font-weight:bold;font-size:1.1rem;background:rgba(255,255,255,0.05);padding:10px;border-radius:4px;">
+        ${productTitle}<br>
+        <span style="font-size:0.9rem;opacity:0.7;">${variantTitle}</span><br>
+        <span style="color:#e74c3c;font-size:0.8rem;margin-top:5px;display:inline-block;">SOLD OUT</span>
+      </div>
+      <button id="oos-close-btn" style="background:var(--color-gold, #d4af37);color:black;border:none;padding:12px 24px;border-radius:4px;cursor:pointer;font-weight:bold;text-transform:uppercase;letter-spacing:1px;width:100%;">Okay</button>
+    `;
+
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    document.getElementById('oos-close-btn').addEventListener('click', () => {
+      overlay.remove();
+    });
+  },
+
+  /**
+   * Load Cart from localStorage
    */
   async loadCart() {
     const savedCartId = localStorage.getItem(this.cartIdKey);
@@ -188,23 +219,46 @@ const ShopifyCartUI = {
       }
 
       // Check if variantId is a valid published Shopify GID
-      const isRealShopifyVariant = variantId && typeof variantId === 'string' && variantId.startsWith('gid://shopify/ProductVariant/');
+      let isRealShopifyVariant = variantId && typeof variantId === 'string' && variantId.startsWith('gid://shopify/ProductVariant/');
+      let matchedVariant = null;
 
-      // If variantId is not available or not GID, check matched shopify products
-      if (!isRealShopifyVariant && this.shopifyProducts.length > 0) {
-        const matched = this.shopifyProducts.find(p => 
+      // Ensure variantId is valid and fetch live variant data
+      if (this.shopifyProducts.length > 0) {
+        const matchedProduct = this.shopifyProducts.find(p => 
           p.title.toLowerCase().includes(productName.toLowerCase()) || 
           productName.toLowerCase().includes(p.title.toLowerCase())
         );
-        if (matched && matched.variants?.length > 0) {
-          variantId = matched.variants[0].id;
+        if (matchedProduct && matchedProduct.variants?.length > 0) {
+          if (isRealShopifyVariant) {
+            matchedVariant = matchedProduct.variants.find(v => v.id === variantId) || matchedProduct.variants[0];
+          } else {
+            matchedVariant = matchedProduct.variants[0];
+            variantId = matchedVariant.id;
+            isRealShopifyVariant = true;
+          }
         }
       }
 
-      const validGid = variantId && typeof variantId === 'string' && variantId.startsWith('gid://shopify/ProductVariant/');
+      // CART VALIDATION
+      if (matchedVariant) {
+        let currentCartQty = 0;
+        if (this.cart && this.cart.lines) {
+          const existingLine = this.cart.lines.find(l => l.variantId === variantId);
+          if (existingLine) currentCartQty = existingLine.quantity;
+        }
+        
+        const requestedQty = currentCartQty + 1;
+        const isAvailable = matchedVariant.availableForSale !== false;
+        // If currentlyNotInStock is true, Shopify allows selling when out of stock
+        const outOfStock = matchedVariant.quantityAvailable !== null && matchedVariant.quantityAvailable < requestedQty && matchedVariant.currentlyNotInStock !== true;
+        
+        if (!isAvailable || outOfStock) {
+          this.showOutOfStockModal(productName, matchedVariant.title || "Size");
+          throw new Error("Validation: Out of stock");
+        }
+      }
 
-      // If valid Shopify variant exists, update Storefront API Cart
-      if (validGid) {
+      if (isRealShopifyVariant) {
         if (!this.cart || !this.cart.id || this.cart.id.startsWith('local_cart_')) {
           this.cart = await ShopifyAPI.createCart([{ merchandiseId: variantId, quantity: 1 }]);
           localStorage.setItem(this.cartIdKey, this.cart.id);
@@ -212,8 +266,7 @@ const ShopifyCartUI = {
           this.cart = await ShopifyAPI.addToCart(this.cart.id, [{ merchandiseId: variantId, quantity: 1 }]);
         }
       } else {
-        // Dynamic fallback for offline/unpublished product variants
-        this.addLocalFallbackItem(productName, price);
+        throw new Error("Invalid Shopify Variant ID");
       }
 
       buttonElement.innerHTML = `<span>ADDED TO BAG ✓</span>`;
@@ -226,10 +279,9 @@ const ShopifyCartUI = {
 
     } catch (error) {
       console.warn('Shopify Cart Notice:', error.message);
-      // Dynamic local fallback using active product name and price
-      this.addLocalFallbackItem(productName, price);
-      this.renderCart();
-      this.openDrawer();
+      if (error.message !== "Validation: Out of stock") {
+        this.showToast("Failed to add to cart: " + error.message);
+      }
     } finally {
       setTimeout(() => {
         buttonElement.innerHTML = originalText;
@@ -297,6 +349,14 @@ const ShopifyCartUI = {
     }
 
     if (this.cart.id && !this.cart.id.startsWith('local_cart_')) {
+      const lineItem = this.cart.lines.find(l => l.id === lineId);
+      if (lineItem) {
+        const outOfStock = lineItem.quantityAvailable !== null && lineItem.quantityAvailable < newQty && lineItem.currentlyNotInStock !== true;
+        if (outOfStock) {
+          this.showOutOfStockModal(lineItem.productTitle, lineItem.variantTitle);
+          return;
+        }
+      }
       try {
         this.cart = await ShopifyAPI.updateCartItem(this.cart.id, lineId, newQty);
       } catch (e) {
