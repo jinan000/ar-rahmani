@@ -74,10 +74,15 @@ const ShopifyCartUI = {
               <span class="cart-subtotal-price" id="cart-subtotal">0.00 AED</span>
             </div>
             <p class="cart-tax-shipping-note">Taxes and shipping calculated at checkout.</p>
-            <button class="btn btn-primary cart-checkout-btn" id="cart-checkout-btn">
-              <span>PROCEED TO CHECKOUT</span>
-              <span class="btn-arrow">→</span>
-            </button>
+            <div class="cart-actions-row" style="display: flex; gap: 10px; margin-top: 15px;">
+              <button class="btn btn-outline close-drawer-link" style="flex: 1; padding: 12px; font-size: 0.9em;">
+                <span>CONTINUE SHOPPING</span>
+              </button>
+              <button class="btn btn-primary cart-checkout-btn" id="cart-checkout-btn" style="flex: 1; padding: 12px; font-size: 0.9em;">
+                <span>PROCEED TO CHECKOUT</span>
+                <span class="btn-arrow">→</span>
+              </button>
+            </div>
           </div>
         </div>
         <div class="cart-toast" id="cart-toast"></div>
@@ -168,16 +173,16 @@ const ShopifyCartUI = {
     buttonElement.disabled = true;
 
     try {
-      // Determine active product name & details from FeaturedShowcase or page context
-      let productName = "HAMOOD";
-      let price = "180.00";
-      let variantId = null;
+      // Determine active product name & details from the button dataset, fallback to FeaturedShowcase
+      let productName = buttonElement.dataset.productTitle || "HAMOOD";
+      let price = (buttonElement.dataset.price || "180.00").replace(/[^0-9.]/g, '');
+      let variantId = buttonElement.dataset.variantId || null;
 
-      if (typeof FeaturedShowcase !== 'undefined' && FeaturedShowcase.products) {
+      if (!buttonElement.dataset.productTitle && typeof FeaturedShowcase !== 'undefined' && FeaturedShowcase.products) {
         const activeItem = FeaturedShowcase.products.find(p => p.id === FeaturedShowcase.activeId);
         if (activeItem) {
           productName = activeItem.name;
-          price = activeItem.price.replace('₹', '').replace('$', '').replace(' INR', '').replace(' USD', '').trim();
+          price = activeItem.price.replace(/[^0-9.]/g, '');
           variantId = activeItem.selectedVariantId || activeItem.shopifyVariantId || null;
         }
       }
