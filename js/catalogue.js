@@ -639,6 +639,23 @@ const Catalogue = {
       ? `<span style="text-decoration: line-through; opacity: 0.5; font-size: 0.85em; margin-right: 6px;">${product.compareAtPrice}</span>`
       : '';
 
+    const hasMultipleVariants = product.variants && product.variants.length > 1;
+    let actionBtnHTML = '';
+
+    if (hasMultipleVariants) {
+      actionBtnHTML = `
+        <button class="cat-btn-cart cat-btn-select-size">
+          <span>SELECT SIZE</span>
+        </button>
+      `;
+    } else {
+      actionBtnHTML = `
+        <button class="cat-btn-cart btn-add-bag" data-variant-id="${product.variants[0]?.id || ''}" data-product-title="${this._escapeHtml(product.title)}" data-price="${priceDisplay}">
+          <span>ADD TO BAG</span>
+        </button>
+      `;
+    }
+
     card.innerHTML = `
       <div class="cat-card-image">
         <img class="cat-card-bottle cat-card-bottle--primary" 
@@ -663,9 +680,7 @@ const Catalogue = {
         <p class="cat-card-desc">${this._escapeHtml(truncatedDesc)}</p>
         <div class="cat-card-price">${compareAtHTML}${priceDisplay} <span class="cat-card-currency">${currencyDisplay}</span></div>
         <div class="cat-card-actions">
-          <button class="cat-btn-cart btn-add-bag" data-variant-id="${product.variants[0]?.id || ''}" data-product-title="${this._escapeHtml(product.title)}" data-price="${priceDisplay}">
-            <span>ADD TO BAG</span>
-          </button>
+          ${actionBtnHTML}
           <button class="cat-btn-details" data-handle="${product.handle}">
             <span>VIEW DETAILS</span>
           </button>
@@ -675,7 +690,9 @@ const Catalogue = {
 
     // Card-wide click opens View Details modal (unless clicking Add to Bag)
     card.addEventListener('click', (e) => {
-      if (e.target.closest('.cat-btn-cart') || e.target.closest('.btn-add-bag')) return;
+      // If clicking the direct Add to Bag button for single variant, let it pass to shopify-cart-ui
+      if (e.target.closest('.btn-add-bag')) return;
+      // Otherwise (clicking card, or clicking SELECT SIZE), open the modal
       this.openModal(product);
     });
 

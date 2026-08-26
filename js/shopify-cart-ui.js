@@ -180,6 +180,9 @@ const ShopifyCartUI = {
    * Maps UI data to variantID and dispatches to CartService.
    */
   async handleAddToBagClick(buttonElement) {
+    // 1. Prevent duplicate clicks
+    if (buttonElement.disabled) return;
+
     const originalText = buttonElement.innerHTML;
     buttonElement.innerHTML = `<span>ADDING...</span>`;
     buttonElement.disabled = true;
@@ -197,7 +200,7 @@ const ShopifyCartUI = {
         }
       }
 
-      // Check if we need to lookup variant ID from fetched Shopify Products
+      // 2. Validate Variant GID
       let isRealShopifyVariant = variantId && typeof variantId === 'string' && variantId.startsWith('gid://shopify/ProductVariant/');
       
       if (!isRealShopifyVariant && this.shopifyProducts.length > 0) {
@@ -211,29 +214,39 @@ const ShopifyCartUI = {
         }
       }
 
-      if (isRealShopifyVariant && window.CartService) {
-        // Dispatch to CartService
+      if (!isRealShopifyVariant) {
+        throw new Error("Invalid Product/Variant Configuration");
+      }
+
+      if (window.CartService) {
+        // 3. Dispatch to CartService
         await window.CartService.addLine(variantId, 1);
         
-        // Wait for state to settle
-        if (window.CartService.state.status === 'ready' && !window.CartService.state.error) {
+        // 4. Verify no Shopify/CartService errors occurred
+        if (window.CartService.state.error) {
+          throw new Error(window.CartService.state.error);
+        }
+
+        // 5. Success Path
+        if (window.CartService.state.status === 'ready') {
            buttonElement.innerHTML = `<span>ADDED TO BAG ✓</span>`;
            this.showToast(`${productName} added to your bag`);
+           // Delay opening drawer slightly for visual effect, but we DO NOT delay reverting the button
            setTimeout(() => {
              this.openDrawer();
            }, 300);
         }
       } else {
-        throw new Error("Invalid Product/Variant Configuration");
+        throw new Error("CartService is not initialized");
       }
     } catch (error) {
+      // 6. Error Path - display exact error
       console.warn('UI Add to Cart Error:', error);
       this.showToast("Failed to add to cart: " + error.message, true);
     } finally {
-      setTimeout(() => {
-        buttonElement.innerHTML = originalText;
-        buttonElement.disabled = false;
-      }, 1800);
+      // 7. Guaranteed Synchronous Cleanup
+      buttonElement.innerHTML = originalText;
+      buttonElement.disabled = false;
     }
   },
 

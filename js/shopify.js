@@ -67,6 +67,7 @@ const ShopifyAPI = {
               }
               variants(first: 10) {
                 edges {
+                  node {
                     id
                     title
                     availableForSale
@@ -115,6 +116,7 @@ const ShopifyAPI = {
           }
           variants(first: 10) {
             edges {
+              node {
                 id
                 title
                 availableForSale
