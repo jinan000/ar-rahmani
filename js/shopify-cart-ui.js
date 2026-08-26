@@ -1,17 +1,21 @@
 /* ============================================================
-   AR-RAHMANI — Shopify Cart & UI Integration
-   Handles cart drawer, add-to-bag handlers, badges, and Shopify sync.
+   AR-RAHMANI — Shopify Cart UI Integration (Rebuilt)
+   Pure View Layer driven by CartService state.
    ============================================================ */
 
 const ShopifyCartUI = {
-  cart: null,
-  cartIdKey: 'ar_rahmani_shopify_cart_id',
-  shopifyProducts: [],
+  shopifyProducts: [], // Used strictly for UI metadata (descriptions, matching names)
 
   async init() {
     this.injectCartMarkup();
     this.setupEventListeners();
-    await this.loadCart();
+    
+    // Subscribe to State Changes
+    if (window.CartService) {
+      window.CartService.subscribe((state) => this.renderCart(state));
+      await window.CartService.init();
+    }
+    
     await this.syncProductsFromShopify();
   },
 
@@ -122,7 +126,7 @@ const ShopifyCartUI = {
       const addBtn = e.target.closest('.btn-add-bag');
       if (addBtn) {
         e.preventDefault();
-        await this.handleAddToBag(addBtn);
+        await this.handleAddToBagClick(addBtn);
       }
     });
 
@@ -131,37 +135,8 @@ const ShopifyCartUI = {
     if (checkoutBtn) {
       checkoutBtn.addEventListener('click', async (e) => {
         e.preventDefault();
-        
-        // Re-validate cart with Shopify before proceeding
-        checkoutBtn.innerHTML = `<span>VALIDATING...</span>`;
-        checkoutBtn.disabled = true;
-        
-        try {
-          if (this.cart && this.cart.id) {
-            this.cart = await ShopifyAPI.getCart(this.cart.id);
-            const isValid = await this.validateCartItems();
-            if (!isValid) {
-              this.cart = await ShopifyAPI.getCart(this.cart.id);
-              this.renderCart();
-              this.showToast('Some items in your cart are no longer available and were removed.', true);
-              checkoutBtn.innerHTML = `<span>PROCEED TO CHECKOUT</span><span class="btn-arrow">→</span>`;
-              checkoutBtn.disabled = false;
-              return; // Stop checkout
-            }
-          }
-          
-          if (this.cart && this.cart.checkoutUrl) {
-            window.location.href = this.cart.checkoutUrl;
-          } else {
-            this.showToast('Checkout URL unavailable', true);
-            checkoutBtn.innerHTML = `<span>PROCEED TO CHECKOUT</span><span class="btn-arrow">→</span>`;
-            checkoutBtn.disabled = false;
-          }
-        } catch (err) {
-          console.error("Checkout validation failed:", err);
-          this.showToast('Failed to validate cart. Please try again.', true);
-          checkoutBtn.innerHTML = `<span>PROCEED TO CHECKOUT</span><span class="btn-arrow">→</span>`;
-          checkoutBtn.disabled = false;
+        if (window.CartService) {
+           await window.CartService.checkout();
         }
       });
     }
@@ -171,217 +146,89 @@ const ShopifyCartUI = {
       if (e.key === 'Escape') this.closeDrawer();
     });
 
-    // Reset checkout button state when returning from bfcache (Back button)
+    // Handle Bfcache - explicitly tell CartService to reset checkout state if returning via Back button
     window.addEventListener('pageshow', (event) => {
-      if (event.persisted) {
-        const btn = document.getElementById('cart-checkout-btn');
-        if (btn && btn.disabled) {
-          btn.innerHTML = `<span>PROCEED TO CHECKOUT</span><span class="btn-arrow">→</span>`;
-          btn.disabled = false;
-        }
+      if (event.persisted && window.CartService) {
+         window.CartService.resetCheckoutState();
       }
     });
 
-    // Reset checkout button state when tab regains visibility (New tab scenarios)
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        const btn = document.getElementById('cart-checkout-btn');
-        if (btn && btn.disabled) {
-          btn.innerHTML = `<span>PROCEED TO CHECKOUT</span><span class="btn-arrow">→</span>`;
-          btn.disabled = false;
-        }
+      if (document.visibilityState === 'visible' && window.CartService) {
+         window.CartService.resetCheckoutState();
       }
     });
   },
 
   /**
-   * showOutOfStockModal(productTitle, variantTitle) {
-    const existing = document.getElementById('out-of-stock-modal');
-    if (existing) existing.remove();
+   * Show Toast Notification
+   */
+  showToast(message, isError = false) {
+    const toast = document.getElementById('cart-toast');
+    if (!toast) return;
 
-    const overlay = document.createElement('div');
-    overlay.id = 'out-of-stock-modal';
-    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(5px);';
+    toast.textContent = message;
+    toast.className = `cart-toast show ${isError ? 'error' : ''}`;
     
-    const modal = document.createElement('div');
-    modal.style.cssText = 'background:var(--color-dark-surface, #111);padding:30px;border-radius:8px;border:1px solid var(--color-gold-dim, #c0a062);max-width:400px;text-align:center;color:white;font-family:var(--font-sans, sans-serif);';
-    
-    modal.innerHTML = `
-      <h2 style="color:var(--color-gold, #d4af37);margin-bottom:15px;text-transform:uppercase;letter-spacing:1px;font-size:1.5rem;">Out of stock</h2>
-      <p style="margin-bottom:20px;font-size:0.9rem;line-height:1.5;opacity:0.8;">These items are no longer available and cannot be added to your cart.</p>
-      <div style="margin-bottom:25px;font-weight:bold;font-size:1.1rem;background:rgba(255,255,255,0.05);padding:10px;border-radius:4px;">
-        ${productTitle}<br>
-        <span style="font-size:0.9rem;opacity:0.7;">${variantTitle}</span><br>
-        <span style="color:#e74c3c;font-size:0.8rem;margin-top:5px;display:inline-block;">SOLD OUT</span>
-      </div>
-      <button id="oos-close-btn" style="background:var(--color-gold, #d4af37);color:black;border:none;padding:12px 24px;border-radius:4px;cursor:pointer;font-weight:bold;text-transform:uppercase;letter-spacing:1px;width:100%;">Okay</button>
-    `;
-
-    overlay.appendChild(modal);
-    document.body.appendChild(overlay);
-
-    document.getElementById('oos-close-btn').addEventListener('click', () => {
-      overlay.remove();
-    });
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3000);
   },
 
   /**
-   * Validate Cart Items against current Shopify state
+   * Click Handler for "Add to Bag" buttons.
+   * Maps UI data to variantID and dispatches to CartService.
    */
-  async validateCartItems() {
-    if (!this.cart || !this.cart.lines) return true;
-    
-    const invalidLineIds = [];
-    for (const line of this.cart.lines) {
-      const isAvailable = line.availableForSale !== false;
-      const outOfStock = line.quantityAvailable !== null && line.quantityAvailable < line.quantity && line.currentlyNotInStock !== true;
-      
-      if (line.quantity <= 0 || !isAvailable || outOfStock) {
-        invalidLineIds.push(line.id);
-      }
-    }
-
-    if (invalidLineIds.length > 0) {
-      console.warn('Found invalid/out-of-stock items in cart. Removing...', invalidLineIds);
-      try {
-        await ShopifyAPI.removeCartItem(this.cart.id, invalidLineIds);
-        return false; // Cart was modified successfully
-      } catch (e) {
-        console.error('Failed to remove invalid cart lines:', e);
-        // If removal failed, the cart is fundamentally corrupt or stale.
-        // Return false so loadCart discards this invalid state and refetches.
-        return false;
-      }
-    }
-    return true; // Cart is valid
-  },
-
-  /**
-   * Load Cart from localStorage
-   */
-  async loadCart() {
-    const savedCartId = localStorage.getItem(this.cartIdKey);
-    if (savedCartId) {
-      try {
-        const existingCart = await ShopifyAPI.getCart(savedCartId);
-        if (existingCart) {
-          this.cart = existingCart;
-          const isValid = await this.validateCartItems();
-          if (!isValid) {
-             // Re-fetch cart if lines were removed
-             this.cart = await ShopifyAPI.getCart(savedCartId);
-          }
-          this.renderCart();
-          return;
-        }
-      } catch (err) {
-        console.log('Saved cart expired or invalid, creating new one...');
-        localStorage.removeItem(this.cartIdKey);
-      }
-    }
-  },
-
-  /**
-   * Add active product to Shopify Cart
-   */
-  async handleAddToBag(buttonElement) {
+  async handleAddToBagClick(buttonElement) {
     const originalText = buttonElement.innerHTML;
     buttonElement.innerHTML = `<span>ADDING...</span>`;
     buttonElement.disabled = true;
 
     try {
-      // Determine active product name & details from the button dataset, fallback to FeaturedShowcase
       let productName = buttonElement.dataset.productTitle || "HAMOOD";
-      let price = (buttonElement.dataset.price || "180.00").replace(/[^0-9.]/g, '');
       let variantId = buttonElement.dataset.variantId || null;
 
+      // Fallback for featured showcase if no dataset exists
       if (!buttonElement.dataset.productTitle && typeof FeaturedShowcase !== 'undefined' && FeaturedShowcase.products) {
         const activeItem = FeaturedShowcase.products.find(p => p.id === FeaturedShowcase.activeId);
         if (activeItem) {
           productName = activeItem.name;
-          price = activeItem.price.replace(/[^0-9.]/g, '');
           variantId = activeItem.selectedVariantId || activeItem.shopifyVariantId || null;
         }
       }
 
-      // Check if variantId is a valid published Shopify GID
+      // Check if we need to lookup variant ID from fetched Shopify Products
       let isRealShopifyVariant = variantId && typeof variantId === 'string' && variantId.startsWith('gid://shopify/ProductVariant/');
-      let matchedVariant = null;
-
-      // Ensure variantId is valid and fetch live variant data
-      if (this.shopifyProducts.length > 0) {
+      
+      if (!isRealShopifyVariant && this.shopifyProducts.length > 0) {
         const matchedProduct = this.shopifyProducts.find(p => 
           p.title.toLowerCase().includes(productName.toLowerCase()) || 
           productName.toLowerCase().includes(p.title.toLowerCase())
         );
         if (matchedProduct && matchedProduct.variants?.length > 0) {
-          if (isRealShopifyVariant) {
-            matchedVariant = matchedProduct.variants.find(v => v.id === variantId) || matchedProduct.variants[0];
-          } else {
-            matchedVariant = matchedProduct.variants[0];
-            variantId = matchedVariant.id;
-            isRealShopifyVariant = true;
-          }
+          variantId = matchedProduct.variants[0].id;
+          isRealShopifyVariant = true;
         }
       }
 
-      // We defer validation to Shopify. We attempt to add to cart, and check the resulting cart state.
-      // If we receive a userError from Shopify, it will be thrown and caught below.
-
-      if (isRealShopifyVariant) {
-        if (!this.cart || !this.cart.id || this.cart.id.startsWith('local_cart_')) {
-          this.cart = await ShopifyAPI.createCart([{ merchandiseId: variantId, quantity: 1 }]);
-          localStorage.setItem(this.cartIdKey, this.cart.id);
-        } else {
-          this.cart = await ShopifyAPI.addToCart(this.cart.id, [{ merchandiseId: variantId, quantity: 1 }]);
+      if (isRealShopifyVariant && window.CartService) {
+        // Dispatch to CartService
+        await window.CartService.addLine(variantId, 1);
+        
+        // Wait for state to settle
+        if (window.CartService.state.status === 'ready' && !window.CartService.state.error) {
+           buttonElement.innerHTML = `<span>ADDED TO BAG ✓</span>`;
+           this.showToast(`${productName} added to your bag`);
+           setTimeout(() => {
+             this.openDrawer();
+           }, 300);
         }
       } else {
-        throw new Error("Invalid Shopify Variant ID");
+        throw new Error("Invalid Product/Variant Configuration");
       }
-
-      buttonElement.innerHTML = `<span>ADDED TO BAG ✓</span>`;
-      this.showToast(`${productName} added to your bag`);
-      this.renderCart();
-      
-      setTimeout(() => {
-        this.openDrawer();
-      }, 300);
-
     } catch (error) {
-      console.warn('Shopify Cart Notice:', error.message);
-      
-      // If Shopify API throws a userError or network error, we can check if it's an inventory issue
-      // We will also re-fetch the specific product to confirm its exact state.
-      if (isRealShopifyVariant && variantId) {
-         try {
-           const productHandle = productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-           const liveProduct = await ShopifyAPI.getProductByHandle(productHandle);
-           if (liveProduct && liveProduct.variants) {
-             const liveVariant = liveProduct.variants.edges.map(e => e.node).find(v => v.id === variantId);
-             if (liveVariant) {
-               const isAvailable = liveVariant.availableForSale !== false;
-               
-               let currentCartQty = 0;
-               if (this.cart && this.cart.lines) {
-                 const existingLine = this.cart.lines.find(l => l.variantId === variantId);
-                 if (existingLine) currentCartQty = existingLine.quantity;
-               }
-               const requestedQty = currentCartQty + 1;
-               
-               const outOfStock = liveVariant.quantityAvailable !== null && liveVariant.quantityAvailable < requestedQty && liveVariant.currentlyNotInStock !== true;
-               
-               if (!isAvailable || outOfStock) {
-                 this.showOutOfStockModal(productName, liveVariant.title || "Size");
-                 return; // Do not show generic toast
-               }
-             }
-           }
-         } catch (e) {
-           console.warn('Failed to verify live inventory:', e);
-         }
-      }
-      
-      this.showToast("Failed to add to cart: " + error.message);
+      console.warn('UI Add to Cart Error:', error);
+      this.showToast("Failed to add to cart: " + error.message, true);
     } finally {
       setTimeout(() => {
         buttonElement.innerHTML = originalText;
@@ -390,103 +237,47 @@ const ShopifyCartUI = {
     }
   },
 
-
   /**
-   * Update quantity of line item
+   * Render DOM purely based on CartService state
    */
-  async updateQuantity(lineId, newQty) {
-    if (newQty <= 0) {
-      await this.removeItem(lineId);
-      return;
+  renderCart(state) {
+    // 1. Toast Error Handling
+    if (state.error) {
+       this.showToast(state.error, true);
     }
 
-    if (this.cart.id && !this.cart.id.startsWith('local_cart_')) {
-      try {
-        const tempCart = await ShopifyAPI.updateCartItem(this.cart.id, lineId, newQty);
-        
-        // After updating, check if the quantity was actually applied, or if there's an inventory limit
-        const updatedLine = tempCart.lines.find(l => l.id === lineId);
-        if (updatedLine) {
-          const outOfStock = updatedLine.quantityAvailable !== null && updatedLine.quantityAvailable < newQty && updatedLine.currentlyNotInStock !== true;
-          if (outOfStock || updatedLine.quantity < newQty) {
-             this.showOutOfStockModal(updatedLine.productTitle, updatedLine.variantTitle);
-             // Re-update back to the max available quantity
-             const maxQty = updatedLine.quantityAvailable !== null ? updatedLine.quantityAvailable : updatedLine.quantity;
-             if (maxQty > 0) {
-               this.cart = await ShopifyAPI.updateCartItem(this.cart.id, lineId, maxQty);
-             } else {
-               this.cart = await ShopifyAPI.removeCartItem(this.cart.id, [lineId]);
-             }
-             this.renderCart();
-             return;
-          }
-        }
-        
-        this.cart = tempCart;
-      } catch (e) {
-        console.error('Shopify quantity update error:', e);
-        this.showToast('Failed to update quantity', true);
-        // Strictly re-fetch the authoritative cart to drop the corrupted UI state
-        try {
-          this.cart = await ShopifyAPI.getCart(this.cart.id);
-        } catch (fetchErr) {
-          console.error('Failed to refetch cart after update error:', fetchErr);
-        }
+    // 2. Checkout Button Status
+    const checkoutBtn = document.getElementById('cart-checkout-btn');
+    if (checkoutBtn) {
+      if (state.status === 'checking_out') {
+        checkoutBtn.innerHTML = `<span>REDIRECTING...</span>`;
+        checkoutBtn.disabled = true;
+      } else if (state.status === 'initializing' || state.status === 'updating') {
+        checkoutBtn.innerHTML = `<span>UPDATING...</span>`;
+        checkoutBtn.disabled = true;
+      } else {
+        checkoutBtn.innerHTML = `<span>PROCEED TO CHECKOUT</span><span class="btn-arrow">→</span>`;
+        checkoutBtn.disabled = state.lines.length === 0;
       }
     }
-    
-    // Rerender with the strictly synced Shopify cart state
-    this.renderCart();
-  },
 
-  /**
-   * Remove line item from cart
-   */
-  async removeItem(lineId) {
-    if (this.cart.id && !this.cart.id.startsWith('local_cart_')) {
-      try {
-        this.cart = await ShopifyAPI.removeCartItem(this.cart.id, [lineId]);
-      } catch (e) {
-        console.error('Shopify remove item error', e);
-        this.showToast('Failed to remove item', true);
-        // Strictly re-fetch the authoritative cart to drop the corrupted UI state
-        try {
-          this.cart = await ShopifyAPI.getCart(this.cart.id);
-        } catch (fetchErr) {
-          console.error('Failed to refetch cart after remove error:', fetchErr);
-        }
-      }
-    }
-    
-    this.renderCart();
-  },
-
-  /**
-   * Render Cart Badge and Drawer Items
-   */
-  renderCart() {
-    const totalQty = this.cart ? this.cart.totalQuantity : 0;
-    const subtotal = this.cart ? this.cart.subtotal : '0.00';
-    const currency = this.cart && this.cart.currency && this.cart.currency !== 'USD' ? this.cart.currency : 'AED';
-
-    // Update Badges & Counts
+    // 3. UI Updates
     const badge = document.getElementById('cart-badge');
     const drawerCount = document.getElementById('drawer-item-count');
     const subtotalEl = document.getElementById('cart-subtotal');
-
+    
     if (badge) {
-      badge.textContent = totalQty;
-      badge.classList.toggle('has-items', totalQty > 0);
+      badge.textContent = state.totalQuantity;
+      badge.classList.toggle('has-items', state.totalQuantity > 0);
     }
-    if (drawerCount) drawerCount.textContent = `(${totalQty} item${totalQty === 1 ? '' : 's'})`;
-    if (subtotalEl) subtotalEl.textContent = `${subtotal} ${currency}`;
+    if (drawerCount) drawerCount.textContent = `(${state.totalQuantity} item${state.totalQuantity === 1 ? '' : 's'})`;
+    if (subtotalEl) subtotalEl.textContent = `${state.subtotal} ${state.currency}`;
 
-    // Render items list
     const itemsListEl = document.getElementById('cart-items-list');
     const emptyStateEl = document.getElementById('cart-empty-state');
     const footerEl = document.getElementById('cart-drawer-footer');
 
-    if (!this.cart || !this.cart.lines || this.cart.lines.length === 0) {
+    if (state.lines.length === 0) {
       if (emptyStateEl) emptyStateEl.style.display = 'flex';
       if (itemsListEl) itemsListEl.innerHTML = '';
       if (footerEl) footerEl.style.display = 'none';
@@ -497,8 +288,12 @@ const ShopifyCartUI = {
     if (footerEl) footerEl.style.display = 'block';
 
     if (itemsListEl) {
-      itemsListEl.innerHTML = this.cart.lines.map(line => {
-        const itemCurr = line.currency && line.currency !== 'USD' ? line.currency : 'AED';
+      itemsListEl.innerHTML = state.lines.map(line => {
+        const linePrice = parseFloat(line.price) || 0;
+        const lineTotal = (linePrice * line.quantity).toFixed(2);
+        const itemCurr = line.currency || state.currency;
+        const isDisabled = state.status === 'updating';
+        
         return `
         <div class="cart-item" data-line-id="${line.id}">
           <div class="cart-item-image">
@@ -507,16 +302,16 @@ const ShopifyCartUI = {
           <div class="cart-item-details">
             <div class="cart-item-header">
               <h4 class="cart-item-title">${line.productTitle}</h4>
-              <button class="cart-item-remove" onclick="ShopifyCartUI.removeItem('${line.id}')" aria-label="Remove item">&times;</button>
+              <button class="cart-item-remove" onclick="ShopifyCartUI.removeItem('${line.id}')" aria-label="Remove item" ${isDisabled ? 'disabled' : ''}>&times;</button>
             </div>
             <p class="cart-item-variant">${line.variantTitle || 'Extrait de Parfum'}</p>
             <div class="cart-item-footer">
               <div class="cart-qty-selector">
-                <button class="qty-btn" onclick="ShopifyCartUI.updateQuantity('${line.id}', ${line.quantity - 1})" aria-label="Decrease">&minus;</button>
+                <button class="qty-btn" onclick="ShopifyCartUI.updateQuantity('${line.id}', ${line.quantity - 1})" aria-label="Decrease" ${isDisabled ? 'disabled' : ''}>&minus;</button>
                 <span class="qty-num">${line.quantity}</span>
-                <button class="qty-btn" onclick="ShopifyCartUI.updateQuantity('${line.id}', ${line.quantity + 1})" aria-label="Increase">&plus;</button>
+                <button class="qty-btn" onclick="ShopifyCartUI.updateQuantity('${line.id}', ${line.quantity + 1})" aria-label="Increase" ${isDisabled ? 'disabled' : ''}>&plus;</button>
               </div>
-              <span class="cart-item-price">${(parseFloat(line.price) * line.quantity).toFixed(2)} ${itemCurr}</span>
+              <span class="cart-item-price">${lineTotal} ${itemCurr}</span>
             </div>
           </div>
         </div>
@@ -525,40 +320,44 @@ const ShopifyCartUI = {
     }
   },
 
+  // Proxies for inline HTML onclick handlers
+  updateQuantity(lineId, newQty) {
+    if (window.CartService) window.CartService.updateQuantity(lineId, newQty);
+  },
+
+  removeItem(lineId) {
+    if (window.CartService) window.CartService.removeLine(lineId);
+  },
+
   /**
-   * Attempt to sync live Shopify products with page showcase
+   * Sync products to map titles/IDs for showcase
    */
   async syncProductsFromShopify() {
     try {
-      const products = await ShopifyAPI.getProducts(10);
-      if (products && products.length > 0) {
-        this.shopifyProducts = products;
-        console.log('Connected to Shopify Storefront API. Products loaded:', products.length);
-
-        // Match Shopify products to FeaturedShowcase if available
-        if (typeof FeaturedShowcase !== 'undefined' && FeaturedShowcase.products) {
-          FeaturedShowcase.products.forEach(localProd => {
-            const match = products.find(sp => sp.title.toLowerCase().includes(localProd.name.toLowerCase()));
-            if (match) {
-              localProd.shopifyId = match.id;
-              if (match.variants?.length > 0) {
-                localProd.shopifyVariantId = match.variants[0].id;
-                localProd.price = `$${parseFloat(match.variants[0].price.amount).toFixed(2)}`;
-              }
-              if (match.description) {
-                localProd.desc = match.description;
-              }
-            }
-          });
-
-          // Refresh active showcase product UI
-          if (typeof FeaturedShowcase.updateCards === 'function') {
-            FeaturedShowcase.updateCards(true);
-          }
-        }
+      if (typeof ShopifyAPI !== 'undefined') {
+         const products = await ShopifyAPI.getProducts(10);
+         if (products && products.length > 0) {
+           this.shopifyProducts = products;
+           
+           if (typeof FeaturedShowcase !== 'undefined' && FeaturedShowcase.products) {
+             FeaturedShowcase.products.forEach(localProd => {
+               const match = products.find(sp => sp.title.toLowerCase().includes(localProd.name.toLowerCase()));
+               if (match) {
+                 localProd.shopifyId = match.id;
+                 if (match.variants?.length > 0) {
+                   localProd.shopifyVariantId = match.variants[0].id;
+                   localProd.price = `$${parseFloat(match.variants[0].price.amount).toFixed(2)}`;
+                 }
+               }
+             });
+             if (typeof FeaturedShowcase.updateCards === 'function') {
+               FeaturedShowcase.updateCards(true);
+             }
+           }
+         }
       }
     } catch (e) {
-      console.log('Shopify products fetch info:', e.message);
+      console.warn('Failed to sync Shopify products for UI mapping', e);
     }
   },
 
@@ -576,20 +375,10 @@ const ShopifyCartUI = {
     if (drawer) drawer.classList.remove('open');
     if (overlay) overlay.classList.remove('open');
     document.body.style.overflow = '';
-  },
-
-  showToast(message, isError = false) {
-    const toast = document.getElementById('cart-toast');
-    if (!toast) return;
-
-    toast.textContent = message;
-    toast.className = `cart-toast show ${isError ? 'error' : ''}`;
-    
-    setTimeout(() => {
-      toast.classList.remove('show');
-    }, 3000);
   }
 };
+
+window.ShopifyCartUI = ShopifyCartUI;
 
 // Initialize when DOM is ready
 (function () {
