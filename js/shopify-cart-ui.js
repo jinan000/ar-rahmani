@@ -214,7 +214,7 @@ const ShopifyCartUI = {
       const isAvailable = line.availableForSale !== false;
       const outOfStock = line.quantityAvailable !== null && line.quantityAvailable < line.quantity && line.currentlyNotInStock !== true;
       
-      if (!isAvailable || outOfStock) {
+      if (line.quantity <= 0 || !isAvailable || outOfStock) {
         invalidLineIds.push(line.id);
       }
     }

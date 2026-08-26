@@ -485,7 +485,7 @@ const ShopifyAPI = {
       currency: cart.cost?.subtotalAmount?.currencyCode || 'AED',
       lines: cart.lines?.edges?.map(edge => ({
         id: edge.node.id,
-        quantity: parseInt(edge.node.quantity) || 1, // ensure it's an integer, fallback to 1 if missing for some reason
+        quantity: parseInt(edge.node.quantity, 10) || 0, // correctly allow 0 quantity lines to be handled as invalid
         variantId: edge.node.merchandise.id,
         variantTitle: edge.node.merchandise.title,
         availableForSale: edge.node.merchandise.availableForSale !== false,
