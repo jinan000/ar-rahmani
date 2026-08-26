@@ -398,6 +398,7 @@ const ShopifyAPI = {
     const lines = [{ id: lineId, quantity }];
     const data = await this.request(query, { cartId, lines });
     if (data?.cartLinesUpdate?.userErrors?.length > 0) {
+      console.error('[SHOPIFY CART UPDATE ERROR]', JSON.stringify(data.cartLinesUpdate.userErrors, null, 2));
       throw new Error(data.cartLinesUpdate.userErrors[0].message);
     }
     return this._formatCart(data?.cartLinesUpdate?.cart);
@@ -467,6 +468,7 @@ const ShopifyAPI = {
     `;
     const data = await this.request(query, { cartId, lineIds });
     if (data?.cartLinesRemove?.userErrors?.length > 0) {
+      console.error('[SHOPIFY CART REMOVE ERROR]', JSON.stringify(data.cartLinesRemove.userErrors, null, 2));
       throw new Error(data.cartLinesRemove.userErrors[0].message);
     }
     return this._formatCart(data?.cartLinesRemove?.cart);

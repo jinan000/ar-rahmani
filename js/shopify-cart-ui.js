@@ -245,9 +245,12 @@ const ShopifyCartUI = {
       console.warn('Found invalid/out-of-stock items in cart. Removing...', invalidLineIds);
       try {
         await ShopifyAPI.removeCartItem(this.cart.id, invalidLineIds);
-        return false; // Cart was modified
+        return false; // Cart was modified successfully
       } catch (e) {
         console.error('Failed to remove invalid cart lines:', e);
+        // If removal failed, the cart is fundamentally corrupt or stale.
+        // Return false so loadCart discards this invalid state and refetches.
+        return false;
       }
     }
     return true; // Cart is valid
@@ -423,6 +426,12 @@ const ShopifyCartUI = {
       } catch (e) {
         console.error('Shopify quantity update error:', e);
         this.showToast('Failed to update quantity', true);
+        // Strictly re-fetch the authoritative cart to drop the corrupted UI state
+        try {
+          this.cart = await ShopifyAPI.getCart(this.cart.id);
+        } catch (fetchErr) {
+          console.error('Failed to refetch cart after update error:', fetchErr);
+        }
       }
     }
     
@@ -439,6 +448,13 @@ const ShopifyCartUI = {
         this.cart = await ShopifyAPI.removeCartItem(this.cart.id, [lineId]);
       } catch (e) {
         console.error('Shopify remove item error', e);
+        this.showToast('Failed to remove item', true);
+        // Strictly re-fetch the authoritative cart to drop the corrupted UI state
+        try {
+          this.cart = await ShopifyAPI.getCart(this.cart.id);
+        } catch (fetchErr) {
+          console.error('Failed to refetch cart after remove error:', fetchErr);
+        }
       }
     }
     
