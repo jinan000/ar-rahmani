@@ -129,11 +129,39 @@ const ShopifyCartUI = {
     // Checkout button listener
     const checkoutBtn = document.getElementById('cart-checkout-btn');
     if (checkoutBtn) {
-      checkoutBtn.addEventListener('click', () => {
-        if (this.cart && this.cart.checkoutUrl) {
-          window.location.href = this.cart.checkoutUrl;
-        } else {
-          this.showToast('Checkout URL unavailable', true);
+      checkoutBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        
+        // Re-validate cart with Shopify before proceeding
+        checkoutBtn.innerHTML = `<span>VALIDATING...</span>`;
+        checkoutBtn.disabled = true;
+        
+        try {
+          if (this.cart && this.cart.id) {
+            this.cart = await ShopifyAPI.getCart(this.cart.id);
+            const isValid = await this.validateCartItems();
+            if (!isValid) {
+              this.cart = await ShopifyAPI.getCart(this.cart.id);
+              this.renderCart();
+              this.showToast('Some items in your cart are no longer available and were removed.', true);
+              checkoutBtn.innerHTML = `<span>PROCEED TO CHECKOUT</span><span class="btn-arrow">→</span>`;
+              checkoutBtn.disabled = false;
+              return; // Stop checkout
+            }
+          }
+          
+          if (this.cart && this.cart.checkoutUrl) {
+            window.location.href = this.cart.checkoutUrl;
+          } else {
+            this.showToast('Checkout URL unavailable', true);
+            checkoutBtn.innerHTML = `<span>PROCEED TO CHECKOUT</span><span class="btn-arrow">→</span>`;
+            checkoutBtn.disabled = false;
+          }
+        } catch (err) {
+          console.error("Checkout validation failed:", err);
+          this.showToast('Failed to validate cart. Please try again.', true);
+          checkoutBtn.innerHTML = `<span>PROCEED TO CHECKOUT</span><span class="btn-arrow">→</span>`;
+          checkoutBtn.disabled = false;
         }
       });
     }
@@ -176,6 +204,34 @@ const ShopifyCartUI = {
   },
 
   /**
+   * Validate Cart Items against current Shopify state
+   */
+  async validateCartItems() {
+    if (!this.cart || !this.cart.lines) return true;
+    
+    const invalidLineIds = [];
+    for (const line of this.cart.lines) {
+      const isAvailable = line.availableForSale !== false;
+      const outOfStock = line.quantityAvailable !== null && line.quantityAvailable < line.quantity && line.currentlyNotInStock !== true;
+      
+      if (!isAvailable || outOfStock) {
+        invalidLineIds.push(line.id);
+      }
+    }
+
+    if (invalidLineIds.length > 0) {
+      console.warn('Found invalid/out-of-stock items in cart. Removing...', invalidLineIds);
+      try {
+        await ShopifyAPI.removeCartItem(this.cart.id, invalidLineIds);
+        return false; // Cart was modified
+      } catch (e) {
+        console.error('Failed to remove invalid cart lines:', e);
+      }
+    }
+    return true; // Cart is valid
+  },
+
+  /**
    * Load Cart from localStorage
    */
   async loadCart() {
@@ -184,16 +240,14 @@ const ShopifyCartUI = {
       try {
         const existingCart = await ShopifyAPI.getCart(savedCartId);
         if (existingCart) {
-          // Verify cart is not corrupted with 0 quantity lines
-          const hasZeroQty = existingCart.lines && existingCart.lines.some(l => l.quantity <= 0);
-          if (!hasZeroQty) {
-            this.cart = existingCart;
-            this.renderCart();
-            return;
-          } else {
-            console.warn('Recovered cart contained invalid 0-quantity lines. Creating new cart...');
-            localStorage.removeItem(this.cartIdKey);
+          this.cart = existingCart;
+          const isValid = await this.validateCartItems();
+          if (!isValid) {
+             // Re-fetch cart if lines were removed
+             this.cart = await ShopifyAPI.getCart(savedCartId);
           }
+          this.renderCart();
+          return;
         }
       } catch (err) {
         console.log('Saved cart expired or invalid, creating new one...');
@@ -246,24 +300,8 @@ const ShopifyCartUI = {
         }
       }
 
-      // CART VALIDATION
-      if (matchedVariant) {
-        let currentCartQty = 0;
-        if (this.cart && this.cart.lines) {
-          const existingLine = this.cart.lines.find(l => l.variantId === variantId);
-          if (existingLine) currentCartQty = existingLine.quantity;
-        }
-        
-        const requestedQty = currentCartQty + 1;
-        const isAvailable = matchedVariant.availableForSale !== false;
-        // If currentlyNotInStock is true, Shopify allows selling when out of stock
-        const outOfStock = matchedVariant.quantityAvailable !== null && matchedVariant.quantityAvailable < requestedQty && matchedVariant.currentlyNotInStock !== true;
-        
-        if (!isAvailable || outOfStock) {
-          this.showOutOfStockModal(productName, matchedVariant.title || "Size");
-          throw new Error("Validation: Out of stock");
-        }
-      }
+      // We defer validation to Shopify. We attempt to add to cart, and check the resulting cart state.
+      // If we receive a userError from Shopify, it will be thrown and caught below.
 
       if (isRealShopifyVariant) {
         if (!this.cart || !this.cart.id || this.cart.id.startsWith('local_cart_')) {
@@ -286,9 +324,39 @@ const ShopifyCartUI = {
 
     } catch (error) {
       console.warn('Shopify Cart Notice:', error.message);
-      if (error.message !== "Validation: Out of stock") {
-        this.showToast("Failed to add to cart: " + error.message);
+      
+      // If Shopify API throws a userError or network error, we can check if it's an inventory issue
+      // We will also re-fetch the specific product to confirm its exact state.
+      if (isRealShopifyVariant && variantId) {
+         try {
+           const productHandle = productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+           const liveProduct = await ShopifyAPI.getProductByHandle(productHandle);
+           if (liveProduct && liveProduct.variants) {
+             const liveVariant = liveProduct.variants.edges.map(e => e.node).find(v => v.id === variantId);
+             if (liveVariant) {
+               const isAvailable = liveVariant.availableForSale !== false;
+               
+               let currentCartQty = 0;
+               if (this.cart && this.cart.lines) {
+                 const existingLine = this.cart.lines.find(l => l.variantId === variantId);
+                 if (existingLine) currentCartQty = existingLine.quantity;
+               }
+               const requestedQty = currentCartQty + 1;
+               
+               const outOfStock = liveVariant.quantityAvailable !== null && liveVariant.quantityAvailable < requestedQty && liveVariant.currentlyNotInStock !== true;
+               
+               if (!isAvailable || outOfStock) {
+                 this.showOutOfStockModal(productName, liveVariant.title || "Size");
+                 return; // Do not show generic toast
+               }
+             }
+           }
+         } catch (e) {
+           console.warn('Failed to verify live inventory:', e);
+         }
       }
+      
+      this.showToast("Failed to add to cart: " + error.message);
     } finally {
       setTimeout(() => {
         buttonElement.innerHTML = originalText;
@@ -308,16 +376,28 @@ const ShopifyCartUI = {
     }
 
     if (this.cart.id && !this.cart.id.startsWith('local_cart_')) {
-      const lineItem = this.cart.lines.find(l => l.id === lineId);
-      if (lineItem) {
-        const outOfStock = lineItem.quantityAvailable !== null && lineItem.quantityAvailable < newQty && lineItem.currentlyNotInStock !== true;
-        if (outOfStock) {
-          this.showOutOfStockModal(lineItem.productTitle, lineItem.variantTitle);
-          return;
-        }
-      }
       try {
-        this.cart = await ShopifyAPI.updateCartItem(this.cart.id, lineId, newQty);
+        const tempCart = await ShopifyAPI.updateCartItem(this.cart.id, lineId, newQty);
+        
+        // After updating, check if the quantity was actually applied, or if there's an inventory limit
+        const updatedLine = tempCart.lines.find(l => l.id === lineId);
+        if (updatedLine) {
+          const outOfStock = updatedLine.quantityAvailable !== null && updatedLine.quantityAvailable < newQty && updatedLine.currentlyNotInStock !== true;
+          if (outOfStock || updatedLine.quantity < newQty) {
+             this.showOutOfStockModal(updatedLine.productTitle, updatedLine.variantTitle);
+             // Re-update back to the max available quantity
+             const maxQty = updatedLine.quantityAvailable !== null ? updatedLine.quantityAvailable : updatedLine.quantity;
+             if (maxQty > 0) {
+               this.cart = await ShopifyAPI.updateCartItem(this.cart.id, lineId, maxQty);
+             } else {
+               this.cart = await ShopifyAPI.removeCartItem(this.cart.id, [lineId]);
+             }
+             this.renderCart();
+             return;
+          }
+        }
+        
+        this.cart = tempCart;
       } catch (e) {
         console.error('Shopify quantity update error:', e);
         this.showToast('Failed to update quantity', true);

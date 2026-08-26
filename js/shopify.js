@@ -18,6 +18,7 @@ const ShopifyAPI = {
           'X-Shopify-Storefront-Access-Token': config.storefrontAccessToken,
         },
         body: JSON.stringify({ query, variables }),
+        cache: 'no-store',
       });
 
       if (!response.ok) {
