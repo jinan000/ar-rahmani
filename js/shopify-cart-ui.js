@@ -170,6 +170,28 @@ const ShopifyCartUI = {
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') this.closeDrawer();
     });
+
+    // Reset checkout button state when returning from bfcache (Back button)
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) {
+        const btn = document.getElementById('cart-checkout-btn');
+        if (btn && btn.disabled) {
+          btn.innerHTML = `<span>PROCEED TO CHECKOUT</span><span class="btn-arrow">→</span>`;
+          btn.disabled = false;
+        }
+      }
+    });
+
+    // Reset checkout button state when tab regains visibility (New tab scenarios)
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        const btn = document.getElementById('cart-checkout-btn');
+        if (btn && btn.disabled) {
+          btn.innerHTML = `<span>PROCEED TO CHECKOUT</span><span class="btn-arrow">→</span>`;
+          btn.disabled = false;
+        }
+      }
+    });
   },
 
   /**
