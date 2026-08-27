@@ -6,7 +6,7 @@
 class DecayCard {
   constructor(container, options = {}) {
     this.container = container;
-    if (!this.container) return;
+    if (!this.container || window.innerWidth <= 768) return;
 
     this.imageSrc = this.container.dataset.image || options.image;
     this.baseFrequency = options.baseFrequency || 0.015;

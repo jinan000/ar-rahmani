@@ -915,9 +915,18 @@
     display: flex;
   }
 
-  .navbar-links,
-  .navbar-links-right {
+  .navbar-links {
     display: none;
+  }
+
+  .navbar-links-right a {
+    display: none;
+  }
+
+  .navbar-links-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
   }
 
   .navbar-logo {

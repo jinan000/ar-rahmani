@@ -443,16 +443,18 @@
   z-index: 0;
 }
 
-.cat-card:hover {
-  border-color: rgba(212, 175, 55, 0.42);
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow:
-    0 20px 50px rgba(0, 0, 0, 0.6),
-    0 0 35px rgba(212, 175, 55, 0.14);
-}
+@media (hover: hover) {
+  .cat-card:hover {
+    border-color: rgba(212, 175, 55, 0.42);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow:
+      0 20px 50px rgba(0, 0, 0, 0.6),
+      0 0 35px rgba(212, 175, 55, 0.14);
+  }
 
-.cat-card:hover::before {
-  opacity: 1;
+  .cat-card:hover::before {
+    opacity: 1;
+  }
 }
 
 /* --- Card Image Area (Fixed 3/4 Aspect Ratio) --- */
@@ -498,17 +500,19 @@
 }
 
 /* Image 1 -> Image 2 Fade on Hover */
-.cat-card:hover .cat-card-bottle--primary {
-  opacity: 0;
-}
+@media (hover: hover) {
+  .cat-card:hover .cat-card-bottle--primary {
+    opacity: 0;
+  }
 
-.cat-card:hover .cat-card-bottle--hover {
-  opacity: 1;
-}
+  .cat-card:hover .cat-card-bottle--hover {
+    opacity: 1;
+  }
 
-/* Fallback if product has only 1 image */
-.cat-card.single-image:hover .cat-card-bottle--primary {
-  opacity: 1;
+  /* Fallback if product has only 1 image */
+  .cat-card.single-image:hover .cat-card-bottle--primary {
+    opacity: 1;
+  }
 }
 
 /* Bottom glow under bottle */
@@ -525,8 +529,10 @@
   pointer-events: none;
 }
 
-.cat-card:hover .cat-card-image::after {
-  opacity: 1;
+@media (hover: hover) {
+  .cat-card:hover .cat-card-image::after {
+    opacity: 1;
+  }
 }
 
 /* --- Card Content --- */
