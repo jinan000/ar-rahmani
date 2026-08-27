@@ -1252,18 +1252,33 @@
     width: 100%;
   }
 
+  .cat-modal-overlay {
+    padding: 0;
+  }
+
   .cat-modal {
     grid-template-columns: 1fr;
-    max-height: 95vh;
+    max-height: 100dvh;
+    height: 100dvh;
+    width: 100vw;
+    max-width: 100vw;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .cat-modal-gallery {
-    min-height: 300px;
-    padding: var(--space-8);
+    min-height: unset;
+    height: min(45vh, 400px);
+    padding: var(--space-4);
+    flex-shrink: 0;
   }
 
   .cat-modal-info {
-    padding: var(--space-7) var(--space-6);
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-6) var(--space-6) 0 var(--space-6);
   }
 }
 
@@ -1288,10 +1303,25 @@
 
   .cat-card {
     border-radius: 16px;
+    height: auto;
   }
 
   .cat-card-image {
-    padding: 1rem 0.5rem;
+    padding: var(--space-2);
+    aspect-ratio: 1 / 1;
+    width: 100%;
+  }
+
+  .cat-card-bottle {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    object-fit: contain;
   }
 
   .cat-card-content {
@@ -1333,24 +1363,48 @@
   }
 
   .cat-modal {
-    border-radius: var(--radius-lg);
+    /* border-radius removed at 900px, keep it flat for mobile */
   }
 
   .cat-modal-gallery {
-    min-height: 250px;
-    padding: var(--space-6);
+    height: min(45vh, 350px);
+    padding: var(--space-4);
   }
 
   .cat-modal-gallery img {
-    max-width: 60%;
+    max-width: 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .cat-modal-thumbs {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    margin-top: 10px;
+  }
+
+  .cat-modal-thumb {
+    width: 56px;
+    height: 56px;
   }
 
   .cat-modal-info {
-    padding: var(--space-6) var(--space-5) var(--space-12);
+    flex: 1;
+    overflow-y: auto;
+    max-height: none;
+    padding: var(--space-5) var(--space-5) 0 var(--space-5);
+  }
+
+  .cat-modal-close {
+    top: max(1.2rem, env(safe-area-inset-top));
+    right: 1.2rem;
   }
 
   .cat-modal-title {
-    font-size: var(--text-3xl);
+    font-size: clamp(2rem, 8vw, 3rem);
   }
 
   .cat-modal-performance {
@@ -1368,6 +1422,7 @@
     padding: var(--space-4);
     margin: 0 calc(-1 * var(--space-5));
     border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-bottom: max(var(--space-4), env(safe-area-inset-bottom));
   }
 }
 
