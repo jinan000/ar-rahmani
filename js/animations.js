@@ -162,9 +162,10 @@ const Animations = {
     if (this.scrollY > 80) {
       this.navbar.classList.add('scrolled');
       
-      if (this.scrollY > this.lastScrollY) {
+      const delta = this.scrollY - this.lastScrollY;
+      if (delta > 15) {
         this.navbar.classList.add('hidden');
-      } else {
+      } else if (delta < -15) {
         this.navbar.classList.remove('hidden');
       }
     } else {
@@ -172,22 +173,28 @@ const Animations = {
       this.navbar.classList.remove('hidden');
     }
 
-    this.lastScrollY = this.scrollY;
+    // Only update lastScrollY if the scroll change was significant enough
+    // to trigger a delta calculation, or if we are at the top.
+    if (Math.abs(this.scrollY - this.lastScrollY) > 15 || this.scrollY <= 80) {
+      this.lastScrollY = this.scrollY;
+    }
 
-    let current = '';
-    this.sections.forEach(section => {
-      const sectionTop = section.offsetTop - this.scrollY;
-      if (sectionTop <= 200) {
-        current = section.id;
-      }
-    });
+    if (!this.isMobile) {
+      let current = '';
+      this.sections.forEach(section => {
+        const sectionTop = section.offsetTop - this.scrollY;
+        if (sectionTop <= 200) {
+          current = section.id;
+        }
+      });
 
-    this.navLinks.forEach(link => {
-      link.classList.remove('active');
-      if (link.getAttribute('href') === `#${current}`) {
-        link.classList.add('active');
-      }
-    });
+      this.navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${current}`) {
+          link.classList.add('active');
+        }
+      });
+    }
   },
 
   /* ----------------------------------------------------------
