@@ -30,14 +30,6 @@ const Animations = {
     // Passive scroll listener
     window.addEventListener('scroll', () => {
       this.scrollY = window.scrollY;
-      
-      if (this.isMobile) {
-        document.body.classList.add('disable-hover');
-        clearTimeout(this.hoverTimer);
-        this.hoverTimer = setTimeout(() => {
-          document.body.classList.remove('disable-hover');
-        }, 150);
-      }
 
       if (!this.ticking) {
         requestAnimationFrame(() => {

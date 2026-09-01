@@ -543,7 +543,7 @@ img {
 
   /* 4. Requirement 9: Pure CSS Sticky Navigation for Mobile Header */
   .navbar {
-    position: sticky !important;
+    position: fixed !important;
     top: 0 !important;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
@@ -559,9 +559,4 @@ img {
     contain: layout paint style;
     content-visibility: visible !important;
   }
-}
-
-/* Globally disable pointer events while scrolling on mobile */
-.disable-hover, .disable-hover * {
-  pointer-events: none !important;
 }
