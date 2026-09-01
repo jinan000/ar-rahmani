@@ -647,7 +647,7 @@
   background: var(--gradient-gold);
   background-size: 200% 100%;
   border: none;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   position: relative;
   overflow: hidden;
   transition: transform 400ms var(--ease-luxury),

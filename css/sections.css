@@ -1680,7 +1680,7 @@
   padding: 0.8rem 2.5rem !important;
   font-size: var(--text-xs) !important;
   letter-spacing: 0.2em !important;
-  border-radius: var(--radius-pill) !important;
+  border-radius: var(--radius-sm) !important;
   cursor: none;
 }
 
