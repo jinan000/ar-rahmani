@@ -12,33 +12,41 @@ const Animations = {
   ticking: false,
 
   init() {
-    const isMobile = window.innerWidth <= 768;
+    this.isMobile = window.innerWidth <= 768;
 
-    this.setupRevealObserver(isMobile);
+    this.setupRevealObserver(this.isMobile);
     
+    this.setupNavbar();
+
     // Only initialize mouse parallax & 3D tilt on desktop screens
-    if (!isMobile) {
+    if (!this.isMobile) {
       this.setupParallax();
       this.setupTiltCards();
-      this.setupNavbar();
     }
     
     this.setupSmoothScrollLinks();
     this.setupTestimonialScroll();
 
-    // Passive scroll listener (desktop only)
-    if (!isMobile) {
-      window.addEventListener('scroll', () => {
-        this.scrollY = window.scrollY;
-        if (!this.ticking) {
-          requestAnimationFrame(() => {
-            this.onScroll();
-            this.ticking = false;
-          });
-          this.ticking = true;
-        }
-      }, { passive: true });
-    }
+    // Passive scroll listener
+    window.addEventListener('scroll', () => {
+      this.scrollY = window.scrollY;
+      
+      if (this.isMobile) {
+        document.body.classList.add('disable-hover');
+        clearTimeout(this.hoverTimer);
+        this.hoverTimer = setTimeout(() => {
+          document.body.classList.remove('disable-hover');
+        }, 150);
+      }
+
+      if (!this.ticking) {
+        requestAnimationFrame(() => {
+          this.onScroll();
+          this.ticking = false;
+        });
+        this.ticking = true;
+      }
+    }, { passive: true });
   },
 
   /* ----------------------------------------------------------
@@ -247,6 +255,8 @@ const Animations = {
 
   onScroll() {
     this.updateNavbar();
-    this.updateParallax();
+    if (!this.isMobile) {
+      this.updateParallax();
+    }
   }
 };
