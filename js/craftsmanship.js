@@ -23,6 +23,12 @@
 
     if (!section || !scrollContainer) return;
 
+    // STEP 8: On Mobile, do NOT allow horizontal animation to hijack vertical scroll.
+    const isMobile = window.innerWidth <= 768 || ('ontouchstart' in window);
+    if (isMobile) {
+      return; // CSS will handle stacking it vertically.
+    }
+
     // Total horizontal scroll distance calculation
     const getScrollAmount = () => scrollContainer.scrollWidth - window.innerWidth;
 

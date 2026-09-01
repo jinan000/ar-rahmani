@@ -95,6 +95,11 @@ const App = {
       }
 
       const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 768);
+      
+      // STEP 10: Desktop: keep smooth scrolling. Mobile: allow pure native browser scrolling.
+      if (isTouchDevice) {
+        return;
+      }
 
       this.lenis = new Lenis({
         duration: 1.5,
