@@ -548,13 +548,6 @@ img {
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
 
-  /* 5. Requirement 5: Section Rendering Containment */
-  section {
-    contain: layout paint style;
-    content-visibility: auto;
-    contain-intrinsic-size: auto 600px;
-  }
-
   .hero {
     contain: layout paint style;
     content-visibility: visible !important;
