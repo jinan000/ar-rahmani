@@ -81,7 +81,8 @@ const HamoodScroll = {
   preloadFrames() {
     let loadedCount = 0;
     const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 768);
-    const initialTargetBuffer = isMobile ? 80 : 60; // Buffer 80 frames on mobile so Story 01 & 02 frames are pre-loaded
+    // Wait for all frames to load before lifting the loading screen for maximum smoothness
+    const initialTargetBuffer = this.totalFrames;
     const self = this;
     
     // Initialize frames array
@@ -123,11 +124,8 @@ const HamoodScroll = {
         }
 
         // When initial buffer is ready, declare site ready and complete loader
-        if (loadedCount >= initialTargetBuffer && !self.isReady) {
-          self.onReady();
-          if (window.Loader && typeof window.Loader.complete === 'function') {
-            window.Loader.complete();
-          }
+        if (loadedCount >= initialTargetBuffer && typeof checkCompletion === 'function') {
+          checkCompletion();
         }
 
         loadNext();
@@ -141,6 +139,35 @@ const HamoodScroll = {
     for (let c = 0; c < concurrency; c++) {
       loadNext();
     }
+
+    // Preload craftsmanship images to ensure smooth animation
+    const extraImages = [
+      'assets/images/thevision.webp',
+      'assets/images/ingredients.webp',
+      'assets/images/thecomposition.webp',
+      'assets/images/thevessel.webp'
+    ];
+    let extraLoaded = 0;
+    
+    // We override the completion condition so it also waits for extraImages
+    const checkCompletion = () => {
+      if (loadedCount >= initialTargetBuffer && extraLoaded >= extraImages.length && !self.isReady) {
+        self.onReady();
+        if (window.Loader && typeof window.Loader.complete === 'function') {
+          window.Loader.complete();
+        }
+      }
+    };
+
+    extraImages.forEach(src => {
+      const img = new Image();
+      img.onload = () => { extraLoaded++; checkCompletion(); };
+      img.onerror = () => { extraLoaded++; checkCompletion(); };
+      img.src = src;
+    });
+
+    // We also need to update the loadNext callback to use checkCompletion
+
   },
 
   /* ----------------------------------------------------------

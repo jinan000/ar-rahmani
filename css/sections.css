@@ -853,12 +853,13 @@
   /* STEP 8: Native Vertical Scrolling for Mobile */
   .craftsmanship {
     height: auto !important;
+    padding: var(--space-8) 0 !important;
   }
   .craft-pin-wrapper,
   .craft-sticky-container {
     position: relative !important;
     height: auto !important;
-    overflow: visible !important;
+    overflow: hidden !important; /* Contain background layers, prevent horizontal scroll */
   }
   .craft-scroll-container {
     height: auto !important;
@@ -866,6 +867,10 @@
     width: 100% !important;
     padding-right: 0 !important;
     transform: none !important;
+  }
+  .craft-header-container {
+    padding-top: var(--space-12);
+    padding-bottom: var(--space-8);
   }
   .craft-timeline-horizontal {
     display: none !important;
@@ -881,7 +886,7 @@
   .craft-step {
     width: 90vw !important;
     height: auto !important;
-    min-height: 50vh !important;
+    min-height: auto !important;
     margin: 0 auto;
     position: relative !important;
     display: flex;
@@ -897,12 +902,19 @@
     top: auto !important;
     transform: none !important;
   }
-  /* Show content directly without GSAP opacity dependency */
+  /* Show content directly without GSAP opacity/clip dependency */
   .craft-step-title,
   .craft-step-text,
   .craft-bottle-img {
     opacity: 1 !important;
     transform: none !important;
+  }
+  .craft-divider {
+    width: 100% !important;
+  }
+  .craft-image-wrapper {
+    clip-path: none !important;
+    -webkit-clip-path: none !important;
   }
   .craft-step-number {
     opacity: 0.1 !important;
