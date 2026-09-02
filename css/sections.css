@@ -850,6 +850,34 @@
   }
 }
 
+@media (max-width: 768px) {
+  .craft-scroll-container {
+    padding-right: 10vw;
+  }
+  .craft-steps-row {
+    padding-left: 10vw;
+    gap: 20vw;
+  }
+  .craft-step {
+    width: 80vw;
+    min-width: 250px;
+    max-width: 320px;
+  }
+  .craft-timeline-horizontal,
+  .craft-step > .craft-marker {
+    top: 50%;
+  }
+  .craft-step-top {
+    bottom: calc(50% + 15px);
+  }
+  .craft-step-bottom {
+    top: calc(50% + 15px);
+  }
+  .craft-connector {
+    bottom: 50%;
+  }
+}
+
 
 /* ============================================================
    INGREDIENTS SECTION
