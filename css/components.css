@@ -150,6 +150,22 @@
   padding: var(--space-2) var(--space-7);
 }
 
+/* Elevate navbar over mobile menu overlay and hide its background/logo */
+.navbar.active {
+  z-index: var(--z-modal);
+}
+.navbar.active .navbar-inner {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.navbar.active .navbar-logo {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .navbar-logo {
   display: flex;
   align-items: center;

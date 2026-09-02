@@ -211,9 +211,12 @@ const App = {
     const mobileNav = document.getElementById('mobile-nav');
     if (!toggle || !mobileNav) return;
 
+    const navbar = document.getElementById('navbar');
+
     toggle.addEventListener('click', () => {
       toggle.classList.toggle('active');
       mobileNav.classList.toggle('active');
+      if (navbar) navbar.classList.toggle('active');
       document.body.style.overflow = mobileNav.classList.contains('active') ? 'hidden' : '';
     });
 
@@ -222,6 +225,7 @@ const App = {
       link.addEventListener('click', () => {
         toggle.classList.remove('active');
         mobileNav.classList.remove('active');
+        if (navbar) navbar.classList.remove('active');
         document.body.style.overflow = '';
       });
     });
