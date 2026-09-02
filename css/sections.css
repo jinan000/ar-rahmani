@@ -876,6 +876,25 @@
   .craft-connector {
     bottom: 50%;
   }
+  
+  /* Reduce oversized text and images on mobile */
+  .craft-step-title {
+    font-size: clamp(1.3rem, 5vw, 1.6rem);
+  }
+  .craft-step-text {
+    font-size: var(--text-sm);
+  }
+  .craft-step-number {
+    font-size: clamp(2.5rem, 10vw, 3.5rem);
+  }
+  .craft-step-image-container {
+    height: 25vh;
+    max-height: 220px;
+  }
+  .craft-bottle-img {
+    max-width: 80%;
+    max-height: 80%;
+  }
 }
 
 
