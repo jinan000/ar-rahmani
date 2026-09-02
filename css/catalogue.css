@@ -1313,15 +1313,8 @@
   }
 
   .cat-card-bottle {
-    position: relative;
-    top: auto;
-    left: auto;
-    transform: none;
-    width: 100%;
-    height: 100%;
-    max-width: none;
-    max-height: none;
-    object-fit: contain;
+    max-width: 85%;
+    max-height: 85%;
   }
 
   .cat-card-content {
