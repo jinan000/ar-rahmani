@@ -849,71 +849,7 @@
     width: 75vw;
   }
 }
-@media (max-width: 768px) {
-  /* STEP 8: Native Vertical Scrolling for Mobile */
-  .craftsmanship {
-    height: auto !important;
-  }
-  .craft-pin-wrapper,
-  .craft-sticky-container {
-    position: relative !important;
-    height: auto !important;
-    overflow: visible !important;
-  }
-  .craft-scroll-container {
-    height: auto !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    padding-right: 0 !important;
-    transform: none !important;
-  }
-  .craft-timeline-horizontal {
-    display: none !important;
-  }
-  .craft-steps-row {
-    flex-direction: column !important;
-    height: auto !important;
-    padding-left: 0 !important;
-    width: 100% !important;
-    gap: var(--space-12) !important;
-    padding-bottom: var(--space-12) !important;
-  }
-  .craft-step {
-    width: 90vw !important;
-    height: auto !important;
-    min-height: 50vh !important;
-    margin: 0 auto;
-    position: relative !important;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-6);
-  }
-  .craft-step-top,
-  .craft-step-bottom {
-    position: relative !important;
-    bottom: auto !important;
-    top: auto !important;
-    transform: none !important;
-  }
-  /* Show content directly without GSAP opacity dependency */
-  .craft-step-title,
-  .craft-step-text,
-  .craft-bottle-img {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-  .craft-step-number {
-    opacity: 0.1 !important;
-    position: absolute !important;
-    top: -20px !important;
-  }
-  .craft-connector,
-  .craft-marker {
-    display: none !important;
-  }
-}
+
 
 /* ============================================================
    INGREDIENTS SECTION
