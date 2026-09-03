@@ -35,7 +35,7 @@ const FeaturedShowcase = {
       subtitle: "EXOTIC BLEND",
       label: "EXTRAIT DE PARFUM",
       desc: "A paradise of tropical fruits, white flowers, and silky musk.",
-      price: "140",
+      price: "200",
       currency: "AED",
       image: "assets/images/5.webp",
       scale: 1.35,
@@ -45,7 +45,7 @@ const FeaturedShowcase = {
       selectedSize: "50ml",
       shopifyVariantId: null,
       variants: [
-        { id: "variant_paradise_50ml", title: "50ml", price: "140.0" }
+        { id: "variant_paradise_50ml", title: "50ml", price: "200.0" }
       ],
       notes: {
         top: "Tropical Fruits, Bergamot, Coconut",

@@ -856,11 +856,11 @@ const Catalogue = {
         // Smooth hardware-accelerated 3D transform for card container
         card.style.transform = `translate3d(0, ${currentLiftY.toFixed(2)}px, 0) rotateX(${currentRotateX.toFixed(2)}deg) rotateY(${currentRotateY.toFixed(2)}deg) scale3d(${currentScale.toFixed(4)}, ${currentScale.toFixed(4)}, 1)`;
 
-        // Smooth centered parallax float for bottle elements (keeps translate -50%, -50% intact)
+        // Smooth centered parallax float for bottle elements
         const bottleRotateX = currentRotateX * 0.5;
         const bottleRotateY = currentRotateY * 0.5;
         const bottleScale = 1 + (currentScale - 1) * 2.5;
-        const bottleTransform = `translate3d(-50%, calc(-50% - 4px), 25px) rotateX(${bottleRotateX.toFixed(2)}deg) rotateY(${bottleRotateY.toFixed(2)}deg) scale3d(${bottleScale.toFixed(4)}, ${bottleScale.toFixed(4)}, 1)`;
+        const bottleTransform = `translate3d(0, -4px, 25px) rotateX(${bottleRotateX.toFixed(2)}deg) rotateY(${bottleRotateY.toFixed(2)}deg) scale3d(${bottleScale.toFixed(4)}, ${bottleScale.toFixed(4)}, 1)`;
 
         bottles.forEach(bottle => {
           bottle.style.transform = bottleTransform;
