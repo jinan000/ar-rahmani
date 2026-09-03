@@ -860,7 +860,7 @@ const Catalogue = {
         const bottleRotateX = currentRotateX * 0.5;
         const bottleRotateY = currentRotateY * 0.5;
         const bottleScale = 1 + (currentScale - 1) * 2.5;
-        const bottleTransform = `translate3d(0, -4px, 25px) rotateX(${bottleRotateX.toFixed(2)}deg) rotateY(${bottleRotateY.toFixed(2)}deg) scale3d(${bottleScale.toFixed(4)}, ${bottleScale.toFixed(4)}, 1)`;
+        const bottleTransform = `translate3d(0, 0px, 25px) rotateX(${bottleRotateX.toFixed(2)}deg) rotateY(${bottleRotateY.toFixed(2)}deg) scale3d(${bottleScale.toFixed(4)}, ${bottleScale.toFixed(4)}, 1)`;
 
         bottles.forEach(bottle => {
           bottle.style.transform = bottleTransform;
@@ -885,7 +885,7 @@ const Catalogue = {
 
       const onMouseEnter = () => {
         isHovering = true;
-        targetLiftY = -8;
+        targetLiftY = 0;
         targetScale = 1.025;
         card.addEventListener('mousemove', onMouseMove);
         if (!rafId) {

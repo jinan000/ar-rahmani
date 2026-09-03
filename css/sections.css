@@ -1855,7 +1855,7 @@
 .showcase-nav-group:hover .preview-card-box {
   border-color: rgba(212, 175, 55, 0.4);
   box-shadow: 0 0 25px rgba(212, 175, 55, 0.15), 0 20px 40px rgba(0,0,0,0.8);
-  transform: translateY(-3px);
+  transform: none;
 }
 
 .preview-card-box .preview-card-image {
@@ -1875,7 +1875,7 @@
 }
 
 .showcase-nav-group:hover .preview-card-box .preview-card-image img {
-  transform: scale(1.08) translateY(-2px);
+  transform: scale(1.08);
 }
 
 .preview-card-box .preview-card-name {
