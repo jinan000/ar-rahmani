@@ -208,9 +208,12 @@ const ShopifyCartUI = {
           p.title.toLowerCase().includes(productName.toLowerCase()) || 
           productName.toLowerCase().includes(p.title.toLowerCase())
         );
-        if (matchedProduct && matchedProduct.variants?.length > 0) {
-          variantId = matchedProduct.variants[0].id;
-          isRealShopifyVariant = true;
+        if (matchedProduct) {
+          const matchedVariants = matchedProduct.variants?.edges?.map(e => e.node) || matchedProduct.variants || [];
+          if (matchedVariants.length > 0) {
+            variantId = matchedVariants[0].id;
+            isRealShopifyVariant = true;
+          }
         }
       }
 
@@ -357,9 +360,10 @@ const ShopifyCartUI = {
                const match = products.find(sp => sp.title.toLowerCase().includes(localProd.name.toLowerCase()));
                if (match) {
                  localProd.shopifyId = match.id;
-                 if (match.variants?.length > 0) {
-                   localProd.shopifyVariantId = match.variants[0].id;
-                   localProd.price = `$${parseFloat(match.variants[0].price.amount).toFixed(2)}`;
+                 const flatVariants = match.variants?.edges ? match.variants.edges.map(e => e.node) : match.variants;
+                 if (flatVariants && flatVariants.length > 0) {
+                   localProd.shopifyVariantId = flatVariants[0].id;
+                   localProd.price = `$${parseFloat(flatVariants[0].price.amount).toFixed(2)}`;
                  }
                }
              });
