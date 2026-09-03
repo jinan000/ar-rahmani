@@ -41,7 +41,7 @@ const ShopifyAPI = {
   /**
    * Fetch products list from Shopify Storefront API
    */
-  async getProducts(first = 10) {
+  async getProducts(first = 250) {
     const query = `
       query getProducts($first: Int!) {
         products(first: $first) {

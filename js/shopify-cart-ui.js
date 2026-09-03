@@ -351,7 +351,7 @@ const ShopifyCartUI = {
   async syncProductsFromShopify() {
     try {
       if (typeof ShopifyAPI !== 'undefined') {
-         const products = await ShopifyAPI.getProducts(10);
+         const products = await ShopifyAPI.getProducts(250);
          if (products && products.length > 0) {
            this.shopifyProducts = products;
            

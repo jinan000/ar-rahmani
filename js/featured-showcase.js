@@ -128,7 +128,7 @@ const FeaturedShowcase = {
   async fetchShopifyProducts() {
     try {
       if (typeof ShopifyAPI === 'undefined') return;
-      const shopifyProducts = await ShopifyAPI.getProducts(50);
+      const shopifyProducts = await ShopifyAPI.getProducts(250);
 
       if (shopifyProducts && shopifyProducts.length > 0) {
         // Sync live Shopify Storefront API variant IDs and pricing directly to HAMOOD, PARADISE, and SABR
@@ -160,6 +160,11 @@ const FeaturedShowcase = {
       }
     } catch (e) {
       console.warn('Shopify sync info for showcase:', e);
+    }
+    
+    // Update DOM buttons with new synced variant IDs
+    if (this.updateCards) {
+      this.updateCards(true);
     }
   },
 
