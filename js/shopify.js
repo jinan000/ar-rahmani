@@ -90,7 +90,7 @@ const ShopifyAPI = {
   },
 
   /**
-   * Fetch single product by handle
+   * Fetch single product by handle (with full metafields for product detail page)
    */
   async getProductByHandle(handle) {
     const query = `
@@ -100,17 +100,45 @@ const ShopifyAPI = {
           title
           handle
           description
+          productType
+          vendor
+          tags
+          availableForSale
+          createdAt
+          updatedAt
+          seo {
+            title
+            description
+          }
+          featuredImage {
+            url
+            altText
+            width
+            height
+          }
           priceRange {
             minVariantPrice {
               amount
               currencyCode
             }
+            maxVariantPrice {
+              amount
+              currencyCode
+            }
           }
-          images(first: 5) {
+          compareAtPriceRange {
+            minVariantPrice {
+              amount
+              currencyCode
+            }
+          }
+          images(first: 10) {
             edges {
               node {
                 url
                 altText
+                width
+                height
               }
             }
           }
@@ -126,8 +154,34 @@ const ShopifyAPI = {
                   amount
                   currencyCode
                 }
+                compareAtPrice {
+                  amount
+                  currencyCode
+                }
+                image {
+                  url
+                  altText
+                }
               }
             }
+          }
+          metafields(identifiers: [
+            {namespace: "custom", key: "concentration"},
+            {namespace: "custom", key: "fragrance_family"},
+            {namespace: "custom", key: "top_notes"},
+            {namespace: "custom", key: "heart_notes"},
+            {namespace: "custom", key: "base_notes"},
+            {namespace: "custom", key: "scent_profile"},
+            {namespace: "custom", key: "longevity"},
+            {namespace: "custom", key: "projection"},
+            {namespace: "custom", key: "sillage"},
+            {namespace: "custom", key: "occasion"},
+            {namespace: "custom", key: "season"},
+            {namespace: "custom", key: "short_description"}
+          ]) {
+            namespace
+            key
+            value
           }
         }
       }

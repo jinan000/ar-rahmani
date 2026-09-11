@@ -600,6 +600,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   max-height: 2.7em;
+  pointer-events: none;
 }
 
 /* --- Price --- */

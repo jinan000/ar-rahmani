@@ -64,7 +64,7 @@ const Cursor = {
 
     document.addEventListener('mouseout', (e) => {
       const target = e.target.closest('a, button, .btn, .product-card, .mood-pill, .ingredient-card, .instagram-item, .feature-card, .testimonial-card, .cat-card, .cat-modal-close, .cat-modal-thumb, .size-btn, .btn-wishlist, .preview-card-box, .arrow-btn-standalone');
-      if (target) {
+      if (target && !target.contains(e.relatedTarget)) {
         this.isHovering = false;
         if (this.dot) this.dot.classList.remove('hovering');
         if (this.ring) this.ring.classList.remove('hovering');

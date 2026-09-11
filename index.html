@@ -30,10 +30,7 @@
   <link rel="stylesheet" href="css/sections.css?v=1.3">
 
   <!-- Deferred CSS (below-the-fold sections) -->
-  <link rel="stylesheet" href="css/catalogue.css?v=1.1" media="print" onload="this.media='all'">
-  <noscript>
-    <link rel="stylesheet" href="css/catalogue.css?v=1.1">
-  </noscript>
+  <!-- Catalogue CSS removed — collection lives on collection.html -->
 
   <!-- Google Fonts — swap ensures text is visible during load -->
   <link
@@ -83,7 +80,7 @@
       <div class="navbar-links">
         <a href="#about">About</a>
         <a href="#craftsmanship">Craftsmanship</a>
-        <a href="#catalogue">Collection</a>
+        <a href="collection.html">Collection</a>
       </div>
       <a href="#home" class="navbar-logo">
         <img src="assets/images/logo.webp" alt="Ar-Rahmani" class="navbar-logo-img" fetchpriority="high">
@@ -106,7 +103,7 @@
       decoding="async">
     <a href="#about">About</a>
     <a href="#craftsmanship">Craftsmanship</a>
-    <a href="#catalogue">Collection</a>
+    <a href="collection.html">Collection</a>
     <a href="#journal">Journal</a>
     <a href="#contact">Contact</a>
   </div>
@@ -523,78 +520,44 @@
   </section>
 
   <!-- ============================================================
-       LUXURY FRAGRANCE CATALOGUE — Dynamic Shopify Collection
+       COLLECTION TEASER — Links to full Collection Page
        ============================================================ -->
-  <section class="catalogue" id="catalogue">
-    <!-- Ambient Background -->
-    <div class="catalogue-ambient">
-      <div class="catalogue-ambient-glow catalogue-ambient-glow--1"></div>
-      <div class="catalogue-ambient-glow catalogue-ambient-glow--2"></div>
-      <div class="catalogue-ambient-glow catalogue-ambient-glow--3"></div>
-      <canvas class="catalogue-dust-canvas" id="catalogue-dust"></canvas>
-    </div>
-
-    <div class="catalogue-inner">
-      <!-- Hero -->
-      <div class="catalogue-hero">
-        <!-- Collection Counter -->
-        <div class="catalogue-counter" id="catalogue-counter">
-          <span class="catalogue-counter-number" id="catalogue-counter-num">0</span>
-          <span id="catalogue-counter-label">Luxury Fragrances</span>
-        </div>
-
-        <span class="catalogue-badge">✦ The Collection ✦</span>
-        <h2 class="catalogue-heading">Discover<br><span class="text-gold-gradient">The Art of Fragrance</span></h2>
-        <p class="catalogue-intro">Explore the complete AR-RAHMANI collection of handcrafted perfumes inspired by timeless Arabian luxury.</p>
+  <section class="section collection-teaser" id="catalogue">
+    <div class="container" style="text-align: center;">
+      <!-- Ambient glow -->
+      <div style="position: absolute; inset: 0; pointer-events: none; overflow: hidden;">
+        <div style="position: absolute; width: 500px; height: 500px; border-radius: 50%; filter: blur(120px); background: rgba(212, 175, 55, 0.04); top: -20%; left: 20%;"></div>
+        <div style="position: absolute; width: 400px; height: 400px; border-radius: 50%; filter: blur(100px); background: rgba(184, 134, 11, 0.03); bottom: -10%; right: 15%;"></div>
       </div>
 
-      <!-- Toolbar: Filters, Search, Sort -->
-      <div class="catalogue-toolbar" id="catalogue-toolbar">
-        <div class="catalogue-filters" id="catalogue-filters">
-          <button class="catalogue-chip active" data-filter="all">All</button>
-          <button class="catalogue-chip" data-filter="extrait de parfum">Extrait de Parfum</button>
-          <button class="catalogue-chip" data-filter="parfum">Parfum</button>
-          <button class="catalogue-chip" data-filter="oriental">Oriental</button>
-          <button class="catalogue-chip" data-filter="woody">Woody</button>
-          <button class="catalogue-chip" data-filter="floral">Floral</button>
-          <button class="catalogue-chip" data-filter="fresh">Fresh</button>
-          <button class="catalogue-chip" data-filter="sweet">Sweet</button>
-          <button class="catalogue-chip" data-filter="oud">Oud</button>
-          <button class="catalogue-chip" data-filter="amber">Amber</button>
-          <button class="catalogue-chip" data-filter="unisex">Unisex</button>
-        </div>
+      <div class="section-header">
+        <span class="label reveal-up">✦ The Collection ✦</span>
+        <h2 class="heading-2 reveal-up">Discover<br><span class="text-gold-gradient">The Art of Fragrance</span></h2>
+        <div class="divider divider-wide reveal-up"></div>
+        <p class="subheading reveal-up" style="max-width: 600px; margin: 0 auto;">
+          Explore the complete AR-RAHMANI collection of handcrafted perfumes — each one an ode to timeless Arabian luxury.
+        </p>
+      </div>
 
-        <div class="catalogue-search-wrap">
-          <svg class="catalogue-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input type="text" class="catalogue-search" id="catalogue-search" placeholder="Search fragrances..." aria-label="Search fragrances">
+      <!-- Preview images row -->
+      <div class="reveal-up" style="display: flex; justify-content: center; gap: var(--space-5); margin: var(--space-9) auto var(--space-8); max-width: 700px; flex-wrap: wrap;">
+        <div style="width: 180px; aspect-ratio: 3/4; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid rgba(255,255,255,0.06); background: var(--color-bg-secondary);">
+          <img src="assets/images/4.webp" alt="HAMOOD" loading="lazy" decoding="async" style="width: 100%; height: 100%; object-fit: contain; padding: 12px;">
         </div>
-
-        <div class="catalogue-sort-wrap">
-          <select class="catalogue-sort" id="catalogue-sort" aria-label="Sort fragrances">
-            <option value="newest">Newest</option>
-            <option value="best-selling">Best Selling</option>
-            <option value="alphabetical">Alphabetical</option>
-            <option value="price-low">Price: Low → High</option>
-            <option value="price-high">Price: High → Low</option>
-          </select>
-          <svg class="catalogue-sort-arrow" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5">
-            <polyline points="1 1 5 5 9 1"></polyline>
-          </svg>
+        <div style="width: 180px; aspect-ratio: 3/4; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid rgba(255,255,255,0.06); background: var(--color-bg-secondary);">
+          <img src="assets/images/5.webp" alt="Paradise Fusion" loading="lazy" decoding="async" style="width: 100%; height: 100%; object-fit: contain; padding: 12px;">
+        </div>
+        <div style="width: 180px; aspect-ratio: 3/4; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid rgba(255,255,255,0.06); background: var(--color-bg-secondary);">
+          <img src="assets/images/sabr.webp" alt="SABR" loading="lazy" decoding="async" style="width: 100%; height: 100%; object-fit: contain; padding: 12px;">
         </div>
       </div>
 
-      <!-- Product Grid -->
-      <div class="catalogue-grid" id="catalogue-grid"></div>
-
-      <!-- Explore The Collection Button -->
-      <div class="catalogue-explore-wrap" id="catalogue-explore-wrap">
-        <button class="catalogue-explore-btn" id="catalogue-explore-btn">
-          <span>EXPLORE ALL COLLECTION</span>
+      <!-- CTA Button -->
+      <div class="reveal-up">
+        <a href="collection.html" class="btn" style="display: inline-flex; align-items: center; gap: 10px; padding: 16px 40px; border: 1px solid var(--color-gold-border); background: rgba(212, 175, 55, 0.06); color: var(--color-gold); font-size: var(--text-sm); font-weight: var(--weight-medium); letter-spacing: var(--tracking-wider); text-transform: uppercase; border-radius: var(--radius-sm); transition: all 0.4s var(--ease-luxury);">
+          <span>EXPLORE THE COLLECTION</span>
           <span class="btn-arrow">→</span>
-        </button>
+        </a>
       </div>
     </div>
   </section>
@@ -917,12 +880,9 @@
   <script src="js/shopify.js" defer></script>
   <script src="js/cart-service.js" defer></script>
   <script src="js/shopify-cart-ui.js" defer></script>
-  <script src="js/catalogue.js" defer></script>
+  <!-- catalogue.js removed — collection lives on collection.html -->
 
-  <!-- Quick View Modal (Top-level viewport fixed popup) -->
-  <div class="cat-modal-overlay" id="cat-modal-overlay">
-    <div class="cat-modal" id="cat-modal"></div>
-  </div>
+  <!-- Quick View Modal removed — product details live on product.html -->
 
   <script src="js/main.js"></script>
 </body>

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Explore the complete Ar-Rahmani collection of luxury Extrait de Parfum. Handcrafted niche fragrances inspired by timeless elegance and exceptional ingredients.">
+  <meta name="keywords"
+    content="luxury perfume collection, extrait de parfum, niche fragrance, oud, Arabian perfume, premium fragrance">
+  <meta name="author" content="Ar-Rahmani Perfumes">
+  <meta name="theme-color" content="#050505">
+  <meta property="og:title" content="The Collection — Ar-Rahmani Perfumes">
+  <meta property="og:description"
+    content="Explore the complete Ar-Rahmani collection of luxury Extrait de Parfum.">
+  <meta property="og:type" content="website">
+  <title>The Collection — Ar-Rahmani | Luxury Extrait de Parfum</title>
+
+  <!-- DNS Prefetch & Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://unpkg.com">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/design-system.css?v=1.3">
+  <link rel="stylesheet" href="css/animations.css?v=1.3">
+  <link rel="stylesheet" href="css/components.css?v=1.3">
+  <link rel="stylesheet" href="css/sections.css?v=1.3">
+  <link rel="stylesheet" href="css/catalogue.css?v=1.1">
+  <link rel="stylesheet" href="css/collection-page.css?v=1.0">
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Roboto+Flex:opsz,wdth,wght@8..144,25..151,100..1000&display=swap"
+    rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/images/logo.webp">
+</head>
+
+<body class="collection-page">
+
+  <!-- ============================================================
+       CUSTOM CURSOR
+       ============================================================ -->
+  <div class="cursor-dot" id="cursor-dot"></div>
+  <div class="cursor-ring" id="cursor-ring"></div>
+
+  <!-- ============================================================
+       NAVIGATION
+       ============================================================ -->
+  <nav class="navbar" id="navbar">
+    <div class="navbar-inner">
+      <div class="navbar-links">
+        <a href="index.html#about">About</a>
+        <a href="index.html#craftsmanship">Craftsmanship</a>
+        <a href="collection.html" class="active">Collection</a>
+      </div>
+      <a href="index.html" class="navbar-logo">
+        <img src="assets/images/logo.webp" alt="Ar-Rahmani" class="navbar-logo-img" fetchpriority="high">
+      </a>
+      <div class="navbar-links-right">
+        <a href="index.html#journal">Journal</a>
+        <a href="index.html#contact">Contact</a>
+        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Navigation -->
+  <div class="mobile-nav" id="mobile-nav">
+    <img src="assets/images/fulllogo.webp" alt="Ar-Rahmani Perfumes" class="mobile-nav-logo" loading="lazy"
+      decoding="async">
+    <a href="index.html#about">About</a>
+    <a href="index.html#craftsmanship">Craftsmanship</a>
+    <a href="collection.html" class="active">Collection</a>
+    <a href="index.html#journal">Journal</a>
+    <a href="index.html#contact">Contact</a>
+  </div>
+
+  <!-- ============================================================
+       COLLECTION HERO
+       ============================================================ -->
+  <section class="collection-hero">
+    <!-- Ambient Glows -->
+    <div class="collection-glow collection-glow--1"></div>
+    <div class="collection-glow collection-glow--2"></div>
+    <div class="collection-glow collection-glow--3"></div>
+
+    <div class="collection-hero-content">
+      <!-- Breadcrumb -->
+      <nav class="collection-breadcrumb" aria-label="Breadcrumb">
+        <a href="index.html">Home</a>
+        <span class="breadcrumb-sep">◆</span>
+        <span class="breadcrumb-current">Collection</span>
+      </nav>
+
+      <span class="collection-hero-badge">✦ Luxury Fragrances ✦</span>
+      <h1 class="collection-hero-title">The <span class="text-gold-gradient">Collection</span></h1>
+      <div class="collection-hero-divider"></div>
+      <p class="collection-hero-subtitle">
+        Explore the complete AR-RAHMANI collection of handcrafted perfumes — each one an ode to timeless Arabian luxury.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       LUXURY FRAGRANCE CATALOGUE — Full Collection
+       ============================================================ -->
+  <section class="catalogue" id="catalogue">
+    <!-- Ambient Background -->
+    <div class="catalogue-ambient">
+      <div class="catalogue-ambient-glow catalogue-ambient-glow--1"></div>
+      <div class="catalogue-ambient-glow catalogue-ambient-glow--2"></div>
+      <div class="catalogue-ambient-glow catalogue-ambient-glow--3"></div>
+      <canvas class="catalogue-dust-canvas" id="catalogue-dust"></canvas>
+    </div>
+
+    <div class="catalogue-inner">
+      <!-- Collection Counter -->
+      <div class="catalogue-counter" id="catalogue-counter" style="text-align: center; margin-bottom: var(--space-8);">
+        <span class="catalogue-counter-number" id="catalogue-counter-num">0</span>
+        <span id="catalogue-counter-label">Luxury Fragrances</span>
+      </div>
+
+      <!-- Toolbar: Filters, Search, Sort -->
+      <div class="catalogue-toolbar" id="catalogue-toolbar">
+        <div class="catalogue-filters" id="catalogue-filters">
+          <button class="catalogue-chip active" data-filter="all">All</button>
+          <button class="catalogue-chip" data-filter="extrait de parfum">Extrait de Parfum</button>
+          <button class="catalogue-chip" data-filter="parfum">Parfum</button>
+          <button class="catalogue-chip" data-filter="oriental">Oriental</button>
+          <button class="catalogue-chip" data-filter="woody">Woody</button>
+          <button class="catalogue-chip" data-filter="floral">Floral</button>
+          <button class="catalogue-chip" data-filter="fresh">Fresh</button>
+          <button class="catalogue-chip" data-filter="sweet">Sweet</button>
+          <button class="catalogue-chip" data-filter="oud">Oud</button>
+          <button class="catalogue-chip" data-filter="amber">Amber</button>
+          <button class="catalogue-chip" data-filter="unisex">Unisex</button>
+        </div>
+
+        <div class="catalogue-search-wrap">
+          <svg class="catalogue-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" class="catalogue-search" id="catalogue-search" placeholder="Search fragrances..." aria-label="Search fragrances">
+        </div>
+
+        <div class="catalogue-sort-wrap">
+          <select class="catalogue-sort" id="catalogue-sort" aria-label="Sort fragrances">
+            <option value="newest">Newest</option>
+            <option value="best-selling">Best Selling</option>
+            <option value="alphabetical">Alphabetical</option>
+            <option value="price-low">Price: Low → High</option>
+            <option value="price-high">Price: High → Low</option>
+          </select>
+          <svg class="catalogue-sort-arrow" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polyline points="1 1 5 5 9 1"></polyline>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Product Grid -->
+      <div class="catalogue-grid" id="catalogue-grid"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="footer" id="contact">
+    <div class="container">
+      <!-- Newsletter -->
+      <div class="footer-newsletter reveal-up">
+        <h3 class="heading-4">Enter the World of <span class="text-gold-gradient">Ar-Rahmani</span></h3>
+        <p class="subheading">Subscribe for exclusive previews, limited editions, and the art of luxury fragrance.</p>
+        <form class="newsletter-form" id="newsletter-form">
+          <input type="email" class="newsletter-input" placeholder="Your email address" required
+            aria-label="Email address">
+          <button type="submit" class="btn btn-primary">
+            <span>Subscribe</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Footer Grid -->
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo">
+            <img src="assets/images/fulllogo.webp" alt="Ar-Rahmani Perfumes" class="footer-logo-img" loading="lazy"
+              decoding="async">
+          </a>
+          <p>Luxury Extrait de Parfum. Handcrafted niche fragrances inspired by timeless elegance, exceptional
+            ingredients, and unforgettable memories.</p>
+          <div class="footer-social">
+            <a href="#" aria-label="Instagram">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M7.75 2h8.5C19.423 2 22 4.577 22 7.75v8.5C22 19.423 19.423 22 16.25 22h-8.5C4.577 22 2 19.423 2 16.25v-8.5C2 4.577 4.577 2 7.75 2Zm8.5 1.5h-8.5c-2.343 0-4.25 1.907-4.25 4.25v8.5c0 2.343 1.907 4.25 4.25 4.25h8.5c2.343 0 4.25-1.907 4.25-4.25v-8.5c0-2.343-1.907-4.25-4.25-4.25ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm5.25-.5a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Z" />
+              </svg>
+            </a>
+            <a href="#" aria-label="Facebook">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M14.53 10.66h3.4l-.54 3.38h-2.86V22h-4.05v-7.96h-2.7v-3.38h2.7V8.42c0-2.67 1.63-4.13 4.02-4.13 1.14 0 2.12.08 2.4.12v2.78l-1.65.01c-1.29 0-1.54.61-1.54 1.51v1.95Z" />
+              </svg>
+            </a>
+            <a href="#" aria-label="X (Twitter)">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+            </a>
+            <a href="#" aria-label="TikTok">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.95v7.4c-.01 1.94-.69 3.84-1.95 5.3-1.26 1.47-3.08 2.42-5.03 2.62-1.95.21-3.95-.14-5.63-1.07-1.68-.94-3.01-2.42-3.78-4.2-.76-1.78-.92-3.79-.45-5.67.46-1.87 1.5-3.53 2.94-4.68 1.45-1.16 3.23-1.77 5.11-1.75.14 0 .28.01.42.02v4.06c-.84-.13-1.71-.05-2.48.24-.76.29-1.42.82-1.88 1.5-.47.67-.71 1.49-.68 2.31.02.82.32 1.61.85 2.22.52.61 1.25 1.01 2.05 1.12.8.11 1.62-.02 2.32-.38.71-.35 1.29-.91 1.64-1.61.35-.7.54-1.48.54-2.28V.02h4.08z" />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div>
+          <h5 class="footer-heading">Maison</h5>
+          <div class="footer-links">
+            <a href="index.html#about">Our Story</a>
+            <a href="index.html#craftsmanship">Craftsmanship</a>
+            <a href="index.html#journal">Ingredients</a>
+          </div>
+        </div>
+
+        <div>
+          <h5 class="footer-heading">Connect</h5>
+          <div class="footer-links">
+            <a href="#">Customer Care</a>
+            <a href="#">Store Locator</a>
+            <a href="#">Wholesale</a>
+            <a href="#">Press & Media</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Bar -->
+      <div class="footer-bottom">
+        <p>© 2026 Ar-Rahmani Perfumes. All rights reserved.</p>
+        <p>Crafted with ♦ for the connoisseur.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       SCRIPTS
+       ============================================================ -->
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <!-- Lenis Smooth Scroll -->
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+
+  <!-- Core -->
+  <script src="js/cursor.js"></script>
+  <script src="js/animations.js"></script>
+
+  <!-- Shopify -->
+  <script src="js/shopify-config.js"></script>
+  <script src="js/shopify.js"></script>
+  <script src="js/cart-service.js"></script>
+  <script src="js/shopify-cart-ui.js"></script>
+
+  <!-- Collection Page Module (replaces catalogue.js) -->
+  <script src="js/collection-page.js"></script>
+
+  <!-- Lenis + Mobile Menu -->
+  <script>
+    // Lightweight init for collection page (no hero scroll, no particles, no fold-text)
+    const CollectionApp = {
+      lenis: null,
+      init() {
+        if (typeof Cursor !== 'undefined') Cursor.init();
+        if (typeof Animations !== 'undefined') Animations.init();
+
+        this.initLenis();
+        this.setupMobileMenu();
+        this.setupNewsletterForm();
+
+        // Cart init
+        if (window.CartService) CartService.init();
+      },
+
+      initLenis() {
+        try {
+          if (typeof Lenis === 'undefined') return;
+          const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 768);
+          if (isTouch) return;
+
+          this.lenis = new Lenis({
+            duration: 1.5,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            smoothWheel: true,
+            wheelMultiplier: 0.85,
+            touchMultiplier: 0,
+            smoothTouch: false,
+          });
+          window.lenis = this.lenis;
+
+          this.lenis.on('scroll', () => {
+            if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.update();
+          });
+
+          if (typeof gsap !== 'undefined') {
+            gsap.ticker.add((time) => this.lenis.raf(time * 1000));
+            gsap.ticker.lagSmoothing(0);
+          }
+
+          // Smooth anchor scrolling
+          document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', (e) => {
+              const targetId = anchor.getAttribute('href');
+              if (targetId === '#' || targetId.length <= 1) return;
+              const targetEl = document.querySelector(targetId);
+              if (targetEl) {
+                e.preventDefault();
+                this.lenis.scrollTo(targetEl, { offset: 0, duration: 1.4 });
+              }
+            });
+          });
+        } catch (e) {
+          console.warn('Lenis error:', e);
+        }
+      },
+
+      setupMobileMenu() {
+        const toggle = document.getElementById('menu-toggle');
+        const mobileNav = document.getElementById('mobile-nav');
+        const navbar = document.getElementById('navbar');
+        if (!toggle || !mobileNav) return;
+
+        toggle.addEventListener('click', () => {
+          toggle.classList.toggle('active');
+          mobileNav.classList.toggle('active');
+          if (navbar) navbar.classList.toggle('active');
+          document.body.style.overflow = mobileNav.classList.contains('active') ? 'hidden' : '';
+        });
+
+        mobileNav.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', () => {
+            toggle.classList.remove('active');
+            mobileNav.classList.remove('active');
+            if (navbar) navbar.classList.remove('active');
+            document.body.style.overflow = '';
+          });
+        });
+      },
+
+      setupNewsletterForm() {
+        const form = document.getElementById('newsletter-form');
+        if (!form) return;
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const input = form.querySelector('input[type="email"]');
+          if (input && input.value) {
+            const btn = form.querySelector('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span>Thank You ✓</span>';
+            input.value = '';
+            setTimeout(() => { btn.innerHTML = originalText; }, 3000);
+          }
+        });
+      }
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => CollectionApp.init());
+    } else {
+      CollectionApp.init();
+    }
+  </script>
+
+</body>
+
+</html>
