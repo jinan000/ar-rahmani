@@ -363,7 +363,7 @@ const ShopifyCartUI = {
                  const flatVariants = match.variants?.edges ? match.variants.edges.map(e => e.node) : match.variants;
                  if (flatVariants && flatVariants.length > 0) {
                    localProd.shopifyVariantId = flatVariants[0].id;
-                   localProd.price = `$${parseFloat(flatVariants[0].price.amount).toFixed(2)}`;
+                   localProd.price = `${parseFloat(flatVariants[0].price.amount).toFixed(2)}`;
                  }
                }
              });
